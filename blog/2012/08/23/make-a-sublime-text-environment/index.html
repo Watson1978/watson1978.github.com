@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>UIView のオブジェクトを Interactive Shell を使って修正する - Watson's Blog</title>
+  <title>Sublime Text を導入して RubyMotion アプリ開発をもっと楽しいものに - Watson's Blog</title>
   <meta name="author" content="Watson">
 
   
-  <meta name="description" content="RubyMotion Screencast を見ていて、シミュレータで UIView のオブジェクトを選択して Interactive Shell で手直しできるなんて cool ですね。 さて、Screencast でたぶん説明されていたのでしょうが、シミュレータ上に表示されている UIView &hellip;">
+  <meta name="description" content="Twitter のつぶやきを眺めていると、RubyMotion アプリ開発では Sublime Text をエディタに使うのが定番になってきた感じがします。 いい加減、私もライセンスを購入しないといけないなと思いつつ、環境構築の手順などをまとめておきます。 1. Sublime Text &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://watson1978.github.com/blog/2012/05/08/using-interactive-shell/">
+  <link rel="canonical" href="http://watson1978.github.com/blog/2012/08/23/make-a-sublime-text-environment/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -78,7 +78,7 @@
   
   <header>
     
-      <h1 class="entry-title">UIView のオブジェクトを Interactive Shell を使って修正する</h1>
+      <h1 class="entry-title">Sublime Text を導入して RubyMotion アプリ開発をもっと楽しいものに</h1>
     
     
       <p class="meta">
@@ -94,7 +94,7 @@
   
 
 
-<time datetime="2012-05-08T15:01:00+09:00" pubdate data-updated="true">May 8<span>th</span>, 2012</time>
+<time datetime="2012-08-23T22:19:00+09:00" pubdate data-updated="true">Aug 23<span>rd</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -103,54 +103,99 @@
   </header>
 
 
-<div class="entry-content"><p><a href="http://pragmaticstudio.com/screencasts/rubymotion">RubyMotion Screencast</a> を見ていて、シミュレータで UIView のオブジェクトを選択して Interactive Shell で手直しできるなんて cool ですね。</p>
+<div class="entry-content"><p>Twitter のつぶやきを眺めていると、RubyMotion アプリ開発では <a href="http://www.sublimetext.com/">Sublime Text</a> をエディタに使うのが定番になってきた感じがします。</p>
 
-<p>さて、Screencast でたぶん説明されていたのでしょうが、シミュレータ上に表示されている UIView のパーツをどのように選択するのかがわからなかったので試してみました。</p>
+<p>いい加減、私もライセンスを購入しないといけないなと思いつつ、環境構築の手順などをまとめておきます。</p>
 
 <!-- more -->
 
 
-<p><kbd>command</kbd> キーを押しながらシミュレータ上でマウスカーソルを移動していると、赤い枠線が表示されます。</p>
+<h2>1. Sublime Text をインストール</h2>
 
-<p><img src="/images/blog/select_uiview.png" alt="UIView のパーツを選択" /></p>
+<p><a href="http://www.sublimetext.com/">公式サイト</a> から Sublime Text をダウンロードしてインストールします。</p>
 
-<p>赤い枠線が表示されると Interactive Shell のプロンプトが、</p>
+<h2>2. Sublime Package Control をインストール</h2>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>(main)&gt;&gt; </span></code></pre></td></tr></table></div></figure>
+<p>Sublime Text は Python で plugin を作成でき、さまざまな機能追加ができるようになっています。Github などを眺めていると便利な plugin がパッケージとしていろいろあります。<a href="http://wbond.net/sublime_packages/package_control">Package Control</a> は、それらパッケージのインストールや不要になった際にはアンインストールしたりと、文字通りパッケージの管理が簡単になります。</p>
 
-
-<p>から</p>
+<p>Sublime Text を起動し、[View] -> [Show Console] とメニューを選択し (ショートカット : <kbd>control</kbd> + <kbd>`</kbd>)、コンソールに次の文をコピー&amp;ペーストし <kbd>Enter</kbd> を押下して実行します。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>(#&lt;UILabel:0x6c52210&gt;)?&gt;  </span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class=''><span class='line'>import urllib2,os; pf='Package Control.sublime-package'; ipp=sublime.installed_packages_path(); os.makedirs(ipp) if not os.path.exists(ipp) else None; urllib2.install_opener(urllib2.build_opener(urllib2.ProxyHandler())); open(os.path.join(ipp,pf),'wb').write(urllib2.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read()); print 'Please restart Sublime Text to finish installation'</span></code></pre></td></tr></table></div></figure>
 
 
-<p>へと変わります。この状態では、まだ選択が確定していないらしく、マウスカーソルを移動したりすると、プロンプトが元に戻ってしまいます。</p>
+<p>Sublime Text を再起動すると、Package Control が利用できるようになります。</p>
 
-<p>選択状態を確定するには、<kbd>command</kbd> キーを押しながらクリックすると良いみたいです。プロンプトが</p>
+<h2>3. SublimeRubyMotionBuilder をインストール</h2>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>(#&lt;UILabel:0x6c52210&gt;)&gt;&gt;  </span></code></pre></td></tr></table></div></figure>
+<p>次に、<a href="https://twitter.com/haraken3">@haraken3</a> さんが開発されている <a href="https://github.com/haraken3/SublimeRubyMotionBuilder">SublimeRubyMotionBuilder</a> プラグインを導入します。コード補完や、アプリ開発に便利な機能が追加されます。</p>
+
+<p>[Tools] -> [Command Palette&#8230;] とメニューを選択し (ショートカット : <kbd>command</kbd> + <kbd>shift</kbd> + <kbd>p</kbd>)、表示されるダイアログに「install package」と入力し実行します。</p>
+
+<p><img src="/images/blog/sublime-install-package.png" alt="install package dialog" /></p>
+
+<p>次に、「RubyMotionBuilder」と入力し <kbd>Enter</kbd> を押下するとプラグインがインストールされます。</p>
+
+<p><img src="/images/blog/sublime-RubyMotionBuilder.png" alt="RubyMotionBuilder" /></p>
+
+<p>RubyMotion のコード(*.rb) か Rakefile を開いた状態にしておくと、以下のようなコマンドが使えるようになり、いちいち Terminal に戻ってでビルドしたりする必要がなくなり便利です。</p>
+
+<table class="table">
+<tr><th>内容</th><th>ショートカット</th></tr>
+<tr>
+    <td>Build</td>
+    <td><kbd>command</kbd> + <kbd>b</kbd> <br />(エラーがあった場合 <kbd>F4</kbd> でジャンプ)</td>
+</tr>
+<tr>
+    <td>Clean</td>
+    <td><kbd>command</kbd> + <kbd>shift</kbd> + <kbd>p</kbd> の後、「clean」と入力</td>
+</tr>
+<tr>
+    <td>Run</td>
+    <td><kbd>command</kbd> + <kbd>r</kbd> <br />(シミュレータを Retina モードにする場合、<kbd>command</kbd> + <kbd>shift</kbd> + <kbd>r</kbd> )</td>
+</tr>
+<tr>
+    <td>Deploy</td>
+    <td><kbd>command</kbd> + <kbd>option</kbd> + <kbd>b</kbd></td>
+</tr>
+
+</table>
 
 
-<p>と、? が消えて >> になります。選択したオブジェクトがレシーバになるので、</p>
+<h2>4. SublimeLinter をインストール</h2>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p><a href="http://www.willprater.me/blog/2012/07/24/rubymotion-linting-and-highlighting-with-sublime-text/">RubyMotion Linting and Highlighting With Sublime Text</a> で知ったのですが、<a href="https://github.com/SublimeLinter/SublimeLinter">SublimeLinter</a> を導入すると、アプリをコンパイルする前に文法エラーとなる箇所を教えてくれるようになります。</p>
+
+<p><img src="/images/blog/sublime-SublimeLinter.png" alt="SublimeLinter" /></p>
+
+<p>さっそく、SublimeLinter をインストールしてみましょう(上のサイトに書いてあるとおりですが・・・)。</p>
+
+<p>[Tools] -> [Command Palette&#8230;] とメニューを選択し (ショートカット : <kbd>command</kbd> + <kbd>shift</kbd> + <kbd>p</kbd>)、表示されるダイアログに「install package」と入力し実行します。「SublimeLinter」と入力し <kbd>Enter</kbd> を押下します。</p>
+
+<p>つぎに [Preferences] -> [Browse Packages&#8230;] を選択します。</p>
+
+<p><img src="/images/blog/sublime-browse-package.png" alt="Browse Packages" /></p>
+
+<p>パッケージがインストールされているディレクトリが、Finder で開かれます。 Finder で <code>SublimeLinter/sublimelinter/modules</code> のディレクトリまで行き、<code>ruby_motion.py</code> というファイルを作成し、次の内容をコピー&amp;ペースとします。</p>
+
+<figure class='code'><figcaption><span>ruby_motion.py</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>(#&lt;UILabel:0x6d10f40&gt;)&gt;&gt; self         
-</span><span class='line'>=&gt; #&lt;UILabel:0x6d10f40&gt;
-</span><span class='line'>(#&lt;UILabel:0x6d10f40&gt;)&gt;&gt; self.frame
-</span><span class='line'>=&gt; #&lt;CGRect origin=#&lt;CGPoint x=20.0 y=200.0&gt; size=#&lt;CGSize width=300.0 height=30.0&gt;&gt;
-</span><span class='line'>(#&lt;UILabel:0x6d10f40&gt;)&gt;&gt; self.backgroundColor = UIColor.lightGrayColor
-</span><span class='line'>=&gt; #&lt;UICachedDeviceWhiteColor:0x8c868b0&gt;</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">from</span> <span class="nn">ruby</span> <span class="kn">import</span> <span class="n">Linter</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s">&#39;language&#39;</span><span class="p">:</span> <span class="s">&#39;RubyMotion&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s">&#39;executable&#39;</span><span class="p">:</span> <span class="s">&#39;/Library/RubyMotion/bin/ruby&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s">&#39;lint_args&#39;</span><span class="p">:</span> <span class="s">&#39;-wc&#39;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-<p>などとメッセージを送信すると、Interactive Shell から配色を変更したり、位置を変更したりできます。</p>
+<p>これで RubyMotion アプリ開発がもっと楽になるのではないでしょうか〜。 Enjoy!</p>
 </div>
 
 
@@ -173,14 +218,8 @@
   
 
 
-<time datetime="2012-05-08T15:01:00+09:00" pubdate data-updated="true">May 8<span>th</span>, 2012</time>
+<time datetime="2012-08-23T22:19:00+09:00" pubdate data-updated="true">Aug 23<span>rd</span>, 2012</time>
       
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/rubymotion/'>RubyMotion</a>
-  
-</span>
 
 
     </p>
@@ -197,7 +236,7 @@
   <a href="#" onclick="Evernote.doClip({}); return false;"><img src="http://static.evernote.com/site-mem-32.png"  height="20" width="20" style="border: none;" alt="Clip to Evernote" /></a>
   
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://watson1978.github.com/blog/2012/05/08/using-interactive-shell/" data-via="watson1978" data-counturl="http://watson1978.github.com/blog/2012/05/08/using-interactive-shell/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://watson1978.github.com/blog/2012/08/23/make-a-sublime-text-environment/" data-via="watson1978" data-counturl="http://watson1978.github.com/blog/2012/08/23/make-a-sublime-text-environment/" >Tweet</a>
   
   
   <div class="fb-like" data-send="false" data-layout="button_count" data-show-faces="true"></div>
@@ -210,10 +249,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/05/03/creating-an-ios-application-using-rubymotion_en/" title="Previous Post: Creating an iOS Application using RubyMotion">&laquo; Creating an iOS Application using RubyMotion</a>
+        <a class="basic-alignment left" href="/blog/2012/08/22/make-a-gradient/" title="Previous Post: CGGradient を使ってグラデーションを作る">&laquo; CGGradient を使ってグラデーションを作る</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2012/05/08/specs-for-stopwatch-app/" title="Next Post: RubyMotion で作成したアプリのテストケースを書いてみました">RubyMotion で作成したアプリのテストケースを書いてみました &raquo;</a>
       
     </p>
   </footer>
@@ -305,8 +342,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://watson1978.github.com/blog/2012/05/08/using-interactive-shell/';
-        var disqus_url = 'http://watson1978.github.com/blog/2012/05/08/using-interactive-shell/';
+        var disqus_identifier = 'http://watson1978.github.com/blog/2012/08/23/make-a-sublime-text-environment/';
+        var disqus_url = 'http://watson1978.github.com/blog/2012/08/23/make-a-sublime-text-environment/';
         var disqus_script = 'embed.js';
       
     (function () {

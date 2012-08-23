@@ -4,7 +4,7 @@
   <title><![CDATA[Watson's Blog]]></title>
   <link href="http://watson1978.github.com/atom.xml" rel="self"/>
   <link href="http://watson1978.github.com/"/>
-  <updated>2012-08-23T09:56:03+09:00</updated>
+  <updated>2012-08-23T23:57:47+09:00</updated>
   <id>http://watson1978.github.com/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -12,6 +12,107 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Sublime Text を導入して RubyMotion アプリ開発をもっと楽しいものに]]></title>
+    <link href="http://watson1978.github.com/blog/2012/08/23/make-a-sublime-text-environment/"/>
+    <updated>2012-08-23T22:19:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/08/23/make-a-sublime-text-environment</id>
+    <content type="html"><![CDATA[<p>Twitter のつぶやきを眺めていると、RubyMotion アプリ開発では <a href="http://www.sublimetext.com/">Sublime Text</a> をエディタに使うのが定番になってきた感じがします。</p>
+
+<p>いい加減、私もライセンスを購入しないといけないなと思いつつ、環境構築の手順などをまとめておきます。</p>
+
+<!-- more -->
+
+
+<h2>1. Sublime Text をインストール</h2>
+
+<p><a href="http://www.sublimetext.com/">公式サイト</a> から Sublime Text をダウンロードしてインストールします。</p>
+
+<h2>2. Sublime Package Control をインストール</h2>
+
+<p>Sublime Text は Python で plugin を作成でき、さまざまな機能追加ができるようになっています。Github などを眺めていると便利な plugin がパッケージとしていろいろあります。<a href="http://wbond.net/sublime_packages/package_control">Package Control</a> は、それらパッケージのインストールや不要になった際にはアンインストールしたりと、文字通りパッケージの管理が簡単になります。</p>
+
+<p>Sublime Text を起動し、[View] -> [Show Console] とメニューを選択し (ショートカット : <kbd>control</kbd> + <kbd>`</kbd>)、コンソールに次の文をコピー&amp;ペーストし <kbd>Enter</kbd> を押下して実行します。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>import urllib2,os; pf='Package Control.sublime-package'; ipp=sublime.installed_packages_path(); os.makedirs(ipp) if not os.path.exists(ipp) else None; urllib2.install_opener(urllib2.build_opener(urllib2.ProxyHandler())); open(os.path.join(ipp,pf),'wb').write(urllib2.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read()); print 'Please restart Sublime Text to finish installation'</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Sublime Text を再起動すると、Package Control が利用できるようになります。</p>
+
+<h2>3. SublimeRubyMotionBuilder をインストール</h2>
+
+<p>次に、<a href="https://twitter.com/haraken3">@haraken3</a> さんが開発されている <a href="https://github.com/haraken3/SublimeRubyMotionBuilder">SublimeRubyMotionBuilder</a> プラグインを導入します。コード補完や、アプリ開発に便利な機能が追加されます。</p>
+
+<p>[Tools] -> [Command Palette&#8230;] とメニューを選択し (ショートカット : <kbd>command</kbd> + <kbd>shift</kbd> + <kbd>p</kbd>)、表示されるダイアログに「install package」と入力し実行します。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/sublime-install-package.png" alt="install package dialog" /></p>
+
+<p>次に、「RubyMotionBuilder」と入力し <kbd>Enter</kbd> を押下するとプラグインがインストールされます。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/sublime-RubyMotionBuilder.png" alt="RubyMotionBuilder" /></p>
+
+<p>RubyMotion のコード(*.rb) か Rakefile を開いた状態にしておくと、以下のようなコマンドが使えるようになり、いちいち Terminal に戻ってでビルドしたりする必要がなくなり便利です。</p>
+
+<table class="table">
+<tr><th>内容</th><th>ショートカット</th></tr>
+<tr>
+    <td>Build</td>
+    <td><kbd>command</kbd> + <kbd>b</kbd> <br />(エラーがあった場合 <kbd>F4</kbd> でジャンプ)</td>
+</tr>
+<tr>
+    <td>Clean</td>
+    <td><kbd>command</kbd> + <kbd>shift</kbd> + <kbd>p</kbd> の後、「clean」と入力</td>
+</tr>
+<tr>
+    <td>Run</td>
+    <td><kbd>command</kbd> + <kbd>r</kbd> <br />(シミュレータを Retina モードにする場合、<kbd>command</kbd> + <kbd>shift</kbd> + <kbd>r</kbd> )</td>
+</tr>
+<tr>
+    <td>Deploy</td>
+    <td><kbd>command</kbd> + <kbd>option</kbd> + <kbd>b</kbd></td>
+</tr>
+
+</table>
+
+
+<h2>4. SublimeLinter をインストール</h2>
+
+<p><a href="http://www.willprater.me/blog/2012/07/24/rubymotion-linting-and-highlighting-with-sublime-text/">RubyMotion Linting and Highlighting With Sublime Text</a> で知ったのですが、<a href="https://github.com/SublimeLinter/SublimeLinter">SublimeLinter</a> を導入すると、アプリをコンパイルする前に文法エラーとなる箇所を教えてくれるようになります。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/sublime-SublimeLinter.png" alt="SublimeLinter" /></p>
+
+<p>さっそく、SublimeLinter をインストールしてみましょう(上のサイトに書いてあるとおりですが・・・)。</p>
+
+<p>[Tools] -> [Command Palette&#8230;] とメニューを選択し (ショートカット : <kbd>command</kbd> + <kbd>shift</kbd> + <kbd>p</kbd>)、表示されるダイアログに「install package」と入力し実行します。「SublimeLinter」と入力し <kbd>Enter</kbd> を押下します。</p>
+
+<p>つぎに [Preferences] -> [Browse Packages&#8230;] を選択します。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/sublime-browse-package.png" alt="Browse Packages" /></p>
+
+<p>パッケージがインストールされているディレクトリが、Finder で開かれます。 Finder で <code>SublimeLinter/sublimelinter/modules</code> のディレクトリまで行き、<code>ruby_motion.py</code> というファイルを作成し、次の内容をコピー&amp;ペースとします。</p>
+
+<figure class='code'><figcaption><span>ruby_motion.py</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">from</span> <span class="nn">ruby</span> <span class="kn">import</span> <span class="n">Linter</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s">&#39;language&#39;</span><span class="p">:</span> <span class="s">&#39;RubyMotion&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s">&#39;executable&#39;</span><span class="p">:</span> <span class="s">&#39;/Library/RubyMotion/bin/ruby&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s">&#39;lint_args&#39;</span><span class="p">:</span> <span class="s">&#39;-wc&#39;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>これで RubyMotion アプリ開発がもっと楽になるのではないでしょうか〜。 Enjoy!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[CGGradient を使ってグラデーションを作る]]></title>
