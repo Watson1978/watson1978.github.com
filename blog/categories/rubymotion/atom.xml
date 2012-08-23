@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: RubyMotion | Watson's Blog]]></title>
+  <link href="http://watson1978.github.com/blog/categories/rubymotion/atom.xml" rel="self"/>
+  <link href="http://watson1978.github.com/"/>
+  <updated>2012-08-23T09:39:40+09:00</updated>
+  <id>http://watson1978.github.com/</id>
+  <author>
+    <name><![CDATA[Watson]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[CGGradient を使ってグラデーションを作る]]></title>
+    <link href="http://watson1978.github.com/blog/2012/08/22/make-a-gradient/"/>
+    <updated>2012-08-22T22:59:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/08/22/make-a-gradient</id>
+    <content type="html"><![CDATA[<p>RubyMotion で <a href="https://developer.apple.com/library/mac/#documentation/graphicsimaging/reference/CGGradient/Reference/reference.html">CGGradient</a> を使ってグラデーションを作る際に 2 点ほどポイントがありそうです。</p>
+
+<!-- more -->
+
+
+<h2>1. Pointer クラスを使用する</h2>
+
+<p>CGGradient オブジェクトを作成する際に使用する関数 <code>CGGradientCreateWithColorComponents</code> は <code>CGFloat</code> 型の配列を受け取ります(変数 <code>components</code>, <code>locations</code> に注目してください)。</p>
+
+<p><code>c
+CGGradientRef CGGradientCreateWithColorComponents(
+   CGColorSpaceRef space,
+   const CGFloat components[],
+   const CGFloat locations[],
+   size_t count
+);
+</code></p>
+
+<p>もし引数が Ruby の Array クラスや、Objective-C の NSArray を受け取るなら話は簡単なのですが、ここでは <code>CGFloat</code> 型の配列なので、RubyMotion で用意されている Pointer クラスを使い <code>CGFloat</code> 型の配列と同等のものを作ります。以下のようなコードになります。</p>
+
+<p><code>ruby
+float_array = Pointer.new(:float, size)
+</code></p>
+
+<h2>2. kCGGradientDrawsXXXX 定数</h2>
+
+<p>CGGradient では <code>kCGGradientDrawsBeforeStartLocation</code> と <code>kCGGradientDrawsAfterEndLocation</code> という定数が用意されています。どちらも小文字から始まる定数です。</p>
+
+<p>RubyMotion では英小文字から始まる定数は、一文字目を大文字に書き換えて利用してあげる必要があります。</p>
+
+<p><code>kCGGradientDrawsAfterEndLocation</code> は <code>KCGGradientDrawsAfterEndLocation</code> になります。</p>
+
+<h2>いざ動かしてみる</h2>
+
+<p>```ruby app_delegate.rb
+class Array
+  def to_pointer(type)</p>
+
+<pre><code># Ruby の Array オブジェクトを Pointer クラスを使ったものに変換
+pointer = Pointer.new(type, self.size)
+self.each_with_index do |v, i|
+  pointer[i] = v
+end
+pointer
+</code></pre>
+
+<p>  end
+end</p>
+
+<p>class GradientView &lt; UIView
+  def drawRect(rect)</p>
+
+<pre><code>super
+
+context = UIGraphicsGetCurrentContext()
+CGContextSaveGState(context)
+
+CGContextAddRect(context, self.frame)
+space = CGColorSpaceCreateDeviceRGB()
+
+comp = [
+    0.0, 0.0, 1.0, 1.0, # Blue
+    1.0, 0.0, 0.0, 1.0, # Red
+    0.0, 1.0, 0.0, 1.0  # Green
+]
+components = comp.to_pointer(:float)
+
+loc = [0.0, 0.5, 1.0]
+locations = loc.to_pointer(:float)
+
+count = loc.size
+frame = self.bounds
+start_point = frame.origin
+end_point = CGPointMake(frame.origin.x + frame.size.width, frame.origin.y)
+gradient = CGGradientCreateWithColorComponents(space, components, locations, count)
+
+CGContextDrawLinearGradient(context,
+                            gradient,
+                            start_point,
+                            end_point,
+                            KCGGradientDrawsAfterEndLocation) # 定数を英大文字で始める
+CGContextRestoreGState(context)
+</code></pre>
+
+<p>  end</p>
+
+<p>end</p>
+
+<p>class AppDelegate
+  def application(application, didFinishLaunchingWithOptions:launchOptions)</p>
+
+<pre><code>@window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)
+@window.rootViewController = UIViewController.alloc.initWithNibName(nil, bundle: nil)
+
+@view = GradientView.alloc.initWithFrame(CGRectMake(10, 10, 100, 100))
+@window.rootViewController.view.addSubview(@view)
+@window.makeKeyAndVisible
+
+true
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>次のような View が表示されるはずです。</p>
+
+<p><img src="/images/blog/gradient.png" alt="Gradient" /></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion の Articles を翻訳しました]]></title>
+    <link href="http://watson1978.github.com/blog/2012/08/01/translating-rubymotion-articles/"/>
+    <updated>2012-08-01T23:31:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/08/01/translating-rubymotion-articles</id>
+    <content type="html"><![CDATA[<p>最近は <a href="https://github.com/RubyMotionJP">RubyMotionJP</a> でちまちま作業しており、RubyMotion の公式サイトの <a href="http://www.rubymotion.com/developer-center/">Developer Center</a> で公開されている記事を翻訳しました。</p>
+
+<p>翻訳した記事は <a href="http://rubymotion.jp/">rubymotion.jp</a> で公開しております。誤訳などありましたら、pull request いただけると大変ありがたいです。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion のガイドを日本語に翻訳しました]]></title>
+    <link href="http://watson1978.github.com/blog/2012/05/12/translating-rubymotion-guide/"/>
+    <updated>2012-05-12T11:11:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/05/12/translating-rubymotion-guide</id>
+    <content type="html"><![CDATA[<p>RubyMotion の <a href="http://www.rubymotion.com/developer-center/">Developer Center</a> にガイドとして 3 つの記事が掲載されているのを日本語に訳していました。</p>
+
+<!-- more -->
+
+
+<ul>
+<li><a href="/RubyMotionGuide/getting-started.html">Getting Started</a></li>
+<li><a href="/RubyMotionGuide/runtime.html">Runtime</a></li>
+<li><a href="/RubyMotionGuide/project-management.html">Project Management</a></li>
+</ul>
+
+
+<p>翻訳には誤りがあるかもしれませんので、公式のドキュメントをちゃんと参照ください。(誤りがあれば、twitter などで教えてください)</p>
+
+<p><ins datetime="2012-07-26T00:33:55+09:00">現在、これらのドキュメントは <a href="http://rubymotion.jp/">RubyMotionJP</a> へ移管しました。</ins></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Benchmark Result]]></title>
+    <link href="http://watson1978.github.com/blog/2012/05/10/benchmark-result/"/>
+    <updated>2012-05-10T12:29:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/05/10/benchmark-result</id>
+    <content type="html"><![CDATA[<p>昨日は、<a href="/blog/2012/05/09/mixing-the-ruby-and-objc/">ベンチマーク用ライブラリ</a> を作ったので、RubyMotion のパフォーマンスと、Objective-C のパフォーマンスをそれぞれ計測してみました。</p>
+
+<!-- more -->
+
+
+<p>RubyMotion の計測に使用したものは、昨日 Github にアップロードしたフィボナッチ数列を求めるものをそのまま利用しました。</p>
+
+<p>Objective-C で利用したコードは、1 つは以下のような C 言語の関数で用意しました。</p>
+
+<p>```objc
+int fib(int n)
+{</p>
+
+<pre><code>if (n &lt;= 0) return 0;
+if (n == 1) return 1;
+return fib(n - 2) + fib(n - 1);
+</code></pre>
+
+<p>}
+```</p>
+
+<p>2 つ目には、</p>
+
+<p>```objc
+@implementation Fib</p>
+
+<ul>
+<li>(int)calc:(int)n
+{
+  if (n &lt;= 0) return 0;
+  if (n == 1) return 1;
+  return [self calc:(n - 2)] + [self calc:(n - 1)];
+}</li>
+</ul>
+
+
+<p>@end
+```</p>
+
+<p>とクラスを用意してメッセージを送信する形式にしました。Ruby ではメソッドはクラスやモジュールに属しメッセージ送信が行われるので、Objective-C でもクラスを用意しないとアンフェアですよね。</p>
+
+<p>計測する部分のコードは、</p>
+
+<p>```objc</p>
+
+<pre><code>Bench *bench = [[Bench alloc] init];
+void (^func)() = ^(){
+    [Fib calc:34];
+    //fib(34);
+};
+bench.bm = func;
+[bench exec];
+</code></pre>
+
+<p>```</p>
+
+<p>と昨日作成したライブラリを活用してみました。</p>
+
+<p>結果は (シミュレータ上でしか試していません)、</p>
+
+<table class="table">
+<tr><td></td><td>Result (sec)</td></tr>
+<tr><td>Objective-C 関数</td><td>0.100919</td></tr>
+<tr><td>Objective-C クラス</td><td>0.203850</td></tr>
+<tr><td>RubyMotion</td><td>0.205876</td></tr>
+</table>
+
+
+<p>(3回ずつ計測して最小値をピックアップしただけです)</p>
+
+<p>フィボナッチ数列を求める場合では、RubyMotion は Objective-C のクラスでメッセージ送信を行うものとほぼ差が無いことがわかりました。</p>
+
+<p>MacRuby では遅いと叩かれ続けている文字列処理のパフォーマンスなども計測してみるとおもしろいかもしれない。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion で ruby と Objective-C をミックスしてみました]]></title>
+    <link href="http://watson1978.github.com/blog/2012/05/09/mixing-the-ruby-and-objc/"/>
+    <updated>2012-05-09T20:24:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/05/09/mixing-the-ruby-and-objc</id>
+    <content type="html"><![CDATA[<p>今日は、RubyMotion でベンチマークを計測してみたいなと思い、いろいろ試行錯誤していました。Ruby には benchmark というライブラリがあるのでそれを使えばすぐなのですが、RubyMotion ではライブラリがないので自作することにしました。そして、Objective-C を使って書いておけば何かの役に立ちそうかと簡単なライブラリをつくりました。</p>
+
+<!-- more -->
+
+
+<p>興味を持たれた方は <a href="https://github.com/Watson1978/RubyMotion-Benchmark">Github</a> に置いてありますので、</p>
+
+<p><code>
+$ git clone git://github.com/Watson1978/RubyMotion-Benchmark.git
+$ cd RubyMotion-Benchmark/
+$ rake
+</code></p>
+
+<p>と実行してください。</p>
+
+<p>以下は試行錯誤の過程です。</p>
+
+<p><a href="http://www.rubymotion.com/developer-center/guides/project-management/#_using_3rd_party_libraries">RubyMotion Project Management Guide</a> を読むと、サードパーティのライブラリは <code>vendor</code> ディレクトリを作成しそこに配置するのが慣わしらしいです。</p>
+
+<p>配置するライブラリは Xcode で Cocoa Touch Static Library のテンプレートを選択して別途用意し、<code>vendor</code> ディレクトリに配置します。そして、<code>Rakefile</code> にライブラリを設定します。</p>
+
+<p><code>``ruby
+Motion::Project::App.setup do |app|
+  # Use</code>rake config' to see complete project settings.
+  app.name = 'bench'</p>
+
+<p>  # 3rd-Party Libraries
+  app.vendor_project('vendor/Benchmark', :xcode,</p>
+
+<pre><code>:headers_dir =&gt; 'Benchmark')
+</code></pre>
+
+<p>  # wrapper module
+  app.files += Dir.glob(File.join(app.project_dir, 'vendor/Benchmark/lib/<em>*/</em>.rb'))
+end
+```</p>
+
+<p><code>app.vendor_project</code> でライブラリのパス、ライブラリの種類(<code>:xcode</code> か <code>:static</code>)、ヘッダファイルが存在するディレクトリを <code>:headers_dir</code> で設定します。<code>:headers_dir</code> は第一引数で指定したライブラリのパスからの相対パスで指定します。</p>
+
+<p><code>:headers_dir</code> は必ず指定した方がよさそうです。MacRuby や RubyMotion では、ヘッダファイルを解析して、どのような定数があるか、メソッドに Blocks が使われていないかチェックし、MacRuby や RubyMotion でそれらが使用できるようにするために <a href="https://github.com/MacRuby/MacRuby/wiki/Loading-Objective-C-Frameworks-and-Bundles">Bridge Support</a> というファイルを作ります。実際にプロジェクトをビルドしていただくと <em>vendor/Benchmark/Benchmark.bridgesupport</em> と Bridge Support ファイルが作成されています。</p>
+
+<p>ライブラリは、</p>
+
+<p><code>ruby
+b = Bench.new
+b.bm = lambda { 1 + 2 + 3 } # an expression for measuring
+b.exec
+</code></p>
+
+<p>のように使用し、<code>b.bm = lambda { 1 + 2 + 3 }</code> で Blocks を property として受け付けるように Objective-C でライブラリを作成しています。</p>
+
+<p>MacRuby や RubyMotion では、<code>lambda</code> などで生成した <code>Proc</code> オブジェクトを Blocks として実行することができます。</p>
+
+<p>パフォーマンスを計測するたびに、毎回、上記のように記述するのが煩わしいので、<em>vendor/Benchmark/lib/Benchmark.rb</em> で</p>
+
+<p>```ruby
+module Benchmark
+  module_function</p>
+
+<p>  def bm(&amp;block)</p>
+
+<pre><code>b = Bench.new
+b.bm = block
+b.exec
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>というラッパーを用意してあります。<code>bm</code> メソッドの引数でもらうブロックは <code>Proc</code> オブジェクトなので、そのまま Blocks として使っています。</p>
+
+<p><code>ruby
+Benchmark.bm do
+  # an expression for measuring
+  1 + 2 + 3
+end
+</code></p>
+
+<p>と記述できるようなります。</p>
+
+<p>Github にアップロードしたプロジェクトを実行すると、以下のようになります。</p>
+
+<p>```
+$ rake</p>
+
+<pre><code> Build ./build/iPhoneSimulator-5.1-Development
+ Build vendor/Benchmark
+</code></pre>
+
+<p>  Simulate ./build/iPhoneSimulator-5.1-Development/bench.app
+(main)>> 5702887
+2012-05-09 21:50:43.158 bench[77935:f803] time = 0.278049
+(main)>>
+```</p>
+]]></content>
+  </entry>
+  
+</feed>

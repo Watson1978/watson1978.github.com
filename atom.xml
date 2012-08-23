@@ -1,0 +1,1807 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Watson's Blog]]></title>
+  <link href="http://watson1978.github.com/atom.xml" rel="self"/>
+  <link href="http://watson1978.github.com/"/>
+  <updated>2012-08-23T09:39:40+09:00</updated>
+  <id>http://watson1978.github.com/</id>
+  <author>
+    <name><![CDATA[Watson]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[CGGradient を使ってグラデーションを作る]]></title>
+    <link href="http://watson1978.github.com/blog/2012/08/22/make-a-gradient/"/>
+    <updated>2012-08-22T22:59:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/08/22/make-a-gradient</id>
+    <content type="html"><![CDATA[<p>RubyMotion で <a href="https://developer.apple.com/library/mac/#documentation/graphicsimaging/reference/CGGradient/Reference/reference.html">CGGradient</a> を使ってグラデーションを作る際に 2 点ほどポイントがありそうです。</p>
+
+<!-- more -->
+
+
+<h2>1. Pointer クラスを使用する</h2>
+
+<p>CGGradient オブジェクトを作成する際に使用する関数 <code>CGGradientCreateWithColorComponents</code> は <code>CGFloat</code> 型の配列を受け取ります(変数 <code>components</code>, <code>locations</code> に注目してください)。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">CGGradientRef</span> <span class="n">CGGradientCreateWithColorComponents</span><span class="p">(</span>
+</span><span class='line'>   <span class="n">CGColorSpaceRef</span> <span class="n">space</span><span class="p">,</span>
+</span><span class='line'>   <span class="k">const</span> <span class="n">CGFloat</span> <span class="n">components</span><span class="p">[],</span>
+</span><span class='line'>   <span class="k">const</span> <span class="n">CGFloat</span> <span class="n">locations</span><span class="p">[],</span>
+</span><span class='line'>   <span class="kt">size_t</span> <span class="n">count</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>もし引数が Ruby の Array クラスや、Objective-C の NSArray を受け取るなら話は簡単なのですが、ここでは <code>CGFloat</code> 型の配列なので、RubyMotion で用意されている Pointer クラスを使い <code>CGFloat</code> 型の配列と同等のものを作ります。以下のようなコードになります。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">float_array</span> <span class="o">=</span> <span class="no">Pointer</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:float</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>2. kCGGradientDrawsXXXX 定数</h2>
+
+<p>CGGradient では <code>kCGGradientDrawsBeforeStartLocation</code> と <code>kCGGradientDrawsAfterEndLocation</code> という定数が用意されています。どちらも小文字から始まる定数です。</p>
+
+<p>RubyMotion では英小文字から始まる定数は、一文字目を大文字に書き換えて利用してあげる必要があります。</p>
+
+<p><code>kCGGradientDrawsAfterEndLocation</code> は <code>KCGGradientDrawsAfterEndLocation</code> になります。</p>
+
+<h2>いざ動かしてみる</h2>
+
+<figure class='code'><figcaption><span>app_delegate.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Array</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">to_pointer</span><span class="p">(</span><span class="n">type</span><span class="p">)</span>
+</span><span class='line'>    <span class="c1"># Ruby の Array オブジェクトを Pointer クラスを使ったものに変換</span>
+</span><span class='line'>    <span class="n">pointer</span> <span class="o">=</span> <span class="no">Pointer</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">type</span><span class="p">,</span> <span class="nb">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">each_with_index</span> <span class="k">do</span> <span class="o">|</span><span class="n">v</span><span class="p">,</span> <span class="n">i</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">pointer</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">v</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>    <span class="n">pointer</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">GradientView</span> <span class="o">&lt;</span> <span class="no">UIView</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">drawRect</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">super</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">context</span> <span class="o">=</span> <span class="no">UIGraphicsGetCurrentContext</span><span class="p">()</span>
+</span><span class='line'>    <span class="no">CGContextSaveGState</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="no">CGContextAddRect</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="nb">self</span><span class="o">.</span><span class="n">frame</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">space</span> <span class="o">=</span> <span class="no">CGColorSpaceCreateDeviceRGB</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">comp</span> <span class="o">=</span> <span class="o">[</span>
+</span><span class='line'>        <span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">.</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">.</span><span class="mi">0</span><span class="p">,</span> <span class="c1"># Blue</span>
+</span><span class='line'>        <span class="mi">1</span><span class="o">.</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">.</span><span class="mi">0</span><span class="p">,</span> <span class="c1"># Red</span>
+</span><span class='line'>        <span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">.</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">.</span><span class="mi">0</span>  <span class="c1"># Green</span>
+</span><span class='line'>    <span class="o">]</span>
+</span><span class='line'>    <span class="n">components</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">to_pointer</span><span class="p">(</span><span class="ss">:float</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">loc</span> <span class="o">=</span> <span class="o">[</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="o">.</span><span class="mi">0</span><span class="o">]</span>
+</span><span class='line'>    <span class="n">locations</span> <span class="o">=</span> <span class="n">loc</span><span class="o">.</span><span class="n">to_pointer</span><span class="p">(</span><span class="ss">:float</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">count</span> <span class="o">=</span> <span class="n">loc</span><span class="o">.</span><span class="n">size</span>
+</span><span class='line'>    <span class="n">frame</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">bounds</span>
+</span><span class='line'>    <span class="n">start_point</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">origin</span>
+</span><span class='line'>    <span class="n">end_point</span> <span class="o">=</span> <span class="no">CGPointMake</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">origin</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">frame</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">frame</span><span class="o">.</span><span class="n">origin</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">gradient</span> <span class="o">=</span> <span class="no">CGGradientCreateWithColorComponents</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">locations</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="no">CGContextDrawLinearGradient</span><span class="p">(</span><span class="n">context</span><span class="p">,</span>
+</span><span class='line'>                                <span class="n">gradient</span><span class="p">,</span>
+</span><span class='line'>                                <span class="n">start_point</span><span class="p">,</span>
+</span><span class='line'>                                <span class="n">end_point</span><span class="p">,</span>
+</span><span class='line'>                                <span class="no">KCGGradientDrawsAfterEndLocation</span><span class="p">)</span> <span class="c1"># 定数を英大文字で始める</span>
+</span><span class='line'>    <span class="no">CGContextRestoreGState</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="ss">:launchOptions</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@window</span> <span class="o">=</span> <span class="no">UIWindow</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithFrame</span><span class="p">(</span><span class="no">UIScreen</span><span class="o">.</span><span class="n">mainScreen</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">rootViewController</span> <span class="o">=</span> <span class="no">UIViewController</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithNibName</span><span class="p">(</span><span class="kp">nil</span><span class="p">,</span> <span class="n">bundle</span><span class="p">:</span> <span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="vi">@view</span> <span class="o">=</span> <span class="no">GradientView</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithFrame</span><span class="p">(</span><span class="no">CGRectMake</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">rootViewController</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">addSubview</span><span class="p">(</span><span class="vi">@view</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">makeKeyAndVisible</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kp">true</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>次のような View が表示されるはずです。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/gradient.png" alt="Gradient" /></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion の Articles を翻訳しました]]></title>
+    <link href="http://watson1978.github.com/blog/2012/08/01/translating-rubymotion-articles/"/>
+    <updated>2012-08-01T23:31:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/08/01/translating-rubymotion-articles</id>
+    <content type="html"><![CDATA[<p>最近は <a href="https://github.com/RubyMotionJP">RubyMotionJP</a> でちまちま作業しており、RubyMotion の公式サイトの <a href="http://www.rubymotion.com/developer-center/">Developer Center</a> で公開されている記事を翻訳しました。</p>
+
+<p>翻訳した記事は <a href="http://rubymotion.jp/">rubymotion.jp</a> で公開しております。誤訳などありましたら、pull request いただけると大変ありがたいです。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[第一回 RubyMotion 勉強会に参加してきました。]]></title>
+    <link href="http://watson1978.github.com/blog/2012/07/22/meet-up-rubymotionjp/"/>
+    <updated>2012-07-22T21:30:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/07/22/meet-up-rubymotionjp</id>
+    <content type="html"><![CDATA[<p>今日は <a href="http://connpass.com/event/665/">RubyMotion 勉強会</a>に参加してきました。</p>
+
+<p>13時半頃に会場最寄りの麹町駅に到着したのですが、駅を出てからの一歩目の方向を間違えてしまい、いきなり迷ってしまいました。しかも会場である「住友不動産麹町ビル３号」とは別に「住友不動産麹ビル」というビルを見つけてしまい、しばらく右往左往してこの時点で無駄に体力を消費してしまい死にそうでした。tweet して助けを求めるとやはり違うところに来てしまったことが判明し、なんとか無事に会場にたどり着くことができました・・・。</p>
+
+<!-- more -->
+
+
+<p>MacRuby と RubyMotion が CRuby とどう違っているのかという普段 MacRuby のパッチを書いている立場の視点から資料を用意したのですが、Ruby を知らない人を全力で置き去りにしてしまう内容になってしまったのは申しわけありませんでした・・・。</p>
+
+<p>発表資料は、Speaker Deck に置いております。また、会場で聞けなかったようなことがありましたら、Twitter などで気軽に問い合わせていただければ、ご返答したいと思います。</p>
+
+<p> <script async class="speakerdeck-embed" data-id="500a284b4eac540002002cbe" data-ratio="1.3333333333333333" src="http://watson1978.github.com//speakerdeck.com/assets/embed.js"></script></p>
+
+<p>日本語のドキュメントを一カ所に集めれるような場所を用意したいという話が出て、<a href="https://twitter.com/satococoa">@satococoa</a> さんが GitHub に RubyMotionJP の organization を用意されるそうです。私も RubyMotion のガイドを訳したものがあるので、提供できればと思っております。ただ、RubyMotion がリリースされた直後に訳してそれきりになっており、最新のガイドに追随してないのでいくらか手直しが必要になりそうです。</p>
+
+<p>また、<a href="https://twitter.com/naoya_ito">@naoya_ito</a> さんが <a href="http://cookpad.com/">cookpad</a> に乗り込んで、RubyMotion を宣伝してきますという発言に注目したいと思います。</p>
+
+<p>RubyMotion はリリースされて 3 ヶ月も経っていませんが、変化が早くついていくのが大変だったりしますが、MacRuby を直していきながら、適宜いろいろ試していきたいです。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion で使う iOS スタティックライブラリを作る]]></title>
+    <link href="http://watson1978.github.com/blog/2012/06/07/create-static-library/"/>
+    <updated>2012-06-07T14:55:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/06/07/create-static-library</id>
+    <content type="html"><![CDATA[<p>今日はどのように iOS スタティックライブラリを作るのか、Xcode と格闘していました。</p>
+
+<p>何も考えずにビルドしてしまうと ARM 用のバイナリのみのライブラリができてしまい、i386 バイナリを必要とするシミュレータ用には使えません。</p>
+
+<p>ビルドの仕方がわからずに、どうすればライブラリが作れるか試行錯誤の課程を書きます。</p>
+
+<!-- more -->
+
+
+<h2>ライブラリ用のプロジェクトを作成</h2>
+
+<p>Xcode で &#8220;Cocoa Touch Static Library&#8221; というテンプレートを選択し、スタティックライブラリ用のプロジェクトを作成します。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/cocoa_touch_static_library.png" alt="cocoa touch static library" /></p>
+
+<p>あとは、ライブラリで必要なプログラムを書きます。</p>
+
+<h2>ビルドする</h2>
+
+<p>ARMv6、ARMv7、i386 バイナリを含むユニバーサルなライブラリが欲しいのですが、Xcode でどのようにビルドすれば良いのかわからず途中であきらめ、Terminal 上での操作しました。</p>
+
+<p>Terminal で作成したプロジェクトのディレクトリに移動します。今回は &#8220;foo&#8221; という名前でプロジェクトを作成しています。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ ls
+</span><span class='line'>foo/           foo.xcodeproj/</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ARM バイナリを作成します。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ xcodebuild -arch armv6 -arch armv7
+</span><span class='line'>$ file build/Release-iphoneos/libfoo.a 
+</span><span class='line'>build/Release-iphoneos/libfoo.a: Mach-O universal binary with 2 architectures
+</span><span class='line'>build/Release-iphoneos/libfoo.a (for architecture armv6): current ar archive random library
+</span><span class='line'>build/Release-iphoneos/libfoo.a (for architecture armv7): current ar archive random library</span></code></pre></td></tr></table></div></figure>
+
+
+<p>i386 バイナリは SDK に iphonesimulator を指定するとビルドされるようです。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ xcodebuild -sdk iphonesimulator
+</span><span class='line'>$ file build/Release-iphonesimulator/libfoo.a 
+</span><span class='line'>build/Release-iphonesimulator/libfoo.a: current ar archive random library</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ライブラリファイルが 2 つになってしまったので、<code>lipo</code> コマンドを使って 1 つに結合します。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ lipo -create build/Release-iphoneos/libfoo.a build/Release-iphonesimulator/libfoo.a -output libfoo.a
+</span><span class='line'>$ file libfoo.a 
+</span><span class='line'>libfoo.a: Mach-O universal binary with 3 architectures
+</span><span class='line'>libfoo.a (for architecture armv6): current ar archive random library
+</span><span class='line'>libfoo.a (for architecture armv7): current ar archive random library
+</span><span class='line'>libfoo.a (for architecture i386):  current ar archive random library</span></code></pre></td></tr></table></div></figure>
+
+
+<p>これで欲しかったライブラリができあがりました。</p>
+
+<p>もっと簡単に作れる方法をご存じの方がおられましたら、ご教示ください。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion のガイドを日本語に翻訳しました]]></title>
+    <link href="http://watson1978.github.com/blog/2012/05/12/translating-rubymotion-guide/"/>
+    <updated>2012-05-12T11:11:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/05/12/translating-rubymotion-guide</id>
+    <content type="html"><![CDATA[<p>RubyMotion の <a href="http://www.rubymotion.com/developer-center/">Developer Center</a> にガイドとして 3 つの記事が掲載されているのを日本語に訳していました。</p>
+
+<!-- more -->
+
+
+<ul>
+<li><a href="http://watson1978.github.com/RubyMotionGuide/getting-started.html">Getting Started</a></li>
+<li><a href="http://watson1978.github.com/RubyMotionGuide/runtime.html">Runtime</a></li>
+<li><a href="http://watson1978.github.com/RubyMotionGuide/project-management.html">Project Management</a></li>
+</ul>
+
+
+<p>翻訳には誤りがあるかもしれませんので、公式のドキュメントをちゃんと参照ください。(誤りがあれば、twitter などで教えてください)</p>
+
+<p><ins datetime="2012-07-26T00:33:55+09:00">現在、これらのドキュメントは <a href="http://rubymotion.jp/">RubyMotionJP</a> へ移管しました。</ins></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Benchmark Result]]></title>
+    <link href="http://watson1978.github.com/blog/2012/05/10/benchmark-result/"/>
+    <updated>2012-05-10T12:29:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/05/10/benchmark-result</id>
+    <content type="html"><![CDATA[<p>昨日は、<a href="http://watson1978.github.com/blog/2012/05/09/mixing-the-ruby-and-objc/">ベンチマーク用ライブラリ</a> を作ったので、RubyMotion のパフォーマンスと、Objective-C のパフォーマンスをそれぞれ計測してみました。</p>
+
+<!-- more -->
+
+
+<p>RubyMotion の計測に使用したものは、昨日 Github にアップロードしたフィボナッチ数列を求めるものをそのまま利用しました。</p>
+
+<p>Objective-C で利用したコードは、1 つは以下のような C 言語の関数で用意しました。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="kt">int</span> <span class="nf">fib</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>2 つ目には、</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="k">@implementation</span> <span class="nc">Fib</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">+</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="nf">calc:</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="nv">n</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">[</span><span class="n">self</span> <span class="nl">calc:</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="n">self</span> <span class="nl">calc:</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>とクラスを用意してメッセージを送信する形式にしました。Ruby ではメソッドはクラスやモジュールに属しメッセージ送信が行われるので、Objective-C でもクラスを用意しないとアンフェアですよね。</p>
+
+<p>計測する部分のコードは、</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="n">Bench</span> <span class="o">*</span><span class="n">bench</span> <span class="o">=</span> <span class="p">[[</span><span class="n">Bench</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>
+</span><span class='line'><span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="n">func</span><span class="p">)()</span> <span class="o">=</span> <span class="o">^</span><span class="p">(){</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">Fib</span> <span class="nl">calc:</span><span class="mi">34</span><span class="p">];</span>
+</span><span class='line'>    <span class="c1">//fib(34);</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="n">bench</span><span class="p">.</span><span class="n">bm</span> <span class="o">=</span> <span class="n">func</span><span class="p">;</span>
+</span><span class='line'><span class="p">[</span><span class="n">bench</span> <span class="n">exec</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>と昨日作成したライブラリを活用してみました。</p>
+
+<p>結果は (シミュレータ上でしか試していません)、</p>
+
+<table class="table">
+<tr><td></td><td>Result (sec)</td></tr>
+<tr><td>Objective-C 関数</td><td>0.100919</td></tr>
+<tr><td>Objective-C クラス</td><td>0.203850</td></tr>
+<tr><td>RubyMotion</td><td>0.205876</td></tr>
+</table>
+
+
+<p>(3回ずつ計測して最小値をピックアップしただけです)</p>
+
+<p>フィボナッチ数列を求める場合では、RubyMotion は Objective-C のクラスでメッセージ送信を行うものとほぼ差が無いことがわかりました。</p>
+
+<p>MacRuby では遅いと叩かれ続けている文字列処理のパフォーマンスなども計測してみるとおもしろいかもしれない。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion で ruby と Objective-C をミックスしてみました]]></title>
+    <link href="http://watson1978.github.com/blog/2012/05/09/mixing-the-ruby-and-objc/"/>
+    <updated>2012-05-09T20:24:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/05/09/mixing-the-ruby-and-objc</id>
+    <content type="html"><![CDATA[<p>今日は、RubyMotion でベンチマークを計測してみたいなと思い、いろいろ試行錯誤していました。Ruby には benchmark というライブラリがあるのでそれを使えばすぐなのですが、RubyMotion ではライブラリがないので自作することにしました。そして、Objective-C を使って書いておけば何かの役に立ちそうかと簡単なライブラリをつくりました。</p>
+
+<!-- more -->
+
+
+<p>興味を持たれた方は <a href="https://github.com/Watson1978/RubyMotion-Benchmark">Github</a> に置いてありますので、</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ git clone git://github.com/Watson1978/RubyMotion-Benchmark.git
+</span><span class='line'>$ cd RubyMotion-Benchmark/
+</span><span class='line'>$ rake</span></code></pre></td></tr></table></div></figure>
+
+
+<p>と実行してください。</p>
+
+<p>以下は試行錯誤の過程です。</p>
+
+<p><a href="http://www.rubymotion.com/developer-center/guides/project-management/#_using_3rd_party_libraries">RubyMotion Project Management Guide</a> を読むと、サードパーティのライブラリは <code>vendor</code> ディレクトリを作成しそこに配置するのが慣わしらしいです。</p>
+
+<p>配置するライブラリは Xcode で Cocoa Touch Static Library のテンプレートを選択して別途用意し、<code>vendor</code> ディレクトリに配置します。そして、<code>Rakefile</code> にライブラリを設定します。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Motion</span><span class="o">::</span><span class="no">Project</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
+</span><span class='line'>  <span class="c1"># Use `rake config&#39; to see complete project settings.</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;bench&#39;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1"># 3rd-Party Libraries</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">vendor_project</span><span class="p">(</span><span class="s1">&#39;vendor/Benchmark&#39;</span><span class="p">,</span> <span class="ss">:xcode</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:headers_dir</span> <span class="o">=&gt;</span> <span class="s1">&#39;Benchmark&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1"># wrapper module</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">files</span> <span class="o">+=</span> <span class="no">Dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">project_dir</span><span class="p">,</span> <span class="s1">&#39;vendor/Benchmark/lib/**/*.rb&#39;</span><span class="p">))</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>app.vendor_project</code> でライブラリのパス、ライブラリの種類(<code>:xcode</code> か <code>:static</code>)、ヘッダファイルが存在するディレクトリを <code>:headers_dir</code> で設定します。<code>:headers_dir</code> は第一引数で指定したライブラリのパスからの相対パスで指定します。</p>
+
+<p><code>:headers_dir</code> は必ず指定した方がよさそうです。MacRuby や RubyMotion では、ヘッダファイルを解析して、どのような定数があるか、メソッドに Blocks が使われていないかチェックし、MacRuby や RubyMotion でそれらが使用できるようにするために <a href="https://github.com/MacRuby/MacRuby/wiki/Loading-Objective-C-Frameworks-and-Bundles">Bridge Support</a> というファイルを作ります。実際にプロジェクトをビルドしていただくと <em>vendor/Benchmark/Benchmark.bridgesupport</em> と Bridge Support ファイルが作成されています。</p>
+
+<p>ライブラリは、</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">b</span> <span class="o">=</span> <span class="no">Bench</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'><span class="n">b</span><span class="o">.</span><span class="n">bm</span> <span class="o">=</span> <span class="nb">lambda</span> <span class="p">{</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span> <span class="p">}</span> <span class="c1"># an expression for measuring </span>
+</span><span class='line'><span class="n">b</span><span class="o">.</span><span class="n">exec</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>のように使用し、<code>b.bm = lambda { 1 + 2 + 3 }</code> で Blocks を property として受け付けるように Objective-C でライブラリを作成しています。</p>
+
+<p>MacRuby や RubyMotion では、<code>lambda</code> などで生成した <code>Proc</code> オブジェクトを Blocks として実行することができます。</p>
+
+<p>パフォーマンスを計測するたびに、毎回、上記のように記述するのが煩わしいので、<em>vendor/Benchmark/lib/Benchmark.rb</em> で</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Benchmark</span>
+</span><span class='line'>  <span class="kp">module_function</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">bm</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">b</span> <span class="o">=</span> <span class="no">Bench</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>    <span class="n">b</span><span class="o">.</span><span class="n">bm</span> <span class="o">=</span> <span class="n">block</span>
+</span><span class='line'>    <span class="n">b</span><span class="o">.</span><span class="n">exec</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>というラッパーを用意してあります。<code>bm</code> メソッドの引数でもらうブロックは <code>Proc</code> オブジェクトなので、そのまま Blocks として使っています。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Benchmark</span><span class="o">.</span><span class="n">bm</span> <span class="k">do</span>
+</span><span class='line'>  <span class="c1"># an expression for measuring</span>
+</span><span class='line'>  <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>と記述できるようなります。</p>
+
+<p>Github にアップロードしたプロジェクトを実行すると、以下のようになります。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="err">$</span> <span class="n">rake</span>
+</span><span class='line'>     <span class="no">Build</span> <span class="o">.</span><span class="n">/build</span><span class="o">/</span><span class="n">iPhoneSimulator</span><span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="no">Development</span>
+</span><span class='line'>     <span class="no">Build</span> <span class="n">vendor</span><span class="o">/</span><span class="no">Benchmark</span>
+</span><span class='line'>  <span class="no">Simulate</span> <span class="o">.</span><span class="n">/build</span><span class="o">/</span><span class="n">iPhoneSimulator</span><span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="no">Development</span><span class="o">/</span><span class="n">bench</span><span class="o">.</span><span class="n">app</span>
+</span><span class='line'><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;&gt;</span> <span class="mi">5702887</span>
+</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mo">05</span><span class="o">-</span><span class="mi">09</span> <span class="mi">21</span><span class="p">:</span><span class="mi">50</span><span class="p">:</span><span class="mi">43</span><span class="o">.</span><span class="mi">158</span> <span class="n">bench</span><span class="o">[</span><span class="mi">77935</span><span class="ss">:f803</span><span class="o">]</span> <span class="n">time</span> <span class="o">=</span> <span class="mi">0</span><span class="o">.</span><span class="mi">278049</span>
+</span><span class='line'><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion で作成したアプリのテストケースを書いてみました]]></title>
+    <link href="http://watson1978.github.com/blog/2012/05/08/specs-for-stopwatch-app/"/>
+    <updated>2012-05-08T21:18:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/05/08/specs-for-stopwatch-app</id>
+    <content type="html"><![CDATA[<p>以前に作成した <a href="http://watson1978.github.com/blog/2012/05/03/creating-an-ios-application-using-rubymotion_ja/">StopWatch</a> アプリのテストケースを書いてみました。アクションメソッドを呼び出したりして、インスタンス変数で保持しているオブジェクトが、思い通り生成されているかテストしたくらいですが。</p>
+
+<!-- more -->
+
+
+
+
+<div><script src='https://gist.github.com/2634522.js?file='></script>
+<noscript><pre><code>describe &quot;Application 'StopWatch'&quot; do
+  before do
+    @app = UIApplication.sharedApplication
+    @controller = @app.windows.first.rootViewController
+  end
+
+  it &quot;has one window&quot; do
+    @app.windows.size.should == 1
+  end
+
+  it &quot;should have a label&quot; do
+    label = @controller.instance_variable_get(:@label)
+    label.should != nil
+  end
+
+  it &quot;should start a timer&quot; do
+    @app.sendAction(&quot;startTimer:&quot;, to: @controller, from: self, forEvent: nil)
+
+    timer = @controller.instance_variable_get(:@timer)
+    timer.should != nil
+  end
+
+  it &quot;should stop a timer&quot; do
+    @app.sendAction(&quot;startTimer:&quot;, to: @controller, from: self, forEvent: nil)
+    @app.sendAction(&quot;stopTimer:&quot;, to: @controller, from: self, forEvent: nil)
+
+    timer = @controller.instance_variable_get(:@timer)
+    timer.should == nil
+  end
+
+end
+</code></pre></noscript></div>
+
+
+<p>spec を実行すると、以下のような感じになります。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ rake spec
+</span><span class='line'>     Build ./build/iPhoneSimulator-5.1-Development
+</span><span class='line'>   Compile ./spec/main_spec.rb
+</span><span class='line'>      Link ./build/iPhoneSimulator-5.1-Development/StopWatch_spec.app/StopWatch
+</span><span class='line'>    Create ./build/iPhoneSimulator-5.1-Development/StopWatch_spec.dSYM
+</span><span class='line'>  Simulate ./build/iPhoneSimulator-5.1-Development/StopWatch_spec.app
+</span><span class='line'>Application 'StopWatch'
+</span><span class='line'>  - has one window
+</span><span class='line'>  - should have a label
+</span><span class='line'>  - should start a timer
+</span><span class='line'>  - should stop a timer
+</span><span class='line'>
+</span><span class='line'>4 specifications (4 requirements), 0 failures, 0 errors</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[UIView のオブジェクトを Interactive Shell を使って修正する]]></title>
+    <link href="http://watson1978.github.com/blog/2012/05/08/using-interactive-shell/"/>
+    <updated>2012-05-08T15:01:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/05/08/using-interactive-shell</id>
+    <content type="html"><![CDATA[<p><a href="http://pragmaticstudio.com/screencasts/rubymotion">RubyMotion Screencast</a> を見ていて、シミュレータで UIView のオブジェクトを選択して Interactive Shell で手直しできるなんて cool ですね。</p>
+
+<p>さて、Screencast でたぶん説明されていたのでしょうが、シミュレータ上に表示されている UIView のパーツをどのように選択するのかがわからなかったので試してみました。</p>
+
+<!-- more -->
+
+
+<p><kbd>command</kbd> キーを押しながらシミュレータ上でマウスカーソルを移動していると、赤い枠線が表示されます。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/select_uiview.png" alt="UIView のパーツを選択" /></p>
+
+<p>赤い枠線が表示されると Interactive Shell のプロンプトが、</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(main)&gt;&gt; </span></code></pre></td></tr></table></div></figure>
+
+
+<p>から</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(#&lt;UILabel:0x6c52210&gt;)?&gt;  </span></code></pre></td></tr></table></div></figure>
+
+
+<p>へと変わります。この状態では、まだ選択が確定していないらしく、マウスカーソルを移動したりすると、プロンプトが元に戻ってしまいます。</p>
+
+<p>選択状態を確定するには、<kbd>command</kbd> キーを押しながらクリックすると良いみたいです。プロンプトが</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(#&lt;UILabel:0x6c52210&gt;)&gt;&gt;  </span></code></pre></td></tr></table></div></figure>
+
+
+<p>と、? が消えて >> になります。選択したオブジェクトがレシーバになるので、</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(#&lt;UILabel:0x6d10f40&gt;)&gt;&gt; self         
+</span><span class='line'>=&gt; #&lt;UILabel:0x6d10f40&gt;
+</span><span class='line'>(#&lt;UILabel:0x6d10f40&gt;)&gt;&gt; self.frame
+</span><span class='line'>=&gt; #&lt;CGRect origin=#&lt;CGPoint x=20.0 y=200.0&gt; size=#&lt;CGSize width=300.0 height=30.0&gt;&gt;
+</span><span class='line'>(#&lt;UILabel:0x6d10f40&gt;)&gt;&gt; self.backgroundColor = UIColor.lightGrayColor
+</span><span class='line'>=&gt; #&lt;UICachedDeviceWhiteColor:0x8c868b0&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>などとメッセージを送信すると、Interactive Shell から配色を変更したり、位置を変更したりできます。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Creating an iOS Application using RubyMotion]]></title>
+    <link href="http://watson1978.github.com/blog/2012/05/03/creating-an-ios-application-using-rubymotion_en/"/>
+    <updated>2012-05-03T00:02:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/05/03/creating-an-ios-application-using-rubymotion_en</id>
+    <content type="html"><![CDATA[<p>In this article I will explain how to create a simple iOS application using RubyMotion. I will call this application &#8220;StopWatch&#8221;, and MacRuby version of this application is explained in <a href="https://github.com/MacRuby/MacRuby/wiki/Creating-a-simple-application">&#8220;Creating a simple application&#8221;</a>.</p>
+
+<p>The &#8220;StopWatch&#8221; application has the following features.</p>
+
+<ul>
+<li>This application has the user interface which are start buttion, stop button and label.</li>
+<li>Run the timer if the start button is clicked.</li>
+<li>Stop the timer if the stop button is clicked.</li>
+<li>The timer value is displayed in the label.</li>
+</ul>
+
+
+<!-- more -->
+
+
+<h2>Creating a New Application</h2>
+
+<p>The command-line interface is created as <code>/usr/bin/motion</code> if you install RubyMotion.
+Runs as following command in Terminal, you may create the application template.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ motion create StopWatch
+</span><span class='line'>    Create StopWatch
+</span><span class='line'>    Create StopWatch/.gitignore
+</span><span class='line'>    Create StopWatch/Rakefile
+</span><span class='line'>    Create StopWatch/app
+</span><span class='line'>    Create StopWatch/app/app_delegate.rb
+</span><span class='line'>    Create StopWatch/resources
+</span><span class='line'>    Create StopWatch/spec
+</span><span class='line'>    Create StopWatch/spec/main_spec.rb</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Rakefile: This file contains the configuration of the project, as well as a default set of tasks.</li>
+<li>app: This directory contains the Ruby code of the project.</li>
+<li>resources: This directory contains the resources files of the project, such as images or sounds.</li>
+<li>spec: This directory contains the specification files of the application.</li>
+</ul>
+
+
+<p>You can know detail of the configurations with <a href="http://www.rubymotion.com/developer-center/guides/project-management">Project Management</a>.</p>
+
+<h2>Implements the application</h2>
+
+<p>Opens the app/app_delegate.rb with your editor.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="ss">:launchOptions</span><span class="p">)</span>
+</span><span class='line'>    <span class="kp">true</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Implements the code which contains actions or user interface for iOS into this file.
+<a href="http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIKit_Framework/_index.html">UIKit Framework Reference</a> may help you to implement user interface.</p>
+
+<h3>1. Create the UIWindow object</h3>
+
+<p>First step, creates the UIWindow object. The UIWindow class defines objects that manage and coordinate the windows an application displays on the screen.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="ss">:launchOptions</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@window</span> <span class="o">=</span> <span class="no">UIWindow</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithFrame</span><span class="p">(</span><span class="no">UIScreen</span><span class="o">.</span><span class="n">mainScreen</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># Sets the StopWatchViewController as rootViewController</span>
+</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">rootViewController</span> <span class="o">=</span> <span class="no">StopWatchViewController</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">init</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">makeKeyAndVisible</span>
+</span><span class='line'>    <span class="kp">true</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Sets the StopWatchViewController which inherited the UIViewController as rootViewController.
+The UIViewController provides basic functions for view-management.</p>
+
+<h3>2. Implement the StopWatchViewController</h3>
+
+<p>Prepares the StopWatchViewController as following.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">StopWatchViewController</span> <span class="o">&lt;</span> <span class="no">UIViewController</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">viewDidLoad</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>viewDidLoad</code> method is called after the controller’s view is loaded into memory. Implements the user interface into <code>viewDidLoad</code> method. The UIView is used when lays out the user interface. You may retrive the UIView as following.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># retrive the UIView</span>
+</span><span class='line'><span class="n">view</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">view</span>
+</span><span class='line'><span class="c1"># configure background color</span>
+</span><span class='line'><span class="n">view</span><span class="o">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="no">UIColor</span><span class="o">.</span><span class="n">whiteColor</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># retrive the screen size</span>
+</span><span class='line'><span class="n">frame</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">bounds</span>
+</span><span class='line'><span class="n">height</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">height</span>
+</span><span class='line'><span class="n">width</span>  <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">width</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Lays out the user interface</h4>
+
+<p>Creates the user interface object after retriving the UIView, and you may lay out the user interface that invokes <code>addSubview</code>.</p>
+
+<p>Let&#8217;s lay out the start/stop button and label.</p>
+
+<h5>Lays out the start button</h5>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># start button</span>
+</span><span class='line'><span class="vi">@start</span> <span class="o">=</span> <span class="no">UIButton</span><span class="o">.</span><span class="n">buttonWithType</span><span class="p">(</span><span class="no">UIButtonTypeRoundedRect</span><span class="p">)</span>
+</span><span class='line'><span class="vi">@start</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="no">CGRectMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</span><span class='line'><span class="vi">@start</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="n">forState</span><span class="p">:</span> <span class="no">UIControlStateNormal</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># connect an action method for start button</span>
+</span><span class='line'><span class="vi">@start</span><span class="o">.</span><span class="n">addTarget</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span>
+</span><span class='line'>                 <span class="n">action</span><span class="p">:</span> <span class="s2">&quot;startTimer:&quot;</span><span class="p">,</span>
+</span><span class='line'>                 <span class="n">forControlEvents</span><span class="p">:</span> <span class="no">UIControlEventTouchUpInside</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">view</span><span class="o">.</span><span class="n">addSubview</span><span class="p">(</span><span class="vi">@start</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h5>Lays out the stop button</h5>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># stop button</span>
+</span><span class='line'><span class="vi">@stop</span> <span class="o">=</span> <span class="no">UIButton</span><span class="o">.</span><span class="n">buttonWithType</span><span class="p">(</span><span class="no">UIButtonTypeRoundedRect</span><span class="p">)</span>
+</span><span class='line'><span class="vi">@stop</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="no">CGRectMake</span><span class="p">(</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</span><span class='line'><span class="vi">@stop</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s2">&quot;stop&quot;</span><span class="p">,</span> <span class="n">forState</span><span class="p">:</span> <span class="no">UIControlStateNormal</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># connect an action method for stop button</span>
+</span><span class='line'><span class="vi">@stop</span><span class="o">.</span><span class="n">addTarget</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span>
+</span><span class='line'>                <span class="n">action</span><span class="p">:</span> <span class="s2">&quot;stopTimer:&quot;</span><span class="p">,</span>
+</span><span class='line'>                <span class="n">forControlEvents</span><span class="p">:</span> <span class="no">UIControlEventTouchUpInside</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">view</span><span class="o">.</span><span class="n">addSubview</span><span class="p">(</span><span class="vi">@stop</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h5>Lays out the label</h5>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># label for displaying timer value</span>
+</span><span class='line'><span class="vi">@label</span> <span class="o">=</span> <span class="no">UILabel</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">init</span>
+</span><span class='line'><span class="vi">@label</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="no">CGRectMake</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">width</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</span><span class='line'><span class="vi">@label</span><span class="o">.</span><span class="n">font</span> <span class="o">=</span> <span class="no">UIFont</span><span class="o">.</span><span class="n">fontWithName</span><span class="p">(</span><span class="s2">&quot;AppleGothic&quot;</span><span class="p">,</span><span class="n">size</span><span class="p">:</span><span class="mi">24</span><span class="p">)</span>
+</span><span class='line'><span class="vi">@label</span><span class="o">.</span><span class="n">textAlignment</span> <span class="o">=</span> <span class="no">UITextAlignmentCenter</span>
+</span><span class='line'><span class="n">view</span><span class="o">.</span><span class="n">addSubview</span><span class="p">(</span><span class="vi">@label</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Implements the action methods</h4>
+
+<p>We can define the <code>startTimer</code> and <code>stopTimer</code> methods as following.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">startTimer</span><span class="p">(</span><span class="n">sender</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">if</span> <span class="vi">@timer</span> <span class="o">==</span> <span class="kp">nil</span>
+</span><span class='line'>      <span class="vi">@time</span>  <span class="o">=</span> <span class="mi">0</span><span class="o">.</span><span class="mi">0</span>
+</span><span class='line'>      <span class="vi">@timer</span> <span class="o">=</span> <span class="no">NSTimer</span>
+</span><span class='line'>           <span class="o">.</span><span class="n">scheduledTimerWithTimeInterval</span><span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>                                           <span class="n">target</span><span class="p">:</span> <span class="nb">self</span><span class="p">,</span>
+</span><span class='line'>                                           <span class="n">selector</span><span class="p">:</span> <span class="s2">&quot;timerHandler:&quot;</span><span class="p">,</span>
+</span><span class='line'>                                           <span class="n">userInfo</span><span class="p">:</span> <span class="kp">nil</span><span class="p">,</span>
+</span><span class='line'>                                           <span class="n">repeats</span><span class="p">:</span> <span class="kp">true</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">stopTimer</span><span class="p">(</span><span class="n">sender</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">if</span> <span class="vi">@timer</span>
+</span><span class='line'>      <span class="vi">@timer</span><span class="o">.</span><span class="n">invalidate</span>
+</span><span class='line'>      <span class="vi">@timer</span> <span class="o">=</span> <span class="kp">nil</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">timerHandler</span><span class="p">(</span><span class="n">userInfo</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@time</span> <span class="o">+=</span> <span class="mi">0</span><span class="o">.</span><span class="mi">1</span>
+</span><span class='line'>    <span class="n">string</span> <span class="o">=</span> <span class="nb">sprintf</span><span class="p">(</span><span class="s2">&quot;%.1f&quot;</span><span class="p">,</span> <span class="vi">@time</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@label</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">string</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The above code creates and schedules a timer in <code>startTimer</code> that will execute the <code>timerHandler</code> method repetitively each 0.1 seconds. The <code>timerHandler</code> displays value into label, and <code>stopTimer</code> stops the timer by <code>@timer.invalidate</code>.</p>
+
+<div class="note">
+<strong>** IMPORTANT **</strong>: <br/>
+Currently, if you use the data for a long time, you must keep as instance variables.
+
+<br/>
+Refer: <a href="http://www.rubymotion.com/developer-center/guides/runtime#_memory_management">Runtime</a>
+</div>
+
+
+<h2>Runs the StopWatch application</h2>
+
+<p>You may run the StopWatch application by <code>rake</code> command in Terminal.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="err">$</span> <span class="n">rake</span>
+</span><span class='line'>     <span class="no">Build</span> <span class="o">.</span><span class="n">/build</span><span class="o">/</span><span class="n">iPhoneSimulator</span><span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="no">Development</span>
+</span><span class='line'>   <span class="no">Compile</span> <span class="o">.</span><span class="n">/app</span><span class="o">/</span><span class="n">app_delegate</span><span class="o">.</span><span class="n">rb</span>
+</span><span class='line'>    <span class="no">Create</span> <span class="o">.</span><span class="n">/build</span><span class="o">/</span><span class="n">iPhoneSimulator</span><span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="no">Development</span><span class="o">/</span><span class="no">StopWatch</span><span class="o">.</span><span class="n">app</span>
+</span><span class='line'>      <span class="no">Link</span> <span class="o">.</span><span class="n">/build</span><span class="o">/</span><span class="n">iPhoneSimulator</span><span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="no">Development</span><span class="o">/</span><span class="no">StopWatch</span><span class="o">.</span><span class="n">app</span><span class="o">/</span><span class="no">StopWatch</span>
+</span><span class='line'>    <span class="no">Create</span> <span class="o">.</span><span class="n">/build</span><span class="o">/</span><span class="n">iPhoneSimulator</span><span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="no">Development</span><span class="o">/</span><span class="no">StopWatch</span><span class="o">.</span><span class="n">app</span><span class="o">/</span><span class="no">Info</span><span class="o">.</span><span class="n">plist</span>
+</span><span class='line'>    <span class="no">Create</span> <span class="o">.</span><span class="n">/build</span><span class="o">/</span><span class="n">iPhoneSimulator</span><span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="no">Development</span><span class="o">/</span><span class="no">StopWatch</span><span class="o">.</span><span class="n">app</span><span class="o">/</span><span class="no">PkgInfo</span>
+</span><span class='line'>    <span class="no">Create</span> <span class="o">.</span><span class="n">/build</span><span class="o">/</span><span class="n">iPhoneSimulator</span><span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="no">Development</span><span class="o">/</span><span class="no">StopWatch</span><span class="o">.</span><span class="n">dSYM</span>
+</span><span class='line'>  <span class="no">Simulate</span> <span class="o">.</span><span class="n">/build</span><span class="o">/</span><span class="n">iPhoneSimulator</span><span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="no">Development</span><span class="o">/</span><span class="no">StopWatch</span><span class="o">.</span><span class="n">app</span>
+</span><span class='line'><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="http://watson1978.github.com/images/blog/stopwatch.png" alt="StopWatch application" /></p>
+
+<h2>Appendix</h2>
+
+<p>There is full code which created in this article as following.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">StopWatchViewController</span> <span class="o">&lt;</span> <span class="no">UIViewController</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">viewDidLoad</span>
+</span><span class='line'>    <span class="c1"># retrive the UIView</span>
+</span><span class='line'>    <span class="n">view</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">view</span>
+</span><span class='line'>    <span class="c1"># configure background color</span>
+</span><span class='line'>    <span class="n">view</span><span class="o">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="no">UIColor</span><span class="o">.</span><span class="n">whiteColor</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># retrive the screen size</span>
+</span><span class='line'>    <span class="n">frame</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">bounds</span>
+</span><span class='line'>    <span class="n">height</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">height</span>
+</span><span class='line'>    <span class="n">width</span>  <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">width</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#--------------------</span>
+</span><span class='line'>    <span class="c1"># start button</span>
+</span><span class='line'>    <span class="vi">@start</span> <span class="o">=</span> <span class="no">UIButton</span><span class="o">.</span><span class="n">buttonWithType</span><span class="p">(</span><span class="no">UIButtonTypeRoundedRect</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@start</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="no">CGRectMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@start</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="n">forState</span><span class="p">:</span> <span class="no">UIControlStateNormal</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># connect an action method for start button</span>
+</span><span class='line'>    <span class="vi">@start</span><span class="o">.</span><span class="n">addTarget</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span>
+</span><span class='line'>                     <span class="n">action</span><span class="p">:</span> <span class="s2">&quot;startTimer:&quot;</span><span class="p">,</span>
+</span><span class='line'>                     <span class="n">forControlEvents</span><span class="p">:</span> <span class="no">UIControlEventTouchUpInside</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">view</span><span class="o">.</span><span class="n">addSubview</span><span class="p">(</span><span class="vi">@start</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#--------------------</span>
+</span><span class='line'>    <span class="c1"># stop button</span>
+</span><span class='line'>    <span class="vi">@stop</span> <span class="o">=</span> <span class="no">UIButton</span><span class="o">.</span><span class="n">buttonWithType</span><span class="p">(</span><span class="no">UIButtonTypeRoundedRect</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@stop</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="no">CGRectMake</span><span class="p">(</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@stop</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s2">&quot;stop&quot;</span><span class="p">,</span> <span class="n">forState</span><span class="p">:</span> <span class="no">UIControlStateNormal</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># connect an action method for stop button</span>
+</span><span class='line'>    <span class="vi">@stop</span><span class="o">.</span><span class="n">addTarget</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span>
+</span><span class='line'>                    <span class="n">action</span><span class="p">:</span> <span class="s2">&quot;stopTimer:&quot;</span><span class="p">,</span>
+</span><span class='line'>                    <span class="n">forControlEvents</span><span class="p">:</span> <span class="no">UIControlEventTouchUpInside</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">view</span><span class="o">.</span><span class="n">addSubview</span><span class="p">(</span><span class="vi">@stop</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#--------------------------</span>
+</span><span class='line'>    <span class="c1"># label for displaying timer value</span>
+</span><span class='line'>    <span class="vi">@label</span> <span class="o">=</span> <span class="no">UILabel</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">init</span>
+</span><span class='line'>    <span class="vi">@label</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="no">CGRectMake</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">width</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@label</span><span class="o">.</span><span class="n">font</span> <span class="o">=</span> <span class="no">UIFont</span><span class="o">.</span><span class="n">fontWithName</span><span class="p">(</span><span class="s2">&quot;AppleGothic&quot;</span><span class="p">,</span><span class="n">size</span><span class="p">:</span><span class="mi">24</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@label</span><span class="o">.</span><span class="n">textAlignment</span> <span class="o">=</span> <span class="no">UITextAlignmentCenter</span>
+</span><span class='line'>    <span class="n">view</span><span class="o">.</span><span class="n">addSubview</span><span class="p">(</span><span class="vi">@label</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">startTimer</span><span class="p">(</span><span class="n">sender</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">if</span> <span class="vi">@timer</span> <span class="o">==</span> <span class="kp">nil</span>
+</span><span class='line'>      <span class="vi">@time</span>  <span class="o">=</span> <span class="mi">0</span><span class="o">.</span><span class="mi">0</span>
+</span><span class='line'>      <span class="vi">@timer</span> <span class="o">=</span> <span class="no">NSTimer</span>
+</span><span class='line'>           <span class="o">.</span><span class="n">scheduledTimerWithTimeInterval</span><span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>                                           <span class="n">target</span><span class="p">:</span> <span class="nb">self</span><span class="p">,</span>
+</span><span class='line'>                                           <span class="n">selector</span><span class="p">:</span> <span class="s2">&quot;timerHandler:&quot;</span><span class="p">,</span>
+</span><span class='line'>                                           <span class="n">userInfo</span><span class="p">:</span> <span class="kp">nil</span><span class="p">,</span>
+</span><span class='line'>                                           <span class="n">repeats</span><span class="p">:</span> <span class="kp">true</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">stopTimer</span><span class="p">(</span><span class="n">sender</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">if</span> <span class="vi">@timer</span>
+</span><span class='line'>      <span class="vi">@timer</span><span class="o">.</span><span class="n">invalidate</span>
+</span><span class='line'>      <span class="vi">@timer</span> <span class="o">=</span> <span class="kp">nil</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">timerHandler</span><span class="p">(</span><span class="n">userInfo</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@time</span> <span class="o">+=</span> <span class="mi">0</span><span class="o">.</span><span class="mi">1</span>
+</span><span class='line'>    <span class="n">string</span> <span class="o">=</span> <span class="nb">sprintf</span><span class="p">(</span><span class="s2">&quot;%.1f&quot;</span><span class="p">,</span> <span class="vi">@time</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@label</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">string</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="ss">:launchOptions</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@window</span> <span class="o">=</span> <span class="no">UIWindow</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithFrame</span><span class="p">(</span><span class="no">UIScreen</span><span class="o">.</span><span class="n">mainScreen</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># Sets the StopWatchViewController as rootViewController</span>
+</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">rootViewController</span> <span class="o">=</span> <span class="no">StopWatchViewController</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">init</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">makeKeyAndVisible</span>
+</span><span class='line'>    <span class="kp">true</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion で簡単な iOS アプリを作ってみよう]]></title>
+    <link href="http://watson1978.github.com/blog/2012/05/03/creating-an-ios-application-using-rubymotion_ja/"/>
+    <updated>2012-05-03T00:01:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/05/03/creating-an-ios-application-using-rubymotion_ja</id>
+    <content type="html"><![CDATA[<p>今回は、RubyMotion で簡単なアプリを作ってみます。ここでは簡単な「StopWatch」アプリケーションを作成し、RubyMotion でどのように iOS アプリを作成するのか説明したいと思います。</p>
+
+<p>StopWatch アプリの簡単な仕様は、</p>
+
+<ul>
+<li>start ボタン、stop ボタンとタイマーの値を表示するラベルを持っています。</li>
+<li>start ボタンが押されると、タイマーがスタートします。</li>
+<li>stop ボタンが押されると、タイマーを停止します。</li>
+<li>タイマーが動作中の値を 0.1 秒刻みでラベルに表示します。</li>
+</ul>
+
+
+<p>です。</p>
+
+<!-- more -->
+
+
+<h2>新規アプリを作成する</h2>
+
+<p>RubyMotion をインストールしたときに、<code>/usr/bin/motion</code> というコマンドがインストールされます。このコマンドを使用して、新規アプリのひな形を作成します。Terminal で次のようにコマンドを実行するとひな形が用意されます。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ motion create StopWatch
+</span><span class='line'>    Create StopWatch
+</span><span class='line'>    Create StopWatch/.gitignore
+</span><span class='line'>    Create StopWatch/Rakefile
+</span><span class='line'>    Create StopWatch/app
+</span><span class='line'>    Create StopWatch/app/app_delegate.rb
+</span><span class='line'>    Create StopWatch/resources
+</span><span class='line'>    Create StopWatch/spec
+</span><span class='line'>    Create StopWatch/spec/main_spec.rb</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Rakefile: アプリ名などの設定に利用します。</li>
+<li>app: アプリを実装するファイルを置くためのディレクトリです。</li>
+<li>resources: 音声や画像などのリソースを置くためのディレクトリです。</li>
+<li>spec: アプリのテストケースを記述したファイルを置くためのディレクトリです。</li>
+</ul>
+
+
+<p>Rakefile で設定できる内容などについては、<a href="http://www.rubymotion.com/developer-center/guides/project-management">Project Management</a> に詳しく書かれていますので、目を通されておくと良いでしょう。</p>
+
+<p><code>motion</code> コマンドの簡単な使い方は <code>motion -h</code> で確認できます。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ motion -h
+</span><span class='line'>Usage:
+</span><span class='line'>  motion [-h, --help]
+</span><span class='line'>  motion [-v, --version]
+</span><span class='line'>  motion &lt;command&gt; [&lt;args...&gt;]
+</span><span class='line'>
+</span><span class='line'>Commands:
+</span><span class='line'>  create       Create a new project
+</span><span class='line'>  activate     Activate the software license
+</span><span class='line'>  update       Update the software
+</span><span class='line'>  support      Create a support ticket</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>アプリを実装する</h2>
+
+<p>さっそくアプリを実装していきましょう。app/app_delegate.rb をエディタで開いてみます。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="ss">:launchOptions</span><span class="p">)</span>
+</span><span class='line'>    <span class="kp">true</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>このファイルに、<a href="http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIKit_Framework/_index.html">UIKit Framework リファレンス</a> を参考に UI 部品を配置するためのコードや、アクションを記述していきます。</p>
+
+<h3>1. UIWindow を配置する</h3>
+
+<p>UIWindow のオブジェクトがないと何もできないといっても良いくらい重要なものです。まず、UIWindow のオブジェクトを用意します。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="ss">:launchOptions</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@window</span> <span class="o">=</span> <span class="no">UIWindow</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithFrame</span><span class="p">(</span><span class="no">UIScreen</span><span class="o">.</span><span class="n">mainScreen</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># UIViewController を継承した StopWatchViewController をルートコントローラーに設定</span>
+</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">rootViewController</span> <span class="o">=</span> <span class="no">StopWatchViewController</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">init</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">makeKeyAndVisible</span>
+</span><span class='line'>    <span class="kp">true</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>UIViewController を継承した StopWatchViewController をルートコントローラーに設定しています。
+UIViewController は一画面分のコンテンツを管理したり、表示するための基本な機能を提供してくれます。</p>
+
+<h3>2. StopWatchViewController を用意する</h3>
+
+<p>StopWatchViewController を以下のように用意します。UIViewController を継承し、<code>viewDidLoad</code> メソッドを用意しておけば良いでしょう。初期化が終わり画面が表示される段階になると <code>viewDidLoad</code> メソッドが呼び出されるので、このメソッドで UI の配置を行います。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">StopWatchViewController</span> <span class="o">&lt;</span> <span class="no">UIViewController</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">viewDidLoad</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>viewDidLoad</code> メソッドに、UI 部品を配置するコードを記述していきます。UI 部品の配置は、UIView に対して行います。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># UIView を取得</span>
+</span><span class='line'><span class="n">view</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">view</span>
+</span><span class='line'><span class="c1"># 背景色を設定</span>
+</span><span class='line'><span class="n">view</span><span class="o">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="no">UIColor</span><span class="o">.</span><span class="n">whiteColor</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># 画面のサイズ</span>
+</span><span class='line'><span class="n">frame</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">bounds</span>
+</span><span class='line'><span class="n">height</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">height</span>
+</span><span class='line'><span class="n">width</span>  <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">width</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>UI 部品の配置</h4>
+
+<p>上記のように UIView を取得したあと、UI 部品の設定などを行い <code>addSubview</code> を実行すると UI 部品が配置されます。それでは、start ボタン、stop ボタンとラベルを配置してみましょう。</p>
+
+<h5>start ボタンを配置</h5>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># start ボタン</span>
+</span><span class='line'><span class="vi">@start</span> <span class="o">=</span> <span class="no">UIButton</span><span class="o">.</span><span class="n">buttonWithType</span><span class="p">(</span><span class="no">UIButtonTypeRoundedRect</span><span class="p">)</span>
+</span><span class='line'><span class="vi">@start</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="no">CGRectMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</span><span class='line'><span class="vi">@start</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="n">forState</span><span class="p">:</span> <span class="no">UIControlStateNormal</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># start ボタンがクリックされたとき、startTimer アクションメソッドが呼ばれるようにする</span>
+</span><span class='line'><span class="vi">@start</span><span class="o">.</span><span class="n">addTarget</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span>
+</span><span class='line'>                 <span class="n">action</span><span class="p">:</span> <span class="s2">&quot;startTimer:&quot;</span><span class="p">,</span>
+</span><span class='line'>                 <span class="n">forControlEvents</span><span class="p">:</span> <span class="no">UIControlEventTouchUpInside</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">view</span><span class="o">.</span><span class="n">addSubview</span><span class="p">(</span><span class="vi">@start</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h5>stop ボタンを配置</h5>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># stop ボタン</span>
+</span><span class='line'><span class="vi">@stop</span> <span class="o">=</span> <span class="no">UIButton</span><span class="o">.</span><span class="n">buttonWithType</span><span class="p">(</span><span class="no">UIButtonTypeRoundedRect</span><span class="p">)</span>
+</span><span class='line'><span class="vi">@stop</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="no">CGRectMake</span><span class="p">(</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</span><span class='line'><span class="vi">@stop</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s2">&quot;stop&quot;</span><span class="p">,</span> <span class="n">forState</span><span class="p">:</span> <span class="no">UIControlStateNormal</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># stop ボタンがクリックされたとき、stopTimer アクションメソッドが呼ばれるようにする</span>
+</span><span class='line'><span class="vi">@stop</span><span class="o">.</span><span class="n">addTarget</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span>
+</span><span class='line'>                <span class="n">action</span><span class="p">:</span> <span class="s2">&quot;stopTimer:&quot;</span><span class="p">,</span>
+</span><span class='line'>                <span class="n">forControlEvents</span><span class="p">:</span> <span class="no">UIControlEventTouchUpInside</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">view</span><span class="o">.</span><span class="n">addSubview</span><span class="p">(</span><span class="vi">@stop</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h5>ラベルを配置</h5>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># タイマーの値を表示するラベル</span>
+</span><span class='line'><span class="vi">@label</span> <span class="o">=</span> <span class="no">UILabel</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">init</span>
+</span><span class='line'><span class="vi">@label</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="no">CGRectMake</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">width</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</span><span class='line'><span class="vi">@label</span><span class="o">.</span><span class="n">font</span> <span class="o">=</span> <span class="no">UIFont</span><span class="o">.</span><span class="n">fontWithName</span><span class="p">(</span><span class="s2">&quot;AppleGothic&quot;</span><span class="p">,</span><span class="n">size</span><span class="p">:</span><span class="mi">24</span><span class="p">)</span>
+</span><span class='line'><span class="vi">@label</span><span class="o">.</span><span class="n">textAlignment</span> <span class="o">=</span> <span class="no">UITextAlignmentCenter</span>
+</span><span class='line'><span class="n">view</span><span class="o">.</span><span class="n">addSubview</span><span class="p">(</span><span class="vi">@label</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>アクションメソッドを実装</h4>
+
+<p>start ボタンがクリックされたときには <code>startTimer</code> アクションメソッドが、stop ボタンがクリックされたときには <code>stopTimer</code> アクションメソッドが呼ばれるようにしましたので、それらのアクションメソッドを用意します。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">startTimer</span><span class="p">(</span><span class="n">sender</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">if</span> <span class="vi">@timer</span> <span class="o">==</span> <span class="kp">nil</span>
+</span><span class='line'>      <span class="vi">@time</span>  <span class="o">=</span> <span class="mi">0</span><span class="o">.</span><span class="mi">0</span>
+</span><span class='line'>      <span class="vi">@timer</span> <span class="o">=</span> <span class="no">NSTimer</span>
+</span><span class='line'>           <span class="o">.</span><span class="n">scheduledTimerWithTimeInterval</span><span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>                                           <span class="n">target</span><span class="p">:</span> <span class="nb">self</span><span class="p">,</span>
+</span><span class='line'>                                           <span class="n">selector</span><span class="p">:</span> <span class="s2">&quot;timerHandler:&quot;</span><span class="p">,</span>
+</span><span class='line'>                                           <span class="n">userInfo</span><span class="p">:</span> <span class="kp">nil</span><span class="p">,</span>
+</span><span class='line'>                                           <span class="n">repeats</span><span class="p">:</span> <span class="kp">true</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">stopTimer</span><span class="p">(</span><span class="n">sender</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">if</span> <span class="vi">@timer</span>
+</span><span class='line'>      <span class="vi">@timer</span><span class="o">.</span><span class="n">invalidate</span>
+</span><span class='line'>      <span class="vi">@timer</span> <span class="o">=</span> <span class="kp">nil</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">timerHandler</span><span class="p">(</span><span class="n">userInfo</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@time</span> <span class="o">+=</span> <span class="mi">0</span><span class="o">.</span><span class="mi">1</span>
+</span><span class='line'>    <span class="n">string</span> <span class="o">=</span> <span class="nb">sprintf</span><span class="p">(</span><span class="s2">&quot;%.1f&quot;</span><span class="p">,</span> <span class="vi">@time</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@label</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">string</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>startTimer</code> では、0.1 秒ごとに <code>timerHandler</code> を呼び出すようにタイマーを用意しています。</p>
+
+<p><code>timerHandler</code> でタイマーの値をラベルに表示しています。<code>stopTimer</code> では <code>@timer.invalidate</code> でタイマーを停止しています。</p>
+
+<div class="note">
+<strong>**重要**</strong><br/>
+現在、RubyMotion のメモリ管理の仕様として長期間に渡って使用するデータはインスタンス変数やグローバル変数として宣言しておく必要があります。
+<br/>
+参考: <a href="http://www.rubymotion.com/developer-center/guides/runtime#_memory_management">Runtime</a>
+</div>
+
+
+<h2>アプリを実行する</h2>
+
+<p>サンプルアプリを実行したときと同じように、Terminal で <code>rake</code> コマンドを実行してアプリを動かします。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="err">$</span> <span class="n">rake</span>
+</span><span class='line'>     <span class="no">Build</span> <span class="o">.</span><span class="n">/build</span><span class="o">/</span><span class="n">iPhoneSimulator</span><span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="no">Development</span>
+</span><span class='line'>   <span class="no">Compile</span> <span class="o">.</span><span class="n">/app</span><span class="o">/</span><span class="n">app_delegate</span><span class="o">.</span><span class="n">rb</span>
+</span><span class='line'>    <span class="no">Create</span> <span class="o">.</span><span class="n">/build</span><span class="o">/</span><span class="n">iPhoneSimulator</span><span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="no">Development</span><span class="o">/</span><span class="no">StopWatch</span><span class="o">.</span><span class="n">app</span>
+</span><span class='line'>      <span class="no">Link</span> <span class="o">.</span><span class="n">/build</span><span class="o">/</span><span class="n">iPhoneSimulator</span><span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="no">Development</span><span class="o">/</span><span class="no">StopWatch</span><span class="o">.</span><span class="n">app</span><span class="o">/</span><span class="no">StopWatch</span>
+</span><span class='line'>    <span class="no">Create</span> <span class="o">.</span><span class="n">/build</span><span class="o">/</span><span class="n">iPhoneSimulator</span><span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="no">Development</span><span class="o">/</span><span class="no">StopWatch</span><span class="o">.</span><span class="n">app</span><span class="o">/</span><span class="no">Info</span><span class="o">.</span><span class="n">plist</span>
+</span><span class='line'>    <span class="no">Create</span> <span class="o">.</span><span class="n">/build</span><span class="o">/</span><span class="n">iPhoneSimulator</span><span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="no">Development</span><span class="o">/</span><span class="no">StopWatch</span><span class="o">.</span><span class="n">app</span><span class="o">/</span><span class="no">PkgInfo</span>
+</span><span class='line'>    <span class="no">Create</span> <span class="o">.</span><span class="n">/build</span><span class="o">/</span><span class="n">iPhoneSimulator</span><span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="no">Development</span><span class="o">/</span><span class="no">StopWatch</span><span class="o">.</span><span class="n">dSYM</span>
+</span><span class='line'>  <span class="no">Simulate</span> <span class="o">.</span><span class="n">/build</span><span class="o">/</span><span class="n">iPhoneSimulator</span><span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="no">Development</span><span class="o">/</span><span class="no">StopWatch</span><span class="o">.</span><span class="n">app</span>
+</span><span class='line'><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="http://watson1978.github.com/images/blog/stopwatch.png" alt="StopWatch アプリ" /></p>
+
+<h2>付録: コード</h2>
+
+<p>今回作成したコードの全文は以下のようになります。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">StopWatchViewController</span> <span class="o">&lt;</span> <span class="no">UIViewController</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">viewDidLoad</span>
+</span><span class='line'>    <span class="c1"># UIView を取得</span>
+</span><span class='line'>    <span class="n">view</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">view</span>
+</span><span class='line'>    <span class="c1"># 背景色を設定</span>
+</span><span class='line'>    <span class="n">view</span><span class="o">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="no">UIColor</span><span class="o">.</span><span class="n">whiteColor</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># 画面のサイズ</span>
+</span><span class='line'>    <span class="n">frame</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">bounds</span>
+</span><span class='line'>    <span class="n">height</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">height</span>
+</span><span class='line'>    <span class="n">width</span>  <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">width</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#--------------------</span>
+</span><span class='line'>    <span class="c1"># start ボタン</span>
+</span><span class='line'>    <span class="vi">@start</span> <span class="o">=</span> <span class="no">UIButton</span><span class="o">.</span><span class="n">buttonWithType</span><span class="p">(</span><span class="no">UIButtonTypeRoundedRect</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@start</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="no">CGRectMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@start</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="n">forState</span><span class="p">:</span> <span class="no">UIControlStateNormal</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># start ボタンがクリックされたとき、startTimer アクションメソッドが呼ばれるようにする</span>
+</span><span class='line'>    <span class="vi">@start</span><span class="o">.</span><span class="n">addTarget</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span>
+</span><span class='line'>                     <span class="n">action</span><span class="p">:</span> <span class="s2">&quot;startTimer:&quot;</span><span class="p">,</span>
+</span><span class='line'>                     <span class="n">forControlEvents</span><span class="p">:</span> <span class="no">UIControlEventTouchUpInside</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">view</span><span class="o">.</span><span class="n">addSubview</span><span class="p">(</span><span class="vi">@start</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#--------------------</span>
+</span><span class='line'>    <span class="c1"># stop ボタン</span>
+</span><span class='line'>    <span class="vi">@stop</span> <span class="o">=</span> <span class="no">UIButton</span><span class="o">.</span><span class="n">buttonWithType</span><span class="p">(</span><span class="no">UIButtonTypeRoundedRect</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@stop</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="no">CGRectMake</span><span class="p">(</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@stop</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s2">&quot;stop&quot;</span><span class="p">,</span> <span class="n">forState</span><span class="p">:</span> <span class="no">UIControlStateNormal</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># stop ボタンがクリックされたとき、stopTimer アクションメソッドが呼ばれるようにする</span>
+</span><span class='line'>    <span class="vi">@stop</span><span class="o">.</span><span class="n">addTarget</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span>
+</span><span class='line'>                    <span class="n">action</span><span class="p">:</span> <span class="s2">&quot;stopTimer:&quot;</span><span class="p">,</span>
+</span><span class='line'>                    <span class="n">forControlEvents</span><span class="p">:</span> <span class="no">UIControlEventTouchUpInside</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">view</span><span class="o">.</span><span class="n">addSubview</span><span class="p">(</span><span class="vi">@stop</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#--------------------------</span>
+</span><span class='line'>    <span class="c1"># タイマーの値を表示するラベル</span>
+</span><span class='line'>    <span class="vi">@label</span> <span class="o">=</span> <span class="no">UILabel</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">init</span>
+</span><span class='line'>    <span class="vi">@label</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="no">CGRectMake</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">width</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@label</span><span class="o">.</span><span class="n">font</span> <span class="o">=</span> <span class="no">UIFont</span><span class="o">.</span><span class="n">fontWithName</span><span class="p">(</span><span class="s2">&quot;AppleGothic&quot;</span><span class="p">,</span><span class="n">size</span><span class="p">:</span><span class="mi">24</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@label</span><span class="o">.</span><span class="n">textAlignment</span> <span class="o">=</span> <span class="no">UITextAlignmentCenter</span>
+</span><span class='line'>    <span class="n">view</span><span class="o">.</span><span class="n">addSubview</span><span class="p">(</span><span class="vi">@label</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">startTimer</span><span class="p">(</span><span class="n">sender</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">if</span> <span class="vi">@timer</span> <span class="o">==</span> <span class="kp">nil</span>
+</span><span class='line'>      <span class="vi">@time</span>  <span class="o">=</span> <span class="mi">0</span><span class="o">.</span><span class="mi">0</span>
+</span><span class='line'>      <span class="vi">@timer</span> <span class="o">=</span> <span class="no">NSTimer</span>
+</span><span class='line'>           <span class="o">.</span><span class="n">scheduledTimerWithTimeInterval</span><span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>                                           <span class="n">target</span><span class="p">:</span> <span class="nb">self</span><span class="p">,</span>
+</span><span class='line'>                                           <span class="n">selector</span><span class="p">:</span> <span class="s2">&quot;timerHandler:&quot;</span><span class="p">,</span>
+</span><span class='line'>                                           <span class="n">userInfo</span><span class="p">:</span> <span class="kp">nil</span><span class="p">,</span>
+</span><span class='line'>                                           <span class="n">repeats</span><span class="p">:</span> <span class="kp">true</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">stopTimer</span><span class="p">(</span><span class="n">sender</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">if</span> <span class="vi">@timer</span>
+</span><span class='line'>      <span class="vi">@timer</span><span class="o">.</span><span class="n">invalidate</span>
+</span><span class='line'>      <span class="vi">@timer</span> <span class="o">=</span> <span class="kp">nil</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">timerHandler</span><span class="p">(</span><span class="n">userInfo</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@time</span> <span class="o">+=</span> <span class="mi">0</span><span class="o">.</span><span class="mi">1</span>
+</span><span class='line'>    <span class="n">string</span> <span class="o">=</span> <span class="nb">sprintf</span><span class="p">(</span><span class="s2">&quot;%.1f&quot;</span><span class="p">,</span> <span class="vi">@time</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@label</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">string</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="ss">:launchOptions</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@window</span> <span class="o">=</span> <span class="no">UIWindow</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithFrame</span><span class="p">(</span><span class="no">UIScreen</span><span class="o">.</span><span class="n">mainScreen</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># UIViewController を継承した StopWatchViewController をルートコントローラーに設定</span>
+</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">rootViewController</span> <span class="o">=</span> <span class="no">StopWatchViewController</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">init</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">makeKeyAndVisible</span>
+</span><span class='line'>    <span class="kp">true</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion、はじめの一歩]]></title>
+    <link href="http://watson1978.github.com/blog/2012/05/03/first-step-in-rubymotion_ja/"/>
+    <updated>2012-05-03T00:00:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/05/03/first-step-in-rubymotion_ja</id>
+    <content type="html"><![CDATA[<p><a href="http://www.rubymotion.com/">RubyMotion</a> は MacRuby をベースとした、Ruby で iOS アプリを開発するための枠組みを提供します。これまで、iOS アプリを開発するために Objective-C や、JavaScript で開発できる Titanium Mobile などが利用されてきましたが、これからは Ruby でも iOS アプリを開発することができます。</p>
+
+<!-- more -->
+
+
+<h2>RubyMotion をインストール</h2>
+
+<p>インストールパッケージをダウンロードしてインストールすると、RubyMotion は /Library/RubyMotion にインストールされます。また、コマンドラインツールとして /usr/bin/motion というシンボリックリンクが作成されます。</p>
+
+<p>/Library/RubyMotion にインストールされるディレクトリ構成は以下のようになります。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/Library/RubyMotion/
+</span><span class='line'>├── bin
+</span><span class='line'>├── data
+</span><span class='line'>└── lib</span></code></pre></td></tr></table></div></figure>
+
+
+<p>アンインストール場合には /Library/RubyMotion/ と /usr/bin/motion を削除してください。</p>
+
+<h2>サンプルを動かしてみる</h2>
+
+<p>RubyMotion にはいくつかサンプルが<a href="https://github.com/HipByte/RubyMotionSamples">GitHub</a> 上で用意されています。ここでは hello というサンプルを動かしてみます。Terminal で、以下のようにコマンドを実行します。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ git clone https://github.com/HipByte/RubyMotionSamples.git
+</span><span class='line'>$ cd RubyMotionSamples/Hello/
+</span><span class='line'>$ rake
+</span><span class='line'>     Build ./build/iPhoneSimulator-5.1-Development
+</span><span class='line'>   Compile ./app/app_delegate.rb
+</span><span class='line'>   Compile ./app/hello_view.rb
+</span><span class='line'>   Compile ./app/hello_view_controller.rb
+</span><span class='line'>    Create ./build/iPhoneSimulator-5.1-Development/Hello.app
+</span><span class='line'>      Link ./build/iPhoneSimulator-5.1-Development/Hello.app/Hello
+</span><span class='line'>    Create ./build/iPhoneSimulator-5.1-Development/Hello.app/Info.plist
+</span><span class='line'>    Create ./build/iPhoneSimulator-5.1-Development/Hello.app/PkgInfo
+</span><span class='line'>      Copy ./resources/icon.png
+</span><span class='line'>    Create ./build/iPhoneSimulator-5.1-Development/Hello.dSYM
+</span><span class='line'>  Simulate ./build/iPhoneSimulator-5.1-Development/Hello.app
+</span><span class='line'>(main)&gt;&gt; </span></code></pre></td></tr></table></div></figure>
+
+
+<p>RubyMotion では Ruby で書かれたコードをコンパイルしてネイティブな実行ファイルを作成します。コンパイルが成功すると iOS シミュレータが起動し hello アプリが実行されます。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/hello.png" alt="hello アプリ" /></p>
+
+<p>RubyMotion は、まだ Xcode と連携する機能が無いため、Terminal での操作が基本になります。Rakefile が置かれているディレクトリで <code>rake -T</code> を実行すると、ビルドに使用するコマンドなどを確認できます。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ rake -T
+</span><span class='line'>rake archive              # Create archives for everything
+</span><span class='line'>rake archive:development  # Create an .ipa archive for development
+</span><span class='line'>rake archive:release      # Create an .ipa and .xcarchive for release (AppStore)
+</span><span class='line'>rake build                # Build everything
+</span><span class='line'>rake build:device         # Build the device version
+</span><span class='line'>rake build:simulator      # Build the simulator version
+</span><span class='line'>rake clean                # Clear build objects
+</span><span class='line'>rake config               # Show project config
+</span><span class='line'>rake ctags                # Generate ctags
+</span><span class='line'>rake default              # Build the project, then run the simulator
+</span><span class='line'>rake device               # Deploy on the device
+</span><span class='line'>rake simulator            # Run the simulator
+</span><span class='line'>rake spec                 # Run specs</span></code></pre></td></tr></table></div></figure>
+
+
+<p>次回は、実際にアプリを作成してみたいと思います。</p>
+]]></content>
+  </entry>
+  
+</feed>

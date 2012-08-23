@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Library | Watson's Blog]]></title>
+  <link href="http://watson1978.github.com/blog/categories/library/atom.xml" rel="self"/>
+  <link href="http://watson1978.github.com/"/>
+  <updated>2012-08-23T09:39:40+09:00</updated>
+  <id>http://watson1978.github.com/</id>
+  <author>
+    <name><![CDATA[Watson]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion で使う iOS スタティックライブラリを作る]]></title>
+    <link href="http://watson1978.github.com/blog/2012/06/07/create-static-library/"/>
+    <updated>2012-06-07T14:55:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/06/07/create-static-library</id>
+    <content type="html"><![CDATA[<p>今日はどのように iOS スタティックライブラリを作るのか、Xcode と格闘していました。</p>
+
+<p>何も考えずにビルドしてしまうと ARM 用のバイナリのみのライブラリができてしまい、i386 バイナリを必要とするシミュレータ用には使えません。</p>
+
+<p>ビルドの仕方がわからずに、どうすればライブラリが作れるか試行錯誤の課程を書きます。</p>
+
+<!-- more -->
+
+
+<h2>ライブラリ用のプロジェクトを作成</h2>
+
+<p>Xcode で "Cocoa Touch Static Library" というテンプレートを選択し、スタティックライブラリ用のプロジェクトを作成します。</p>
+
+<p><img src="/images/blog/cocoa_touch_static_library.png" alt="cocoa touch static library" /></p>
+
+<p>あとは、ライブラリで必要なプログラムを書きます。</p>
+
+<h2>ビルドする</h2>
+
+<p>ARMv6、ARMv7、i386 バイナリを含むユニバーサルなライブラリが欲しいのですが、Xcode でどのようにビルドすれば良いのかわからず途中であきらめ、Terminal 上での操作しました。</p>
+
+<p>Terminal で作成したプロジェクトのディレクトリに移動します。今回は "foo" という名前でプロジェクトを作成しています。</p>
+
+<p><code>
+$ ls
+foo/           foo.xcodeproj/
+</code></p>
+
+<p>ARM バイナリを作成します。</p>
+
+<p><code>
+$ xcodebuild -arch armv6 -arch armv7
+$ file build/Release-iphoneos/libfoo.a
+build/Release-iphoneos/libfoo.a: Mach-O universal binary with 2 architectures
+build/Release-iphoneos/libfoo.a (for architecture armv6):   current ar archive random library
+build/Release-iphoneos/libfoo.a (for architecture armv7):   current ar archive random library
+</code></p>
+
+<p>i386 バイナリは SDK に iphonesimulator を指定するとビルドされるようです。</p>
+
+<p><code>
+$ xcodebuild -sdk iphonesimulator
+$ file build/Release-iphonesimulator/libfoo.a
+build/Release-iphonesimulator/libfoo.a: current ar archive random library
+</code></p>
+
+<p>ライブラリファイルが 2 つになってしまったので、<code>lipo</code> コマンドを使って 1 つに結合します。</p>
+
+<p><code>
+$ lipo -create build/Release-iphoneos/libfoo.a build/Release-iphonesimulator/libfoo.a -output libfoo.a
+$ file libfoo.a
+libfoo.a: Mach-O universal binary with 3 architectures
+libfoo.a (for architecture armv6): current ar archive random library
+libfoo.a (for architecture armv7): current ar archive random library
+libfoo.a (for architecture i386):  current ar archive random library
+</code></p>
+
+<p>これで欲しかったライブラリができあがりました。</p>
+
+<p>もっと簡単に作れる方法をご存じの方がおられましたら、ご教示ください。</p>
+]]></content>
+  </entry>
+  
+</feed>
