@@ -130,7 +130,7 @@ OS X 10.7 環境では「iOS 4.3 Simulator」項目があるのですが、OS X 
 
 <p>プロジェクトの <code>Rakefile</code> で <code>deployment_target</code> を設定し、アプリケーションのターゲットを iOS 4.3 にします。</p>
 
-<figure class='code'><figcaption><span>Rakefile</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -155,14 +155,14 @@ OS X 10.7 環境では「iOS 4.3 Simulator」項目があるのですが、OS X 
 
 <p>単に <code>rake</code> を実行すると iOS 5.1 用のシミュレータが起動しますので、環境変数 <code>target</code> でiOS 4.3 シミュレータを起動するように指定します。</p>
 
-<figure class='code'><figcaption><span>Rakefile</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="err">$</span> <span class="n">rake</span> <span class="n">target</span><span class="o">=</span><span class="mi">4</span><span class="o">.</span><span class="mi">3</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>ほかの環境変数とあわせて利用できるので、たとえば iPad シミュレータを起動する場合には以下のように実行します。</p>
 
-<figure class='code'><figcaption><span>Rakefile</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="err">$</span> <span class="n">rake</span> <span class="n">target</span><span class="o">=</span><span class="mi">4</span><span class="o">.</span><span class="mi">3</span> <span class="n">device_family</span><span class="o">=</span><span class="n">ipad</span>
 </span></code></pre></td></tr></table></div></figure>
 

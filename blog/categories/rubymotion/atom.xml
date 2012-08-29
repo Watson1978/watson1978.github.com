@@ -4,7 +4,7 @@
   <title><![CDATA[Category: RubyMotion | Watson's Blog]]></title>
   <link href="http://watson1978.github.com/blog/categories/rubymotion/atom.xml" rel="self"/>
   <link href="http://watson1978.github.com/"/>
-  <updated>2012-08-29T23:02:53+09:00</updated>
+  <updated>2012-08-29T23:09:43+09:00</updated>
   <id>http://watson1978.github.com/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -45,7 +45,7 @@ OS X 10.7 環境では「iOS 4.3 Simulator」項目があるのですが、OS X 
 
 <p>プロジェクトの <code>Rakefile</code> で <code>deployment_target</code> を設定し、アプリケーションのターゲットを iOS 4.3 にします。</p>
 
-<p>```ruby Rakefile</p>
+<p>```ruby</p>
 
 <h1>-<em>- coding: utf-8 -</em>-</h1>
 
