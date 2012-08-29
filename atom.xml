@@ -4,7 +4,7 @@
   <title><![CDATA[Watson's Blog]]></title>
   <link href="http://watson1978.github.com/atom.xml" rel="self"/>
   <link href="http://watson1978.github.com/"/>
-  <updated>2012-08-25T01:48:16+09:00</updated>
+  <updated>2012-08-29T23:02:53+09:00</updated>
   <id>http://watson1978.github.com/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -12,6 +12,79 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[iOS 4.3 を対象としたアプリケーションを作る]]></title>
+    <link href="http://watson1978.github.com/blog/2012/08/29/make-an-application-which-target-the-ios-4/"/>
+    <updated>2012-08-29T21:02:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/08/29/make-an-application-which-target-the-ios-4</id>
+    <content type="html"><![CDATA[<p>RubyMotion は、iOS 4.3 以降を対象としたアプリケーションを作ることができます。プロジェクトの設定や、シミュレータの起動方法について書きたいと思います。個人的には世の中が iOS 5.x だけになると、みんなハッピーになれそうな気がするのですが・・・(^ ^;)</p>
+
+<div class="note">
+今のところ OS X 10.8 環境では iOS 4.3 シミュレータをインストールできないようなので、OS X 10.7 環境が必要となるので注意してください。
+</div>
+
+
+
+
+<!-- more -->
+
+
+<h2>iOS 4.3 シミュレータをインストール</h2>
+
+<p>もし、iOS 4.3 シミュレータをお持ちでなければインストールしておきます。Xcode の [Preferences&#8230;] メニューの [Downloads] タブでシミュレータをインストールすることができます。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/install_ios43_simulator.png" alt="install iOS 4.3 simulator" /></p>
+
+<div class="note">
+OS X 10.7 環境では「iOS 4.3 Simulator」項目があるのですが、OS X 10.8 では表示されずインストールできないようです。
+</div>
+
+
+<h2>プロジェクトの設定</h2>
+
+<p>プロジェクトの <code>Rakefile</code> で <code>deployment_target</code> を設定し、アプリケーションのターゲットを iOS 4.3 にします。</p>
+
+<figure class='code'><figcaption><span>Rakefile</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># -*- coding: utf-8 -*-</span>
+</span><span class='line'><span class="vg">$:</span><span class="o">.</span><span class="n">unshift</span><span class="p">(</span><span class="s2">&quot;/Library/RubyMotion/lib&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;motion/project&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Motion</span><span class="o">::</span><span class="no">Project</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
+</span><span class='line'>  <span class="c1"># Use `rake config&#39; to see complete project settings.</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;your app name&#39;</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">deployment_target</span> <span class="o">=</span> <span class="s2">&quot;4.3&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>アプリケーションを実行</h2>
+
+<p>単に <code>rake</code> を実行すると iOS 5.1 用のシミュレータが起動しますので、環境変数 <code>target</code> でiOS 4.3 シミュレータを起動するように指定します。</p>
+
+<figure class='code'><figcaption><span>Rakefile</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="err">$</span> <span class="n">rake</span> <span class="n">target</span><span class="o">=</span><span class="mi">4</span><span class="o">.</span><span class="mi">3</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ほかの環境変数とあわせて利用できるので、たとえば iPad シミュレータを起動する場合には以下のように実行します。</p>
+
+<figure class='code'><figcaption><span>Rakefile</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="err">$</span> <span class="n">rake</span> <span class="n">target</span><span class="o">=</span><span class="mi">4</span><span class="o">.</span><span class="mi">3</span> <span class="n">device_family</span><span class="o">=</span><span class="n">ipad</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>あとはアプリケーションのコードをひたすら記述するだけですね！</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Sublime Text を導入して RubyMotion アプリ開発をもっと楽しいものに]]></title>
