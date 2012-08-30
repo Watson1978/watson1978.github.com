@@ -4,7 +4,7 @@
   <title><![CDATA[Watson's Blog]]></title>
   <link href="http://watson1978.github.com/atom.xml" rel="self"/>
   <link href="http://watson1978.github.com/"/>
-  <updated>2012-08-29T23:09:43+09:00</updated>
+  <updated>2012-08-30T09:45:39+09:00</updated>
   <id>http://watson1978.github.com/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -12,6 +12,154 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion ではじめるGoogle Analytics for iOS]]></title>
+    <link href="http://watson1978.github.com/blog/2012/08/30/use-google-analytics/"/>
+    <updated>2012-08-30T08:42:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/08/30/use-google-analytics</id>
+    <content type="html"><![CDATA[<p>アプリがどれだけダウンロードされているか開発者なら誰もが気になるところでしょうが、どの機能がどれだけ使われているかといったことも気になるところがと思います。</p>
+
+<p>Google Analytics for iOS を利用すると、ユーザが使用している機能を簡単にトラッキングすることができます。</p>
+
+<!-- more -->
+
+
+<h2>トラッキング ID を発行する</h2>
+
+<p>Google Analytics の「アカウントの管理」画面で新しいアカウントを追加します。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/analytics_add_account.png" alt="アカウントの管理" /></p>
+
+<p>次にアカウント名などの情報を記入します。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/analytics_create_account.png" alt="アカウントの追加" /></p>
+
+<p>「ウェブサイトのURL」では &#8220;ウェブサイト以外&#8221;、「タイムゾーン」は &#8220;日本&#8221; を選択しておくとよいでしょう。</p>
+
+<p>アカウントを作成した後、&#8221;UA-xxxxxxxx-1&#8221; のようなトラッキング ID が発行されます。あとで使用するので控えておいてください。</p>
+
+<h2>Google Analytics SDK for iOS をダウンロード</h2>
+
+<p><a href="https://developers.google.com/analytics/devguides/collection/ios/resources">Google Analytics SDK for iOS</a> から、SDK をダウンロードしておきます。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/analytics_sdk.png" alt="SDK のダウンロード" /></p>
+
+<h2>RubyMotion プロジェクトを作成</h2>
+
+<p>それでは、アプリに Google Analytics を組み込んでいきましょう。今回は「HelloAnalytics」という名前でアプリを作成します。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ motion create HelloAnalytics</span></code></pre></td></tr></table></div></figure>
+
+
+<p>先ほどダウンロードした SDK のアーカイブを展開し、&#8221;Library&#8221; ディレクトリをプロジェクトに追加します。まずプロジェクトに &#8220;vendor&#8221; ディレクトリを作成しましょう。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd HelloAnalytics/
+</span><span class='line'>$ mkdir vendor</span></code></pre></td></tr></table></div></figure>
+
+
+<p>作成したディレクトリに SDK の &#8220;Library&#8221; を追加します。以下のようなファイル構成になります。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ tree vendor/
+</span><span class='line'>vendor/
+</span><span class='line'>└── Library
+</span><span class='line'>    ├── GANTracker.h
+</span><span class='line'>    ├── libGoogleAnalytics.a
+</span><span class='line'>    └── libGoogleAnalytics_NoThumb.a</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>プロジェクトの設定</h2>
+
+<p>プロジェクトの <code>Rakefile</code> をエディタで開き SDK を使うための設定をします。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># -*- coding: utf-8 -*-</span>
+</span><span class='line'><span class="vg">$:</span><span class="o">.</span><span class="n">unshift</span><span class="p">(</span><span class="s2">&quot;/Library/RubyMotion/lib&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;motion/project&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Motion</span><span class="o">::</span><span class="no">Project</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
+</span><span class='line'>  <span class="c1"># Use `rake config&#39; to see complete project settings.</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;HelloAnalytics&#39;</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">vendor_project</span><span class="p">(</span><span class="s1">&#39;vendor/Library&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:static</span><span class="p">,</span> <span class="ss">:products</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;libGoogleAnalytics.a&#39;</span><span class="o">]</span><span class="p">,</span> <span class="ss">:headers_dir</span> <span class="o">=&gt;</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">frameworks</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;CFNetwork&quot;</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">libs</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;/usr/lib/libsqlite3.dylib&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>vendor_project</code> を設定し Google Analytics SDK を利用できるようにします。SDK は CFNetwork.framework と libsqlite3.dylib を使用するようなので、<code>frameworks</code> と <code>libs</code> でそれぞれ設定します。</p>
+
+<p>これでアプリで Google Analytics SDK を使えるようになります！</p>
+
+<h2>トラッキングを開始</h2>
+
+<p>それでは、以下のようなコードをアプリに追加してトラッキングを開始してみましょう。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="ss">:launchOptions</span><span class="p">)</span>
+</span><span class='line'>    <span class="no">GANTracker</span><span class="o">.</span><span class="n">sharedTracker</span><span class="o">.</span><span class="n">startTrackerWithAccountID</span><span class="p">(</span><span class="s2">&quot;UA-xxxxxxxx-1&quot;</span><span class="p">,</span>
+</span><span class='line'>                                                       <span class="n">dispatchPeriod</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+</span><span class='line'>                                                       <span class="n">delegate</span><span class="p">:</span> <span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">error</span> <span class="o">=</span> <span class="no">Pointer</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:object</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">unless</span> <span class="no">GANTracker</span><span class="o">.</span><span class="n">sharedTracker</span><span class="o">.</span><span class="n">trackPageview</span><span class="p">(</span><span class="s2">&quot;/app_entry_point&quot;</span><span class="p">,</span>
+</span><span class='line'>                                                  <span class="n">withError</span><span class="p">:</span> <span class="n">error</span><span class="p">)</span>
+</span><span class='line'>      <span class="c1"># Handle error here</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kp">true</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>startTrackerWithAccountID</code> メソッドには、先ほど発行されたトラッキング ID を記述します。</p>
+
+<p>アプリを実行すると、計測結果が Google Analytics で確認できるようになります。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/analytics_result.png" alt="計測結果" /></p>
+
+<p><a href="https://developers.google.com/analytics/devguides/collection/ios/devguide">https://developers.google.com/analytics/devguides/collection/ios/devguide</a> に SDK の使い方について詳しく書かれていますので、必要なトラッキング処理をアプリに追加しいろいろ計測してみてください！</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[iOS 4.3 を対象としたアプリケーションを作る]]></title>
