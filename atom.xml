@@ -4,7 +4,7 @@
   <title><![CDATA[Watson's Blog]]></title>
   <link href="http://watson1978.github.com/atom.xml" rel="self"/>
   <link href="http://watson1978.github.com/"/>
-  <updated>2012-08-30T09:45:39+09:00</updated>
+  <updated>2012-09-10T17:39:07+09:00</updated>
   <id>http://watson1978.github.com/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -12,6 +12,119 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Bonjour RubyMotion]]></title>
+    <link href="http://watson1978.github.com/blog/2012/09/10/bonjour-rubymotion/"/>
+    <updated>2012-09-10T17:03:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/09/10/bonjour-rubymotion</id>
+    <content type="html"><![CDATA[<p>今まで主夫兼 MacRuby Team メンバーみたいな肩書きだったのが、9 月 4 日 からは RubyMotion Team メンバーという肩書きが増えました。ありがとうございます。2010 年 8 月に MacRuby Team メンバーに加えていただいてから、少しずつ MacRuby の不具合を取り除いてきましたが、ここまでのものになると参加当時は思ってもみませんでした。Bonjour RubyMotion!</p>
+
+<p>ということで、今日は RubyMotion で Bonjour を使ったものを書いてみました。</p>
+
+<!-- more -->
+
+
+<p>NSNetServiceBrowser と NSNetService というクラスを使って、iOS 側から Web サーバを探して接続するものとなっています。</p>
+
+<figure class='code'><figcaption><span>app/app_delegate.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">BJController</span> <span class="o">&lt;</span> <span class="no">UIViewController</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">viewDidLoad</span>
+</span><span class='line'>    <span class="k">super</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># NSNetServiceBrowser を使ってサービスを検索</span>
+</span><span class='line'>    <span class="vi">@netServiceBrowser</span> <span class="o">=</span> <span class="no">NSNetServiceBrowser</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">init</span>
+</span><span class='line'>    <span class="vi">@netServiceBrowser</span><span class="o">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="nb">self</span>
+</span><span class='line'>    <span class="vi">@netServiceBrowser</span><span class="o">.</span><span class="n">searchForServicesOfType</span><span class="p">(</span><span class="s2">&quot;_http._tcp&quot;</span><span class="p">,</span> <span class="n">inDomain</span><span class="ss">:&quot;local&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="nb">self</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">netServiceBrowser</span><span class="p">(</span><span class="n">netServiceBrowser</span><span class="p">,</span>
+</span><span class='line'>                        <span class="n">didFindService</span><span class="p">:</span> <span class="n">service</span><span class="p">,</span>
+</span><span class='line'>                        <span class="n">moreComing</span><span class="p">:</span> <span class="n">moreComing</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@netServiceBrowser</span><span class="o">.</span><span class="n">stop</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># NSNetService を使って接続先のアドレスを解決</span>
+</span><span class='line'>    <span class="vi">@service</span> <span class="o">=</span> <span class="no">NSNetService</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithDomain</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">type</span><span class="ss">:service</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="nb">name</span><span class="ss">:service</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@service</span><span class="o">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="nb">self</span>
+</span><span class='line'>    <span class="vi">@service</span><span class="o">.</span><span class="n">resolveWithTimeout</span><span class="p">(</span><span class="mi">5</span><span class="o">.</span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">netServiceDidResolveAddress</span><span class="p">(</span><span class="n">service</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@service</span><span class="o">.</span><span class="n">stop</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://</span><span class="si">#{</span><span class="vi">@service</span><span class="o">.</span><span class="n">hostName</span><span class="si">}</span><span class="s2">:</span><span class="si">#{</span><span class="vi">@service</span><span class="o">.</span><span class="n">port</span><span class="si">}</span><span class="s2">/&quot;</span>
+</span><span class='line'>    <span class="vi">@webview</span> <span class="o">=</span> <span class="no">UIWebView</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">tap</span> <span class="k">do</span> <span class="o">|</span><span class="n">v</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">v</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">bounds</span>
+</span><span class='line'>      <span class="n">v</span><span class="o">.</span><span class="n">scalesPageToFit</span> <span class="o">=</span> <span class="kp">true</span>
+</span><span class='line'>      <span class="n">v</span><span class="o">.</span><span class="n">loadRequest</span><span class="p">(</span><span class="no">NSURLRequest</span><span class="o">.</span><span class="n">requestWithURL</span><span class="p">(</span><span class="no">NSURL</span><span class="o">.</span><span class="n">URLWithString</span><span class="p">(</span><span class="n">url</span><span class="p">)))</span>
+</span><span class='line'>      <span class="n">v</span><span class="o">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="nb">self</span>
+</span><span class='line'>      <span class="n">view</span><span class="o">.</span><span class="n">addSubview</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="ss">:launchOptions</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@window</span> <span class="o">=</span> <span class="no">UIWindow</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithFrame</span><span class="p">(</span><span class="no">UIScreen</span><span class="o">.</span><span class="n">mainScreen</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">rootViewController</span> <span class="o">=</span> <span class="no">BJController</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithNibName</span><span class="p">(</span><span class="kp">nil</span><span class="p">,</span> <span class="n">bundle</span><span class="p">:</span> <span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">makeKeyAndVisible</span>
+</span><span class='line'>    <span class="kp">true</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Web サーバはどうするかというと、<a href="https://github.com/MacRuby/MacRubySamples/blob/master/Scripts/webrick.rb">https://github.com/MacRuby/MacRubySamples/blob/master/Scripts/webrick.rb</a> を使うと簡単ですね。</p>
+
+<p>あらかじめ、MacRuby で書かれたサーバを起動しておいて、上記の iOS アプリを実行します。あとは、Bonjour を使って見つかったサーバに接続し UIWebView で表示しています。iPhone で URL を入力するのが面倒なので、そんな手間なしでさくっと Web ページを確認したいときとかに便利・・・かもしれませんね。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/bonjour.png" alt="Bonjour" /></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[RubyMotion ではじめるGoogle Analytics for iOS]]></title>
