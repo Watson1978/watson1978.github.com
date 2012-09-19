@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>RubyMotion ではじめるGoogle Analytics for iOS - Watson's Blog</title>
+  <title>RubyMotion で Parse を使ってみました - Watson's Blog</title>
   <meta name="author" content="Watson">
 
   
-  <meta name="description" content="アプリがどれだけダウンロードされているか開発者なら誰もが気になるところでしょうが、どの機能がどれだけ使われているかといったことも気になるところがと思います。 Google Analytics for iOS を利用すると、ユーザが使用している機能を簡単にトラッキングすることができます。 &hellip;">
+  <meta name="description" content="Parse は、ユーザ認証やプッシュ通知といったサーバ側の実装が必要となる機能をあらかじめ用意してくれていて、アプリから単に API を呼び出すだけで簡単にそれらの機能を利用できてしまうという、すごく便利なサービスです。 ユーザ登録 「Try it for free」 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://watson1978.github.com/blog/2012/08/30/use-google-analytics/">
+  <link rel="canonical" href="http://watson1978.github.com/blog/2012/09/19/using-parse/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -78,7 +78,7 @@
   
   <header>
     
-      <h1 class="entry-title">RubyMotion ではじめるGoogle Analytics for iOS</h1>
+      <h1 class="entry-title">RubyMotion で Parse を使ってみました</h1>
     
     
       <p class="meta">
@@ -94,7 +94,7 @@
   
 
 
-<time datetime="2012-08-30T08:42:00+09:00" pubdate data-updated="true">Aug 30<span>th</span>, 2012</time>
+<time datetime="2012-09-19T17:15:00+09:00" pubdate data-updated="true">Sep 19<span>th</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -103,50 +103,38 @@
   </header>
 
 
-<div class="entry-content"><p>アプリがどれだけダウンロードされているか開発者なら誰もが気になるところでしょうが、どの機能がどれだけ使われているかといったことも気になるところがと思います。</p>
+<div class="entry-content"><p><a href="https://www.parse.com/">Parse</a> は、ユーザ認証やプッシュ通知といったサーバ側の実装が必要となる機能をあらかじめ用意してくれていて、アプリから単に API を呼び出すだけで簡単にそれらの機能を利用できてしまうという、すごく便利なサービスです。</p>
 
-<p>Google Analytics for iOS を利用すると、ユーザが使用している機能を簡単にトラッキングすることができます。</p>
+<p><img src="/images/blog/parse.png" alt="Parse" /></p>
 
 <!-- more -->
 
 
-<h2>トラッキング ID を発行する</h2>
+<h2>ユーザ登録</h2>
 
-<p>Google Analytics の「アカウントの管理」画面で新しいアカウントを追加します。</p>
+<p>「Try it for free」ボタンをクリックすると無料でユーザ登録できます。</p>
 
-<p><img src="/images/blog/analytics_add_account.png" alt="アカウントの管理" /></p>
+<p><img src="/images/blog/parse_sign_up.png" alt="sign up" /></p>
 
-<p>次にアカウント名などの情報を記入します。</p>
+<p>メールアドレスとパスワードを入力すると、次に Parse を使うアプリ名を聞かれます。後ほど変更することもできるので適当な名前を入力しておきましょう。私は「HelloParse」と安易な名前を入力しました。</p>
 
-<p><img src="/images/blog/analytics_create_account.png" alt="アカウントの追加" /></p>
+<p><img src="/images/blog/parse_get_started.png" alt="get started" /></p>
 
-<p>「ウェブサイトのURL」では &#8220;ウェブサイト以外&#8221;、「タイムゾーン」は &#8220;日本&#8221; を選択しておくとよいでしょう。</p>
+<h2>Parse SDK をダウンロード</h2>
 
-<p>アカウントを作成した後、&#8221;UA-xxxxxxxx-1&#8221; のようなトラッキング ID が発行されます。あとで使用するので控えておいてください。</p>
+<p><a href="https://www.parse.com/apps/quickstart">Quick Start</a> ページで Parse SDK の簡単な導入方法について説明が書かれていますので、これに従って作業してみましょう。</p>
 
-<h2>Google Analytics SDK for iOS をダウンロード</h2>
+<p>「1 Choose your platform」で、&#8221;iOS&#8221; と &#8220;Existing Project&#8221; を選択しておきます。(&#8220;Existing Project&#8221; を選択しておくと、SDK のみをダウンロードしやすいので)。</p>
 
-<p><a href="https://developers.google.com/analytics/devguides/collection/ios/resources">Google Analytics SDK for iOS</a> から、SDK をダウンロードしておきます。</p>
+<p><img src="/images/blog/parse_choose_platform.png" alt="Choose your platform" /></p>
 
-<p><img src="/images/blog/analytics_sdk.png" alt="SDK のダウンロード" /></p>
+<p>「3 Download &amp; install the SDK」で、Parse SDK をダウンロードしておきます。</p>
 
-<h2>RubyMotion プロジェクトを作成</h2>
+<p><img src="/images/blog/parse_download_sdk.png" alt="Download &amp; install the SDK" /></p>
 
-<p>それでは、アプリに Google Analytics を組み込んでいきましょう。今回は「HelloAnalytics」という名前でアプリを作成します。</p>
+<h2>RubyMotion アプリを作成</h2>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ motion create HelloAnalytics</span></code></pre></td></tr></table></div></figure>
-
-
-<p>先ほどダウンロードした SDK のアーカイブを展開し、&#8221;Library&#8221; ディレクトリをプロジェクトに追加します。まずプロジェクトに &#8220;vendor&#8221; ディレクトリを作成しましょう。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd HelloAnalytics/
-</span><span class='line'>$ mkdir vendor</span></code></pre></td></tr></table></div></figure>
-
-
-<p>作成したディレクトリに SDK の &#8220;Library&#8221; を追加します。以下のようなファイル構成になります。</p>
+<p>それでは、Parse SDK を使用した RubyMotion で「HelloParse」というアプリを作ってみましょう。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -154,17 +142,45 @@
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ motion create HelloParse
+</span><span class='line'>    Create HelloParse
+</span><span class='line'>    Create HelloParse/.gitignore
+</span><span class='line'>    Create HelloParse/Rakefile
+</span><span class='line'>    Create HelloParse/app
+</span><span class='line'>    Create HelloParse/app/app_delegate.rb
+</span><span class='line'>    Create HelloParse/resources
+</span><span class='line'>    Create HelloParse/spec
+</span><span class='line'>    Create HelloParse/spec/main_spec.rb</span></code></pre></td></tr></table></div></figure>
+
+
+<p>先ほどダウンロードした Parse SDK を <code>vendor</code> ディレクトリに配置します。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd HelloParse
+</span><span class='line'>$ mkdir vendor</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>parse-library-1.1.6.zip</code> を解凍すると <code>Parse.framework</code> というディレクトリが展開されるので、このディレクトリを <code>vendor</code> ディレクトリにコピーします。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>$ tree vendor/
 </span><span class='line'>vendor/
-</span><span class='line'>└── Library
-</span><span class='line'>    ├── GANTracker.h
-</span><span class='line'>    ├── libGoogleAnalytics.a
-</span><span class='line'>    └── libGoogleAnalytics_NoThumb.a</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>└── Parse.framework
+</span><span class='line'>    ├── Headers -&gt; Versions/Current/Headers
+</span><span class='line'>...</span></code></pre></td></tr></table></div></figure>
 
 
-<h2>プロジェクトの設定</h2>
+<h3>Rakefile を編集</h3>
 
-<p>プロジェクトの <code>Rakefile</code> をエディタで開き SDK を使うための設定をします。</p>
+<p>アプリで Parse SDK が使われるように <code>Rakefile</code> を編集し設定します。以下のように <code>vendor_project</code>、<code>frameworks</code>、<code>libs</code> を設定します。</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -178,30 +194,24 @@
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># -*- coding: utf-8 -*-</span>
-</span><span class='line'><span class="vg">$:</span><span class="o">.</span><span class="n">unshift</span><span class="p">(</span><span class="s2">&quot;/Library/RubyMotion/lib&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;motion/project&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="no">Motion</span><span class="o">::</span><span class="no">Project</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Motion</span><span class="o">::</span><span class="no">Project</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
 </span><span class='line'>  <span class="c1"># Use `rake config&#39; to see complete project settings.</span>
-</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;HelloAnalytics&#39;</span>
-</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">vendor_project</span><span class="p">(</span><span class="s1">&#39;vendor/Library&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="ss">:static</span><span class="p">,</span> <span class="ss">:products</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;libGoogleAnalytics.a&#39;</span><span class="o">]</span><span class="p">,</span> <span class="ss">:headers_dir</span> <span class="o">=&gt;</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">frameworks</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;CFNetwork&quot;</span>
-</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">libs</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;/usr/lib/libsqlite3.dylib&quot;</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;HelloParse&#39;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1"># Parse SDK</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">vendor_project</span><span class="p">(</span><span class="s1">&#39;vendor/Parse.framework&#39;</span><span class="p">,</span>
+</span><span class='line'>                      <span class="ss">:static</span><span class="p">,</span>
+</span><span class='line'>                      <span class="ss">:products</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;Parse&#39;</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>                      <span class="ss">:headers_dir</span> <span class="o">=&gt;</span> <span class="s1">&#39;Headers&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">frameworks</span> <span class="o">+=</span> <span class="sx">%w(AudioToolbox CFNetwork MobileCoreServices QuartzCore Security StoreKit SystemConfiguration)</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">libs</span> <span class="o">+=</span> <span class="sx">%W(/usr/lib/libz.dylib /usr/lib/libsqlite3.dylib)</span>
 </span><span class='line'><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><code>vendor_project</code> を設定し Google Analytics SDK を利用できるようにします。SDK は CFNetwork.framework と libsqlite3.dylib を使用するようなので、<code>frameworks</code> と <code>libs</code> でそれぞれ設定します。</p>
+<h3>Parse SDK API を使ってみよう</h3>
 
-<p>これでアプリで Google Analytics SDK を使えるようになります！</p>
-
-<h2>トラッキングを開始</h2>
-
-<p>それでは、以下のようなコードをアプリに追加してトラッキングを開始してみましょう。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>app/app_delegate.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -212,37 +222,29 @@
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
 </span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="ss">:launchOptions</span><span class="p">)</span>
-</span><span class='line'>    <span class="no">GANTracker</span><span class="o">.</span><span class="n">sharedTracker</span><span class="o">.</span><span class="n">startTrackerWithAccountID</span><span class="p">(</span><span class="s2">&quot;UA-xxxxxxxx-1&quot;</span><span class="p">,</span>
-</span><span class='line'>                                                       <span class="n">dispatchPeriod</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-</span><span class='line'>                                                       <span class="n">delegate</span><span class="p">:</span> <span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>    <span class="no">Parse</span><span class="o">.</span><span class="n">setApplicationId</span><span class="p">(</span><span class="s2">&quot;&lt;Application-Id&gt;&quot;</span><span class="p">,</span>
+</span><span class='line'>                           <span class="n">clientKey</span><span class="ss">:&quot;&lt;Client-Key&gt;&quot;</span><span class="p">)</span>
 </span><span class='line'>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">error</span> <span class="o">=</span> <span class="no">Pointer</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:object</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">unless</span> <span class="no">GANTracker</span><span class="o">.</span><span class="n">sharedTracker</span><span class="o">.</span><span class="n">trackPageview</span><span class="p">(</span><span class="s2">&quot;/app_entry_point&quot;</span><span class="p">,</span>
-</span><span class='line'>                                                  <span class="n">withError</span><span class="p">:</span> <span class="n">error</span><span class="p">)</span>
-</span><span class='line'>      <span class="c1"># Handle error here</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
+</span><span class='line'>    <span class="n">obj</span> <span class="o">=</span> <span class="no">PFObject</span><span class="o">.</span><span class="n">objectWithClassName</span><span class="p">(</span><span class="s2">&quot;TestObject&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">obj</span><span class="o">.</span><span class="n">setObject</span><span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="n">forKey</span><span class="ss">:&quot;foo&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">obj</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
 </span><span class='line'>    <span class="kp">true</span>
 </span><span class='line'>  <span class="k">end</span>
 </span><span class='line'><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><code>startTrackerWithAccountID</code> メソッドには、先ほど発行されたトラッキング ID を記述します。</p>
+<p><code>setApplicationId</code> メソッドで使用している <code>&lt;Application-Id&gt;</code> と <code>&lt;Client-Key&gt;</code> は <a href="https://www.parse.com/apps/quickstart">Quick Start</a> に書かれていたものを使用します。</p>
 
-<p>アプリを実行すると、計測結果が Google Analytics で確認できるようになります。</p>
+<p><img src="/images/blog/parse_app_id_client_key.png" alt="Application ID &amp; Client Key" /></p>
 
-<p><img src="/images/blog/analytics_result.png" alt="計測結果" /></p>
+<p><code>rake</code> でアプリを実行してみましょう。Quick Start に設置されていた「Test」というボタンをクリックすると、正しく動作したか確認することができます。</p>
 
-<p><a href="https://developers.google.com/analytics/devguides/collection/ios/devguide">https://developers.google.com/analytics/devguides/collection/ios/devguide</a> に SDK の使い方について詳しく書かれていますので、必要なトラッキング処理をアプリに追加しいろいろ計測してみてください！</p>
+<p><img src="/images/blog/parse_test.png" alt="Test" /></p>
+
+<p>次は Parse SDK を使って Push Notification に挑戦してみたいなと思います。Enjoy!</p>
 </div>
 
 
@@ -265,12 +267,12 @@
   
 
 
-<time datetime="2012-08-30T08:42:00+09:00" pubdate data-updated="true">Aug 30<span>th</span>, 2012</time>
+<time datetime="2012-09-19T17:15:00+09:00" pubdate data-updated="true">Sep 19<span>th</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/rubymotion/'>RubyMotion</a>
+    <a class='category' href='/blog/categories/macruby/'>MacRuby</a>, <a class='category' href='/blog/categories/rubymotion-/'>RubyMotion,</a>
   
 </span>
 
@@ -289,7 +291,7 @@
   <a href="#" onclick="Evernote.doClip({}); return false;"><img src="http://static.evernote.com/site-mem-32.png"  height="20" width="20" style="border: none;" alt="Clip to Evernote" /></a>
   
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://watson1978.github.com/blog/2012/08/30/use-google-analytics/" data-via="watson1978" data-counturl="http://watson1978.github.com/blog/2012/08/30/use-google-analytics/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://watson1978.github.com/blog/2012/09/19/using-parse/" data-via="watson1978" data-counturl="http://watson1978.github.com/blog/2012/09/19/using-parse/" >Tweet</a>
   
   
   <div class="fb-like" data-send="false" data-layout="button_count" data-show-faces="true"></div>
@@ -302,10 +304,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/08/29/make-an-application-which-target-the-ios-4/" title="Previous Post: iOS 4.3 を対象としたアプリケーションを作る">&laquo; iOS 4.3 を対象としたアプリケーションを作る</a>
+        <a class="basic-alignment left" href="/blog/2012/09/10/bonjour-rubymotion/" title="Previous Post: Bonjour RubyMotion">&laquo; Bonjour RubyMotion</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2012/09/10/bonjour-rubymotion/" title="Next Post: Bonjour RubyMotion">Bonjour RubyMotion &raquo;</a>
       
     </p>
   </footer>
@@ -397,8 +397,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://watson1978.github.com/blog/2012/08/30/use-google-analytics/';
-        var disqus_url = 'http://watson1978.github.com/blog/2012/08/30/use-google-analytics/';
+        var disqus_identifier = 'http://watson1978.github.com/blog/2012/09/19/using-parse/';
+        var disqus_url = 'http://watson1978.github.com/blog/2012/09/19/using-parse/';
         var disqus_script = 'embed.js';
       
     (function () {

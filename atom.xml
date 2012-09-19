@@ -4,7 +4,7 @@
   <title><![CDATA[Watson's Blog]]></title>
   <link href="http://watson1978.github.com/atom.xml" rel="self"/>
   <link href="http://watson1978.github.com/"/>
-  <updated>2012-09-10T17:47:09+09:00</updated>
+  <updated>2012-09-19T22:02:01+09:00</updated>
   <id>http://watson1978.github.com/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -12,6 +12,156 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion で Parse を使ってみました]]></title>
+    <link href="http://watson1978.github.com/blog/2012/09/19/using-parse/"/>
+    <updated>2012-09-19T17:15:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/09/19/using-parse</id>
+    <content type="html"><![CDATA[<p><a href="https://www.parse.com/">Parse</a> は、ユーザ認証やプッシュ通知といったサーバ側の実装が必要となる機能をあらかじめ用意してくれていて、アプリから単に API を呼び出すだけで簡単にそれらの機能を利用できてしまうという、すごく便利なサービスです。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/parse.png" alt="Parse" /></p>
+
+<!-- more -->
+
+
+<h2>ユーザ登録</h2>
+
+<p>「Try it for free」ボタンをクリックすると無料でユーザ登録できます。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/parse_sign_up.png" alt="sign up" /></p>
+
+<p>メールアドレスとパスワードを入力すると、次に Parse を使うアプリ名を聞かれます。後ほど変更することもできるので適当な名前を入力しておきましょう。私は「HelloParse」と安易な名前を入力しました。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/parse_get_started.png" alt="get started" /></p>
+
+<h2>Parse SDK をダウンロード</h2>
+
+<p><a href="https://www.parse.com/apps/quickstart">Quick Start</a> ページで Parse SDK の簡単な導入方法について説明が書かれていますので、これに従って作業してみましょう。</p>
+
+<p>「1 Choose your platform」で、&#8221;iOS&#8221; と &#8220;Existing Project&#8221; を選択しておきます。(&#8220;Existing Project&#8221; を選択しておくと、SDK のみをダウンロードしやすいので)。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/parse_choose_platform.png" alt="Choose your platform" /></p>
+
+<p>「3 Download &amp; install the SDK」で、Parse SDK をダウンロードしておきます。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/parse_download_sdk.png" alt="Download &amp; install the SDK" /></p>
+
+<h2>RubyMotion アプリを作成</h2>
+
+<p>それでは、Parse SDK を使用した RubyMotion で「HelloParse」というアプリを作ってみましょう。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ motion create HelloParse
+</span><span class='line'>    Create HelloParse
+</span><span class='line'>    Create HelloParse/.gitignore
+</span><span class='line'>    Create HelloParse/Rakefile
+</span><span class='line'>    Create HelloParse/app
+</span><span class='line'>    Create HelloParse/app/app_delegate.rb
+</span><span class='line'>    Create HelloParse/resources
+</span><span class='line'>    Create HelloParse/spec
+</span><span class='line'>    Create HelloParse/spec/main_spec.rb</span></code></pre></td></tr></table></div></figure>
+
+
+<p>先ほどダウンロードした Parse SDK を <code>vendor</code> ディレクトリに配置します。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd HelloParse
+</span><span class='line'>$ mkdir vendor</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>parse-library-1.1.6.zip</code> を解凍すると <code>Parse.framework</code> というディレクトリが展開されるので、このディレクトリを <code>vendor</code> ディレクトリにコピーします。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ tree vendor/
+</span><span class='line'>vendor/
+</span><span class='line'>└── Parse.framework
+</span><span class='line'>    ├── Headers -&gt; Versions/Current/Headers
+</span><span class='line'>...</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Rakefile を編集</h3>
+
+<p>アプリで Parse SDK が使われるように <code>Rakefile</code> を編集し設定します。以下のように <code>vendor_project</code>、<code>frameworks</code>、<code>libs</code> を設定します。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Motion</span><span class="o">::</span><span class="no">Project</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
+</span><span class='line'>  <span class="c1"># Use `rake config&#39; to see complete project settings.</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;HelloParse&#39;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1"># Parse SDK</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">vendor_project</span><span class="p">(</span><span class="s1">&#39;vendor/Parse.framework&#39;</span><span class="p">,</span>
+</span><span class='line'>                      <span class="ss">:static</span><span class="p">,</span>
+</span><span class='line'>                      <span class="ss">:products</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;Parse&#39;</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>                      <span class="ss">:headers_dir</span> <span class="o">=&gt;</span> <span class="s1">&#39;Headers&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">frameworks</span> <span class="o">+=</span> <span class="sx">%w(AudioToolbox CFNetwork MobileCoreServices QuartzCore Security StoreKit SystemConfiguration)</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">libs</span> <span class="o">+=</span> <span class="sx">%W(/usr/lib/libz.dylib /usr/lib/libsqlite3.dylib)</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Parse SDK API を使ってみよう</h3>
+
+<figure class='code'><figcaption><span>app/app_delegate.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="ss">:launchOptions</span><span class="p">)</span>
+</span><span class='line'>    <span class="no">Parse</span><span class="o">.</span><span class="n">setApplicationId</span><span class="p">(</span><span class="s2">&quot;&lt;Application-Id&gt;&quot;</span><span class="p">,</span>
+</span><span class='line'>                           <span class="n">clientKey</span><span class="ss">:&quot;&lt;Client-Key&gt;&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">obj</span> <span class="o">=</span> <span class="no">PFObject</span><span class="o">.</span><span class="n">objectWithClassName</span><span class="p">(</span><span class="s2">&quot;TestObject&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">obj</span><span class="o">.</span><span class="n">setObject</span><span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="n">forKey</span><span class="ss">:&quot;foo&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">obj</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</span><span class='line'>    <span class="kp">true</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>setApplicationId</code> メソッドで使用している <code>&lt;Application-Id&gt;</code> と <code>&lt;Client-Key&gt;</code> は <a href="https://www.parse.com/apps/quickstart">Quick Start</a> に書かれていたものを使用します。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/parse_app_id_client_key.png" alt="Application ID &amp; Client Key" /></p>
+
+<p><code>rake</code> でアプリを実行してみましょう。Quick Start に設置されていた「Test」というボタンをクリックすると、正しく動作したか確認することができます。</p>
+
+<p><img src="http://watson1978.github.com/images/blog/parse_test.png" alt="Test" /></p>
+
+<p>次は Parse SDK を使って Push Notification に挑戦してみたいなと思います。Enjoy!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Bonjour RubyMotion]]></title>
