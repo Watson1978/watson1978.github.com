@@ -4,7 +4,7 @@
   <title><![CDATA[Watson's Blog]]></title>
   <link href="http://watson1978.github.com/atom.xml" rel="self"/>
   <link href="http://watson1978.github.com/"/>
-  <updated>2012-09-19T22:02:01+09:00</updated>
+  <updated>2012-09-20T18:34:03+09:00</updated>
   <id>http://watson1978.github.com/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -12,6 +12,194 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion と Parse で Push Notifiation してみたよ〜]]></title>
+    <link href="http://watson1978.github.com/blog/2012/09/20/push-notifiation-with-rubymotion/"/>
+    <updated>2012-09-20T16:01:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/09/20/push-notifiation-with-rubymotion</id>
+    <content type="html"><![CDATA[<p>先日に引き続き <a href="https://www.parse.com/">Parse</a> で遊んでいます。今日は<a href="https://www.parse.com/apps/quickstart_push">Push Quick Start Guide</a> を読みながら Push Notifiation に挑戦しました。いろいろ設定することがあって大変ですね。慣れるとそうでもないのでしょうか？(^ ^;)</p>
+
+<!-- more -->
+
+
+<h2>証明書を作成</h2>
+
+<ol>
+<li>「キーチェーンアクセス」を起動します。</li>
+<li>メニューの &#8220;キーチェーンアクセス&#8221; -> &#8220;証明書アシスタント&#8221; -> &#8220;認証局に証明書を要求&#8221; を選択します。</li>
+<li>メールアドレスと名前を記入して、&#8221;ディスクに保存&#8221; を選択し &#8220;続ける&#8221; をクリックします。<code>CertificateSigningRequest.certSigningRequest</code> というファイルが保存されます。(&#8220;CAのメールアドレス&#8221; の欄は未記入で良かったみたいです・・・)<br/>
+<img src="http://watson1978.github.com/images/blog/parse_push/certificate_signing_request.png" alt="Certificate Signing Request" /></li>
+</ol>
+
+
+<p>次に <a href="https://developer.apple.com/ios/manage/bundles/index.action">iOS Provisioning Portal</a> で App ID の設定をします。</p>
+
+<ol>
+<li>&#8220;App IDs&#8221; というメニューを選択し、&#8221;New App ID&#8221; ボタンをクリックします。</li>
+<li>&#8220;Description&#8221; にアプリの内容、&#8221;Bundle Identifier&#8221; にアプリの識別子を記入します。識別子には <code>*</code> を含めず、アプリ名までしっかり記入する必要があるようです。<br/>
+<img src="http://watson1978.github.com/images/blog/parse_push/app_id.png" alt="App IDs" /></li>
+<li>作成したアプリ ID の &#8220;Configure&#8221; をクリックします。<br/>
+<img src="http://watson1978.github.com/images/blog/parse_push/app_id_configure.png" alt="App IDs" /></li>
+<li>&#8220;Enable for Apple Push Notification service&#8221; のチェックを on にし、&#8221;Development Push SSL Certificate&#8221; の &#8220;Configure&#8221; ボタンをクリックします。<br/>
+<img src="http://watson1978.github.com/images/blog/parse_push/enable_push_notification.png" alt="App IDs" /></li>
+<li>&#8220;Generate a Certificate Signing Request&#8221; というポップアップウィンドウが表示されます。&#8221;Continnue&#8221; ボタンをクリックして次の画面に進みます。</li>
+<li>&#8220;Submit Certificate Signing Request&#8221; 画面が表示されます。ここで、「キーチェーンアクセス」で作成した <code>CertificateSigningRequest.certSigningRequest</code> ファイルを選択し、&#8221;Generate&#8221; ボタンをクリックします。<br/>
+<img src="http://watson1978.github.com/images/blog/parse_push/submit_certificate_signing_request.png" alt="App IDs" /></li>
+<li><p>&#8220;Download &amp; Install 〜&#8221; の画面まで進みます。&#8221;Download&#8221; をクリックして証明書をダウンロードしておきます。<br/>
+<img src="http://watson1978.github.com/images/blog/parse_push/download_install_certificate.png" alt="App IDs" /></p></li>
+<li><p>上の作業でダウンロードした証明書をダブルクリックして「キーチェーンアクセス」へ登録します。</p></li>
+<li>キーチェーンアクセスで &#8220;ログイン&#8221; 項目の、&#8221;自分の証明書&#8221; を表示すると先ほど登録した証明書があります。右クリックして「書き出す」を選択します。<br/>
+<img src="http://watson1978.github.com/images/blog/parse_push/keychain_export.png" alt="KeyChain Export" /></li>
+<li>&#8220;.p12&#8221; という形式でファイルを保存します。<br/>
+<img src="http://watson1978.github.com/images/blog/parse_push/export_p12.png" alt="KeyChain Export" /></li>
+<li>&#8220;.p12&#8221; 形式のファイルを保存する際にパスワードを求められますが、空欄のままにしておくようです。<br/>
+<img src="http://watson1978.github.com/images/blog/parse_push/export_p12_password.png" alt="KeyChain Export" /></li>
+</ol>
+
+
+<h2>Provisioning Profile を作成</h2>
+
+<p>ここまでの作業ですでに心が折れそうなくらい、設定が面倒くさいですね。Parse がさっぱり出てこないし・・・。</p>
+
+<p><a href="https://developer.apple.com/ios/manage/bundles/index.action">iOS Provisioning Portal</a> へ戻り、Provisioning Profile を作成しましょう。</p>
+
+<ol>
+<li>&#8220;Provisioning&#8221; メニューを選択し、&#8221;New Profile&#8221; ボタンをクリックします。</li>
+<li>わかりやすい &#8220;Profile Name&#8221; を記入し、プッシュ通知するアプリを選択します。<br/>
+<img src="http://watson1978.github.com/images/blog/parse_push/provisioning.png" alt="Provisioning" /></li>
+<li>&#8220;New Profile&#8221; ボタンをクリックした画面に戻り、Provisioning をダウンロードしておきます。<br/>
+<img src="http://watson1978.github.com/images/blog/parse_push/download_provisioning.png" alt="Provisioning" /></li>
+<li>ダウンロードした Provisioning Profile をダブルクリックし Xcode へ登録しておきます。</li>
+</ol>
+
+
+<h2>Parse へ .p12 ファイルを登録</h2>
+
+<ol>
+<li>Parse の <a href="https://www.parse.com/apps/">Dashboard</a> を開きます。</li>
+<li>プッシュ通知を行うアプリの &#8220;Setting&#8221; 画面を開きます。</li>
+<li>キーチェーンアクセスで作成した &#8220;.p12&#8221; ファイルを登録します。<br/>
+<img src="http://watson1978.github.com/images/blog/parse_push/parse_dashboard.png" alt="Dashboard" /></li>
+</ol>
+
+
+<h2>プッシュ通知を受け付けるアプリを作成</h2>
+
+<h3>Rakefile を編集</h3>
+
+<p>昨日作成した <code>Rakefile</code> に <code>identifier</code>、<code>provisioning_profile</code>、<code>entitlements</code> の設定を追加します。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Motion</span><span class="o">::</span><span class="no">Project</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
+</span><span class='line'><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="s1">&#39;com.yourcompany.HelloParsePush&#39;</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">provisioning_profile</span> <span class="o">=</span> <span class="s2">&quot;/Users/watson/Library/MobileDevice/Provisioning Profiles/CE5E34BE-FDEB-43C5-860A-9301122AB46D.mobileprovision&quot;</span>
+</span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">entitlements</span><span class="o">[</span><span class="s1">&#39;aps-environment&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;development&#39;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>provisioning_profile</code> に設定する Provisioning Profile のパスは Xcode の Organizer で確認することができます。該当する Profile 上で右クリック &#8220;Reveal Profile in Finder&#8221; を選択すると、Finder 上で確認できます。</p>
+
+<h3>アプリを作成</h3>
+
+<p><code>app/app_delegate.rb</code> に、次のようなコードを記述します。</p>
+
+<figure class='code'><figcaption><span>app/app_delegate.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="ss">:launchOptions</span><span class="p">)</span>
+</span><span class='line'>    <span class="no">Parse</span><span class="o">.</span><span class="n">setApplicationId</span><span class="p">(</span><span class="s2">&quot;WGbUIbeszIgo46N2k7PcZlorkq30FAV9PNfSVHrJ&quot;</span><span class="p">,</span>
+</span><span class='line'>                           <span class="n">clientKey</span><span class="ss">:&quot;DwEzOAUZNql8kofzMaV0e30vCzJ3LeWBC3ODoGeA&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">application</span><span class="o">.</span><span class="n">registerForRemoteNotificationTypes</span><span class="p">(</span><span class="no">UIRemoteNotificationTypeBadge</span><span class="o">|</span>
+</span><span class='line'>                                                <span class="no">UIRemoteNotificationTypeAlert</span><span class="o">|</span>
+</span><span class='line'>                                                <span class="no">UIRemoteNotificationTypeSound</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kp">true</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">didRegisterForRemoteNotificationsWithDeviceToken</span><span class="ss">:newDeviceToken</span><span class="p">)</span>
+</span><span class='line'>    <span class="c1"># Tell Parse about the device token.</span>
+</span><span class='line'>    <span class="no">PFPush</span><span class="o">.</span><span class="n">storeDeviceToken</span><span class="p">(</span><span class="n">newDeviceToken</span><span class="p">)</span>
+</span><span class='line'>    <span class="c1"># Subscribe to the global broadcast channel.</span>
+</span><span class='line'>    <span class="no">PFPush</span><span class="o">.</span><span class="n">subscribeToChannelInBackground</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">didReceiveRemoteNotification</span><span class="ss">:userInfo</span><span class="p">)</span>
+</span><span class='line'>    <span class="no">PFPush</span><span class="o">.</span><span class="n">handlePush</span><span class="p">(</span><span class="n">userInfo</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">didFailToRegisterForRemoteNotificationsWithError</span><span class="ss">:error</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="mi">3010</span>
+</span><span class='line'>      <span class="no">NSLog</span><span class="p">(</span><span class="s2">&quot;Push notifications don&#39;t work in the simulator!&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'>      <span class="no">NSLog</span><span class="p">(</span><span class="s2">&quot;didFailToRegisterForRemoteNotificationsWithError: %@&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>プッシュ通知はシミュレータ上で動作確認できないようなので、デバイスへアプリを転送します。</p>
+
+<figure class='code'><figcaption><span>app/app_delegate.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="err">$</span> <span class="n">rake</span> <span class="n">device</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>デバイス上でアプリを起動したら、<a href="https://www.parse.com/apps/quickstart_push">Push Quick Start Guide</a> ページの &#8220;Send Push Test&#8221; ボタンをクリックします。</p>
+
+<p>正しく動作すると、</p>
+
+<p><img src="http://watson1978.github.com/images/blog/parse_push/receive_push.png" alt="Push Notification" /></p>
+
+<p>のように、通知を受け取ることができます！</p>
+
+<p>これで、Apple が何か発表したか監視するものを用意すれば、簡単にストーカー行為ができますね！</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[RubyMotion で Parse を使ってみました]]></title>
@@ -27,7 +215,7 @@
 
 <h2>ユーザ登録</h2>
 
-<p>「Try it for free」ボタンをクリックすると無料でユーザ登録できます。</p>
+<p>さっそく、ユーザ登録をして Parse を使ってみましょう。「Try it for free」ボタンをクリックすると無料でユーザ登録できます。</p>
 
 <p><img src="http://watson1978.github.com/images/blog/parse_sign_up.png" alt="sign up" /></p>
 
