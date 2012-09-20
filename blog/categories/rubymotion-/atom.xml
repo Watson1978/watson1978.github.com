@@ -4,7 +4,7 @@
   <title><![CDATA[Category: RubyMotion, | Watson's Blog]]></title>
   <link href="http://watson1978.github.com/blog/categories/rubymotion-/atom.xml" rel="self"/>
   <link href="http://watson1978.github.com/"/>
-  <updated>2012-09-20T18:36:07+09:00</updated>
+  <updated>2012-09-20T18:36:38+09:00</updated>
   <id>http://watson1978.github.com/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -12,132 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[RubyMotion で Parse を使ってみました]]></title>
-    <link href="http://watson1978.github.com/blog/2012/09/19/using-parse/"/>
-    <updated>2012-09-19T17:15:00+09:00</updated>
-    <id>http://watson1978.github.com/blog/2012/09/19/using-parse</id>
-    <content type="html"><![CDATA[<p><a href="https://www.parse.com/">Parse</a> は、ユーザ認証やプッシュ通知といったサーバ側の実装が必要となる機能をあらかじめ用意してくれていて、アプリから単に API を呼び出すだけで簡単にそれらの機能を利用できてしまうという、すごく便利なサービスです。</p>
-
-<p><img src="/images/blog/parse.png" alt="Parse" /></p>
-
-<!-- more -->
-
-
-<h2>ユーザ登録</h2>
-
-<p>さっそく、ユーザ登録をして Parse を使ってみましょう。「Try it for free」ボタンをクリックすると無料でユーザ登録できます。</p>
-
-<p><img src="/images/blog/parse_sign_up.png" alt="sign up" /></p>
-
-<p>メールアドレスとパスワードを入力すると、次に Parse を使うアプリ名を聞かれます。後ほど変更することもできるので適当な名前を入力しておきましょう。私は「HelloParse」と安易な名前を入力しました。</p>
-
-<p><img src="/images/blog/parse_get_started.png" alt="get started" /></p>
-
-<h2>Parse SDK をダウンロード</h2>
-
-<p><a href="https://www.parse.com/apps/quickstart">Quick Start</a> ページで Parse SDK の簡単な導入方法について説明が書かれていますので、これに従って作業してみましょう。</p>
-
-<p>「1 Choose your platform」で、"iOS" と "Existing Project" を選択しておきます。("Existing Project" を選択しておくと、SDK のみをダウンロードしやすいので)。</p>
-
-<p><img src="/images/blog/parse_choose_platform.png" alt="Choose your platform" /></p>
-
-<p>「3 Download &amp; install the SDK」で、Parse SDK をダウンロードしておきます。</p>
-
-<p><img src="/images/blog/parse_download_sdk.png" alt="Download &amp; install the SDK" /></p>
-
-<h2>RubyMotion アプリを作成</h2>
-
-<p>それでは、Parse SDK を使用した RubyMotion で「HelloParse」というアプリを作ってみましょう。</p>
-
-<p>```
-$ motion create HelloParse</p>
-
-<pre><code>Create HelloParse
-Create HelloParse/.gitignore
-Create HelloParse/Rakefile
-Create HelloParse/app
-Create HelloParse/app/app_delegate.rb
-Create HelloParse/resources
-Create HelloParse/spec
-Create HelloParse/spec/main_spec.rb
-</code></pre>
-
-<p>```</p>
-
-<p>先ほどダウンロードした Parse SDK を <code>vendor</code> ディレクトリに配置します。</p>
-
-<p><code>
-$ cd HelloParse
-$ mkdir vendor
-</code></p>
-
-<p><code>parse-library-1.1.6.zip</code> を解凍すると <code>Parse.framework</code> というディレクトリが展開されるので、このディレクトリを <code>vendor</code> ディレクトリにコピーします。</p>
-
-<p>```
-$ tree vendor/
-vendor/
-└── Parse.framework</p>
-
-<pre><code>├── Headers -&gt; Versions/Current/Headers
-</code></pre>
-
-<p>...
-```</p>
-
-<h3>Rakefile を編集</h3>
-
-<p>アプリで Parse SDK が使われるように <code>Rakefile</code> を編集し設定します。以下のように <code>vendor_project</code>、<code>frameworks</code>、<code>libs</code> を設定します。</p>
-
-<p><code>``ruby
-Motion::Project::App.setup do |app|
-  # Use</code>rake config' to see complete project settings.
-  app.name = 'HelloParse'</p>
-
-<p>  # Parse SDK
-  app.vendor_project('vendor/Parse.framework',</p>
-
-<pre><code>                  :static,
-                  :products =&gt; ['Parse'],
-                  :headers_dir =&gt; 'Headers')
-</code></pre>
-
-<p>  app.frameworks += %w(AudioToolbox CFNetwork MobileCoreServices QuartzCore Security StoreKit SystemConfiguration)
-  app.libs += %W(/usr/lib/libz.dylib /usr/lib/libsqlite3.dylib)
-end
-```</p>
-
-<h3>Parse SDK API を使ってみよう</h3>
-
-<p>```ruby app/app_delegate.rb
-class AppDelegate
-  def application(application, didFinishLaunchingWithOptions:launchOptions)</p>
-
-<pre><code>Parse.setApplicationId("&lt;Application-Id&gt;", 
-                       clientKey:"&lt;Client-Key&gt;")
-
-obj = PFObject.objectWithClassName("TestObject")
-obj.setObject("bar", forKey:"foo")
-obj.save()
-true
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p><code>setApplicationId</code> メソッドで使用している <code>&lt;Application-Id&gt;</code> と <code>&lt;Client-Key&gt;</code> は <a href="https://www.parse.com/apps/quickstart">Quick Start</a> に書かれていたものを使用します。</p>
-
-<p><img src="/images/blog/parse_app_id_client_key.png" alt="Application ID &amp; Client Key" /></p>
-
-<p><code>rake</code> でアプリを実行してみましょう。Quick Start に設置されていた「Test」というボタンをクリックすると、正しく動作したか確認することができます。</p>
-
-<p><img src="/images/blog/parse_test.png" alt="Test" /></p>
-
-<p>次は Parse SDK を使って Push Notification に挑戦してみたいなと思います。Enjoy!</p>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Bonjour RubyMotion]]></title>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: RubyMotion | Watson's Blog]]></title>
   <link href="http://watson1978.github.com/blog/categories/rubymotion/atom.xml" rel="self"/>
   <link href="http://watson1978.github.com/"/>
-  <updated>2012-09-20T18:36:07+09:00</updated>
+  <updated>2012-09-20T18:36:38+09:00</updated>
   <id>http://watson1978.github.com/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -169,6 +169,132 @@ $ rake device</p>
 <p>のように、通知を受け取ることができます！</p>
 
 <p>これで、Apple が何か発表したか監視するものを用意すれば、簡単にストーカー行為ができますね！</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion で Parse を使ってみました]]></title>
+    <link href="http://watson1978.github.com/blog/2012/09/19/using-parse/"/>
+    <updated>2012-09-19T17:15:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/09/19/using-parse</id>
+    <content type="html"><![CDATA[<p><a href="https://www.parse.com/">Parse</a> は、ユーザ認証やプッシュ通知といったサーバ側の実装が必要となる機能をあらかじめ用意してくれていて、アプリから単に API を呼び出すだけで簡単にそれらの機能を利用できてしまうという、すごく便利なサービスです。</p>
+
+<p><img src="/images/blog/parse.png" alt="Parse" /></p>
+
+<!-- more -->
+
+
+<h2>ユーザ登録</h2>
+
+<p>さっそく、ユーザ登録をして Parse を使ってみましょう。「Try it for free」ボタンをクリックすると無料でユーザ登録できます。</p>
+
+<p><img src="/images/blog/parse_sign_up.png" alt="sign up" /></p>
+
+<p>メールアドレスとパスワードを入力すると、次に Parse を使うアプリ名を聞かれます。後ほど変更することもできるので適当な名前を入力しておきましょう。私は「HelloParse」と安易な名前を入力しました。</p>
+
+<p><img src="/images/blog/parse_get_started.png" alt="get started" /></p>
+
+<h2>Parse SDK をダウンロード</h2>
+
+<p><a href="https://www.parse.com/apps/quickstart">Quick Start</a> ページで Parse SDK の簡単な導入方法について説明が書かれていますので、これに従って作業してみましょう。</p>
+
+<p>「1 Choose your platform」で、"iOS" と "Existing Project" を選択しておきます。("Existing Project" を選択しておくと、SDK のみをダウンロードしやすいので)。</p>
+
+<p><img src="/images/blog/parse_choose_platform.png" alt="Choose your platform" /></p>
+
+<p>「3 Download &amp; install the SDK」で、Parse SDK をダウンロードしておきます。</p>
+
+<p><img src="/images/blog/parse_download_sdk.png" alt="Download &amp; install the SDK" /></p>
+
+<h2>RubyMotion アプリを作成</h2>
+
+<p>それでは、Parse SDK を使用した RubyMotion で「HelloParse」というアプリを作ってみましょう。</p>
+
+<p>```
+$ motion create HelloParse</p>
+
+<pre><code>Create HelloParse
+Create HelloParse/.gitignore
+Create HelloParse/Rakefile
+Create HelloParse/app
+Create HelloParse/app/app_delegate.rb
+Create HelloParse/resources
+Create HelloParse/spec
+Create HelloParse/spec/main_spec.rb
+</code></pre>
+
+<p>```</p>
+
+<p>先ほどダウンロードした Parse SDK を <code>vendor</code> ディレクトリに配置します。</p>
+
+<p><code>
+$ cd HelloParse
+$ mkdir vendor
+</code></p>
+
+<p><code>parse-library-1.1.6.zip</code> を解凍すると <code>Parse.framework</code> というディレクトリが展開されるので、このディレクトリを <code>vendor</code> ディレクトリにコピーします。</p>
+
+<p>```
+$ tree vendor/
+vendor/
+└── Parse.framework</p>
+
+<pre><code>├── Headers -&gt; Versions/Current/Headers
+</code></pre>
+
+<p>...
+```</p>
+
+<h3>Rakefile を編集</h3>
+
+<p>アプリで Parse SDK が使われるように <code>Rakefile</code> を編集し設定します。以下のように <code>vendor_project</code>、<code>frameworks</code>、<code>libs</code> を設定します。</p>
+
+<p><code>``ruby
+Motion::Project::App.setup do |app|
+  # Use</code>rake config' to see complete project settings.
+  app.name = 'HelloParse'</p>
+
+<p>  # Parse SDK
+  app.vendor_project('vendor/Parse.framework',</p>
+
+<pre><code>                  :static,
+                  :products =&gt; ['Parse'],
+                  :headers_dir =&gt; 'Headers')
+</code></pre>
+
+<p>  app.frameworks += %w(AudioToolbox CFNetwork MobileCoreServices QuartzCore Security StoreKit SystemConfiguration)
+  app.libs += %W(/usr/lib/libz.dylib /usr/lib/libsqlite3.dylib)
+end
+```</p>
+
+<h3>Parse SDK API を使ってみよう</h3>
+
+<p>```ruby app/app_delegate.rb
+class AppDelegate
+  def application(application, didFinishLaunchingWithOptions:launchOptions)</p>
+
+<pre><code>Parse.setApplicationId("&lt;Application-Id&gt;", 
+                       clientKey:"&lt;Client-Key&gt;")
+
+obj = PFObject.objectWithClassName("TestObject")
+obj.setObject("bar", forKey:"foo")
+obj.save()
+true
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p><code>setApplicationId</code> メソッドで使用している <code>&lt;Application-Id&gt;</code> と <code>&lt;Client-Key&gt;</code> は <a href="https://www.parse.com/apps/quickstart">Quick Start</a> に書かれていたものを使用します。</p>
+
+<p><img src="/images/blog/parse_app_id_client_key.png" alt="Application ID &amp; Client Key" /></p>
+
+<p><code>rake</code> でアプリを実行してみましょう。Quick Start に設置されていた「Test」というボタンをクリックすると、正しく動作したか確認することができます。</p>
+
+<p><img src="/images/blog/parse_test.png" alt="Test" /></p>
+
+<p>次は Parse SDK を使って Push Notification に挑戦してみたいなと思います。Enjoy!</p>
 ]]></content>
   </entry>
   
@@ -455,122 +581,6 @@ from ruby import Linter</p>
 ```</p>
 
 <p>これで RubyMotion アプリ開発がもっと楽になるのではないでしょうか〜。 Enjoy!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[CGGradient を使ってグラデーションを作る]]></title>
-    <link href="http://watson1978.github.com/blog/2012/08/22/make-a-gradient/"/>
-    <updated>2012-08-22T22:59:00+09:00</updated>
-    <id>http://watson1978.github.com/blog/2012/08/22/make-a-gradient</id>
-    <content type="html"><![CDATA[<p>RubyMotion で <a href="https://developer.apple.com/library/mac/#documentation/graphicsimaging/reference/CGGradient/Reference/reference.html">CGGradient</a> を使ってグラデーションを作る際に 2 点ほどポイントがありそうです。</p>
-
-<!-- more -->
-
-
-<h2>1. Pointer クラスを使用する</h2>
-
-<p>CGGradient オブジェクトを作成する際に使用する関数 <code>CGGradientCreateWithColorComponents</code> は <code>CGFloat</code> 型の配列を受け取ります(変数 <code>components</code>, <code>locations</code> に注目してください)。</p>
-
-<p><code>c
-CGGradientRef CGGradientCreateWithColorComponents(
-   CGColorSpaceRef space,
-   const CGFloat components[],
-   const CGFloat locations[],
-   size_t count
-);
-</code></p>
-
-<p>もし引数が Ruby の Array クラスや、Objective-C の NSArray を受け取るなら話は簡単なのですが、ここでは <code>CGFloat</code> 型の配列なので、RubyMotion で用意されている Pointer クラスを使い <code>CGFloat</code> 型の配列と同等のものを作ります。以下のようなコードになります。</p>
-
-<p><code>ruby
-float_array = Pointer.new(:float, size)
-</code></p>
-
-<h2>2. kCGGradientDrawsXXXX 定数</h2>
-
-<p>CGGradient では <code>kCGGradientDrawsBeforeStartLocation</code> と <code>kCGGradientDrawsAfterEndLocation</code> という定数が用意されています。どちらも小文字から始まる定数です。</p>
-
-<p>RubyMotion では英小文字から始まる定数は、一文字目を大文字に書き換えて利用してあげる必要があります。</p>
-
-<p><code>kCGGradientDrawsAfterEndLocation</code> は <code>KCGGradientDrawsAfterEndLocation</code> になります。</p>
-
-<h2>いざ動かしてみる</h2>
-
-<p>```ruby app_delegate.rb
-class Array
-  def to_pointer(type)</p>
-
-<pre><code># Ruby の Array オブジェクトを Pointer クラスを使ったものに変換
-pointer = Pointer.new(type, self.size)
-self.each_with_index do |v, i|
-  pointer[i] = v
-end
-pointer
-</code></pre>
-
-<p>  end
-end</p>
-
-<p>class GradientView &lt; UIView
-  def drawRect(rect)</p>
-
-<pre><code>super
-
-context = UIGraphicsGetCurrentContext()
-CGContextSaveGState(context)
-
-CGContextAddRect(context, self.frame)
-space = CGColorSpaceCreateDeviceRGB()
-
-comp = [
-    0.0, 0.0, 1.0, 1.0, # Blue
-    1.0, 0.0, 0.0, 1.0, # Red
-    0.0, 1.0, 0.0, 1.0  # Green
-]
-components = comp.to_pointer(:float)
-
-loc = [0.0, 0.5, 1.0]
-locations = loc.to_pointer(:float)
-
-count = loc.size
-frame = self.bounds
-start_point = frame.origin
-end_point = CGPointMake(frame.origin.x + frame.size.width, frame.origin.y)
-gradient = CGGradientCreateWithColorComponents(space, components, locations, count)
-
-CGContextDrawLinearGradient(context,
-                            gradient,
-                            start_point,
-                            end_point,
-                            KCGGradientDrawsAfterEndLocation) # 定数を英大文字で始める
-CGContextRestoreGState(context)
-</code></pre>
-
-<p>  end</p>
-
-<p>end</p>
-
-<p>class AppDelegate
-  def application(application, didFinishLaunchingWithOptions:launchOptions)</p>
-
-<pre><code>@window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)
-@window.rootViewController = UIViewController.alloc.initWithNibName(nil, bundle: nil)
-
-@view = GradientView.alloc.initWithFrame(CGRectMake(10, 10, 100, 100))
-@window.rootViewController.view.addSubview(@view)
-@window.makeKeyAndVisible
-
-true
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>次のような View が表示されるはずです。</p>
-
-<p><img src="/images/blog/gradient.png" alt="Gradient" /></p>
 ]]></content>
   </entry>
   
