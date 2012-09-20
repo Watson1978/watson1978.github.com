@@ -4,7 +4,7 @@
   <title><![CDATA[Category: RubyMotion | Watson's Blog]]></title>
   <link href="http://watson1978.github.com/blog/categories/rubymotion/atom.xml" rel="self"/>
   <link href="http://watson1978.github.com/"/>
-  <updated>2012-09-20T18:34:03+09:00</updated>
+  <updated>2012-09-20T18:36:07+09:00</updated>
   <id>http://watson1978.github.com/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -12,6 +12,165 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion と Parse で Push Notifiation してみたよ〜]]></title>
+    <link href="http://watson1978.github.com/blog/2012/09/20/push-notifiation-with-rubymotion/"/>
+    <updated>2012-09-20T16:01:00+09:00</updated>
+    <id>http://watson1978.github.com/blog/2012/09/20/push-notifiation-with-rubymotion</id>
+    <content type="html"><![CDATA[<p>先日に引き続き <a href="https://www.parse.com/">Parse</a> で遊んでいます。今日は<a href="https://www.parse.com/apps/quickstart_push">Push Quick Start Guide</a> を読みながら Push Notifiation に挑戦しました。いろいろ設定することがあって大変ですね。慣れるとそうでもないのでしょうか？(^ ^;)</p>
+
+<!-- more -->
+
+
+<h2>証明書を作成</h2>
+
+<ol>
+<li>「キーチェーンアクセス」を起動します。</li>
+<li>メニューの "キーチェーンアクセス" -> "証明書アシスタント" -> "認証局に証明書を要求" を選択します。</li>
+<li>メールアドレスと名前を記入して、"ディスクに保存" を選択し "続ける" をクリックします。<code>CertificateSigningRequest.certSigningRequest</code> というファイルが保存されます。("CAのメールアドレス" の欄は未記入で良かったみたいです・・・)<br/>
+<img src="/images/blog/parse_push/certificate_signing_request.png" alt="Certificate Signing Request" /></li>
+</ol>
+
+
+<p>次に <a href="https://developer.apple.com/ios/manage/bundles/index.action">iOS Provisioning Portal</a> で App ID の設定をします。</p>
+
+<ol>
+<li>"App IDs" というメニューを選択し、"New App ID" ボタンをクリックします。</li>
+<li>"Description" にアプリの内容、"Bundle Identifier" にアプリの識別子を記入します。識別子には <code>*</code> を含めず、アプリ名までしっかり記入する必要があるようです。<br/>
+<img src="/images/blog/parse_push/app_id.png" alt="App IDs" /></li>
+<li>作成したアプリ ID の "Configure" をクリックします。<br/>
+<img src="/images/blog/parse_push/app_id_configure.png" alt="App IDs" /></li>
+<li>"Enable for Apple Push Notification service" のチェックを on にし、"Development Push SSL Certificate" の "Configure" ボタンをクリックします。<br/>
+<img src="/images/blog/parse_push/enable_push_notification.png" alt="App IDs" /></li>
+<li>"Generate a Certificate Signing Request" というポップアップウィンドウが表示されます。"Continnue" ボタンをクリックして次の画面に進みます。</li>
+<li>"Submit Certificate Signing Request" 画面が表示されます。ここで、「キーチェーンアクセス」で作成した <code>CertificateSigningRequest.certSigningRequest</code> ファイルを選択し、"Generate" ボタンをクリックします。<br/>
+<img src="/images/blog/parse_push/submit_certificate_signing_request.png" alt="App IDs" /></li>
+<li><p>"Download &amp; Install 〜" の画面まで進みます。"Download" をクリックして証明書をダウンロードしておきます。<br/>
+<img src="/images/blog/parse_push/download_install_certificate.png" alt="App IDs" /></p></li>
+<li><p>上の作業でダウンロードした証明書をダブルクリックして「キーチェーンアクセス」へ登録します。</p></li>
+<li>キーチェーンアクセスで "ログイン" 項目の、"自分の証明書" を表示すると先ほど登録した証明書があります。右クリックして「書き出す」を選択します。<br/>
+<img src="/images/blog/parse_push/keychain_export.png" alt="KeyChain Export" /></li>
+<li>".p12" という形式でファイルを保存します。<br/>
+<img src="/images/blog/parse_push/export_p12.png" alt="KeyChain Export" /></li>
+<li>".p12" 形式のファイルを保存する際にパスワードを求められますが、空欄のままにしておくようです。<br/>
+<img src="/images/blog/parse_push/export_p12_password.png" alt="KeyChain Export" /></li>
+</ol>
+
+
+<h2>Provisioning Profile を作成</h2>
+
+<p>ここまでの作業ですでに心が折れそうなくらい、設定が面倒くさいですね。Parse がさっぱり出てこないし・・・。</p>
+
+<p><a href="https://developer.apple.com/ios/manage/bundles/index.action">iOS Provisioning Portal</a> へ戻り、Provisioning Profile を作成しましょう。</p>
+
+<ol>
+<li>"Provisioning" メニューを選択し、"New Profile" ボタンをクリックします。</li>
+<li>わかりやすい "Profile Name" を記入し、プッシュ通知するアプリを選択します。<br/>
+<img src="/images/blog/parse_push/provisioning.png" alt="Provisioning" /></li>
+<li>"New Profile" ボタンをクリックした画面に戻り、Provisioning をダウンロードしておきます。<br/>
+<img src="/images/blog/parse_push/download_provisioning.png" alt="Provisioning" /></li>
+<li>ダウンロードした Provisioning Profile をダブルクリックし Xcode へ登録しておきます。</li>
+</ol>
+
+
+<h2>Parse へ .p12 ファイルを登録</h2>
+
+<ol>
+<li>Parse の <a href="https://www.parse.com/apps/">Dashboard</a> を開きます。</li>
+<li>プッシュ通知を行うアプリの "Setting" 画面を開きます。</li>
+<li>キーチェーンアクセスで作成した ".p12" ファイルを登録します。<br/>
+<img src="/images/blog/parse_push/parse_dashboard.png" alt="Dashboard" /></li>
+</ol>
+
+
+<h2>プッシュ通知を受け付けるアプリを作成</h2>
+
+<h3>Rakefile を編集</h3>
+
+<p>昨日作成した <code>Rakefile</code> に <code>identifier</code>、<code>provisioning_profile</code>、<code>entitlements</code> の設定を追加します。</p>
+
+<p><code>ruby
+Motion::Project::App.setup do |app|
+...
+  app.identifier = 'com.yourcompany.HelloParsePush'
+  app.provisioning_profile = "/Users/watson/Library/MobileDevice/Provisioning Profiles/CE5E34BE-FDEB-43C5-860A-9301122AB46D.mobileprovision"
+  app.entitlements['aps-environment'] = 'development'
+end
+</code></p>
+
+<p><code>provisioning_profile</code> に設定する Provisioning Profile のパスは Xcode の Organizer で確認することができます。該当する Profile 上で右クリック "Reveal Profile in Finder" を選択すると、Finder 上で確認できます。</p>
+
+<h3>アプリを作成</h3>
+
+<p><code>app/app_delegate.rb</code> に、次のようなコードを記述します。</p>
+
+<p>```ruby app/app_delegate.rb
+class AppDelegate
+  def application(application, didFinishLaunchingWithOptions:launchOptions)</p>
+
+<pre><code>Parse.setApplicationId("WGbUIbeszIgo46N2k7PcZlorkq30FAV9PNfSVHrJ", 
+                       clientKey:"DwEzOAUZNql8kofzMaV0e30vCzJ3LeWBC3ODoGeA")
+
+application.registerForRemoteNotificationTypes(UIRemoteNotificationTypeBadge|
+                                            UIRemoteNotificationTypeAlert|
+                                            UIRemoteNotificationTypeSound)
+
+true
+</code></pre>
+
+<p>  end</p>
+
+<p>  def application(application,</p>
+
+<pre><code>    didRegisterForRemoteNotificationsWithDeviceToken:newDeviceToken)
+# Tell Parse about the device token.
+PFPush.storeDeviceToken(newDeviceToken)
+# Subscribe to the global broadcast channel.
+PFPush.subscribeToChannelInBackground("")
+</code></pre>
+
+<p>  end</p>
+
+<p>  def application(application,</p>
+
+<pre><code>    didReceiveRemoteNotification:userInfo)
+PFPush.handlePush(userInfo)
+</code></pre>
+
+<p>  end</p>
+
+<p>  def application(application,</p>
+
+<pre><code>    didFailToRegisterForRemoteNotificationsWithError:error)
+if error.code == 3010
+  NSLog("Push notifications don't work in the simulator!")
+else
+  NSLog("didFailToRegisterForRemoteNotificationsWithError: %@", error)
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>プッシュ通知はシミュレータ上で動作確認できないようなので、デバイスへアプリを転送します。</p>
+
+<p>```
+$ rake device</p>
+
+<p>```
+デバイス上でアプリを起動したら、<a href="https://www.parse.com/apps/quickstart_push">Push Quick Start Guide</a> ページの "Send Push Test" ボタンをクリックします。</p>
+
+<p>正しく動作すると、</p>
+
+<p><img src="/images/blog/parse_push/receive_push.png" alt="Push Notification" /></p>
+
+<p>のように、通知を受け取ることができます！</p>
+
+<p>これで、Apple が何か発表したか監視するものを用意すれば、簡単にストーカー行為ができますね！</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[RubyMotion ではじめるGoogle Analytics for iOS]]></title>
@@ -412,17 +571,6 @@ end
 <p>次のような View が表示されるはずです。</p>
 
 <p><img src="/images/blog/gradient.png" alt="Gradient" /></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[RubyMotion の Articles を翻訳しました]]></title>
-    <link href="http://watson1978.github.com/blog/2012/08/01/translating-rubymotion-articles/"/>
-    <updated>2012-08-01T23:31:00+09:00</updated>
-    <id>http://watson1978.github.com/blog/2012/08/01/translating-rubymotion-articles</id>
-    <content type="html"><![CDATA[<p>最近は <a href="https://github.com/RubyMotionJP">RubyMotionJP</a> でちまちま作業しており、RubyMotion の公式サイトの <a href="http://www.rubymotion.com/developer-center/">Developer Center</a> で公開されている記事を翻訳しました。</p>
-
-<p>翻訳した記事は <a href="http://rubymotion.jp/">rubymotion.jp</a> で公開しております。誤訳などありましたら、pull request いただけると大変ありがたいです。</p>
 ]]></content>
   </entry>
   
