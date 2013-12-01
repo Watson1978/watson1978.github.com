@@ -4,7 +4,7 @@
   <title><![CDATA[Watson's Blog]]></title>
   <link href="http://watson1978.github.io/atom.xml" rel="self"/>
   <link href="http://watson1978.github.io/"/>
-  <updated>2013-12-02T08:14:50+09:00</updated>
+  <updated>2013-12-02T08:24:53+09:00</updated>
   <id>http://watson1978.github.io/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -21,6 +21,9 @@
     <content type="html"><![CDATA[<p>この記事ではmotion-modeとrubocopをEmacsに導入してRubyMotionアプリ開発で活用する方法について扱います。motion-modeについては作者の<a href="http://qiita.com/ainame">ainame</a>さんが何か書いてくださるそうなので期待しましょう。</p>
 
 <p><a href="https://github.com/bbatsov/rubocop">Rubocop</a>はアプリがsnake caseとcamel caseが入り乱れていないかなど、一貫したルールでコードが記述されているかチェックしてくれるツールです。チームで開発する際はもちろん一人でコードを記述する際にも一貫したコードは、可読性が向上し将来的にメンテナンスが容易になることでしょう。</p>
+
+<!-- more -->
+
 
 <h2>1. Rubocopをインストール</h2>
 
