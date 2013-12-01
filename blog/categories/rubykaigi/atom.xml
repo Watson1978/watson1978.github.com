@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: RubyKaigi, | Watson's Blog]]></title>
+  <link href="http://watson1978.github.io/blog/categories/rubykaigi/atom.xml" rel="self"/>
+  <link href="http://watson1978.github.io/"/>
+  <updated>2013-12-02T08:12:19+09:00</updated>
+  <id>http://watson1978.github.io/</id>
+  <author>
+    <name><![CDATA[Watson]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[東京 Ruby 会議 10 3日目にいってきました]]></title>
+    <link href="http://watson1978.github.io/blog/2013/02/11/tokyo-rubykaigi-3rd/"/>
+    <updated>2013-02-11T13:51:00+09:00</updated>
+    <id>http://watson1978.github.io/blog/2013/02/11/tokyo-rubykaigi-3rd</id>
+    <content type="html"><![CDATA[<p><a href="https://twitter.com/satococoa">@satococoa</a> さんが RubyMotion について話されるというので行ってきましたよ、東京 Ruby 会議 10 の 3 日目に。</p>
+
+<!-- more -->
+
+
+<p>@satococoa さんが発表の前に壇上からアンケートをとっていたので興味深く拝見しました。</p>
+
+<ul>
+<li>RubyMotion の認知度は 8 &ndash; 9 割くらい。<a href="https://twitter.com/satococoa">@satococoa</a> さんや <a href="https://twitter.com/naoya_ito">@naoya_ito</a> さんの宣伝のおかげですね。ありがとうございます。</li>
+<li>購入した方は、ぱっと見て居ないんじゃないかと言うくらい・・・。</li>
+</ul>
+
+
+<p>UITableView を実装した RubyMotion アプリ上に、<a href="https://github.com/rubymotion/BubbleWrap">BubbleWrap</a> という gem を使用して rails サーバからデータを取得し表示するというものを、一からライブコーディングされていました (rails サーバ側は事前に用意されてました)。</p>
+
+<p>15 分という持ち時間でちゃんと動くものになっていたのは圧巻で、観衆のみなさんの受けはとても良かったように思います。発表資料やアプリのコードは <a href="http://satococoa.github.com/blog/2013/02/11/tkrk10-3rd-day/">東京 Ruby 会議 10 3日目に参加しました</a> で参照できます。</p>
+
+<p>発表前に RubyFriendsCamera というアプリを試されていた風景。</p>
+
+<p><img src="http://farm9.staticflickr.com/8096/8462804169_48935f12fc_z.jpg" alt="RubyFriends" /></p>
+
+<p>From <a href="http://www.flickr.com/photos/igaiga/sets/72157632741076174/">http://www.flickr.com/photos/igaiga/sets/72157632741076174/</a></p>
+]]></content>
+  </entry>
+  
+</feed>

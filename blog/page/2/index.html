@@ -17,7 +17,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://watson1978.github.com/blog/page/2/">
+  <link rel="canonical" href="http://watson1978.github.io/blog/page/2/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -25,8 +25,21 @@
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="Watson's Blog" type="application/atom+xml">
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<meta name="author" content="Watson" />
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<meta property="article:author" content="https://www.facebook.com/fujita.shizuo" />
+
+<meta property="og:title" content="Watson's Blog" />
+<meta property="og:type" content="website" />
+<meta property="og:description" content="" />
+
+<meta property="og:url" content="http://watson1978.github.io/blog/page/2/" />
+<meta property="og:image" content="http://watson1978.github.io/images/RubyMotion_icon.png" />
+<meta property="og:site_name" content="Watson's Blog" />
+<meta property="og:locale" content="ja_JP" />
+<meta property="fb:app_id" content="141769376031637" />
+
 
   
   <script type="text/javascript">
@@ -58,7 +71,7 @@
   
 <form action="http://google.com/search" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:watson1978.github.com" />
+    <input type="hidden" name="q" value="site:watson1978.github.io" />
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
@@ -80,7 +93,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/05/12/translating-rubymotion-guide/">RubyMotion のガイドを日本語に翻訳しました</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/01/25/motion-pixate-observer/">Motion-pixate-observer という Gem を作りました</a></h1>
     
     
       <p class="meta">
@@ -96,22 +109,24 @@
   
 
 
-<time datetime="2012-05-12T11:11:00+09:00" pubdate data-updated="true">May 12<span>th</span>, 2012</time>
+<time datetime="2013-01-25T00:48:00+09:00" pubdate data-updated="true">Jan 25<span>th</span>, 2013</time>
         
-         | <a href="/blog/2012/05/12/translating-rubymotion-guide/#disqus_thread">Comments</a>
+         | <a href="/blog/2013/01/25/motion-pixate-observer/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>RubyMotion の <a href="http://www.rubymotion.com/developer-center/">Developer Center</a> にガイドとして 3 つの記事が掲載されているのを日本語に訳していました。</p>
+  <div class="entry-content"><p>いやー、<a href="http://www.pixate.com/">Pixate</a> は素晴らしいですね。CSS でデザインできることがこんなに楽だったのかと改めて痛感しております。</p>
+
+<p>ただ使っているうちに CSS を変更するたびに <code>rake</code> を実行し rebuild してデザインを確認するのが面倒くさい、もっと楽にならんのかと欲がでてきてしまいました。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/05/12/translating-rubymotion-guide/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2013/01/25/motion-pixate-observer/">Read on &rarr;</a>
     </footer>
   
 
@@ -123,7 +138,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/05/10/benchmark-result/">Benchmark Result</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/01/19/pit/">設定情報の管理に Pit を使ってみた</a></h1>
     
     
       <p class="meta">
@@ -139,22 +154,28 @@
   
 
 
-<time datetime="2012-05-10T12:29:00+09:00" pubdate data-updated="true">May 10<span>th</span>, 2012</time>
+<time datetime="2013-01-19T10:50:00+09:00" pubdate data-updated="true">Jan 19<span>th</span>, 2013</time>
         
-         | <a href="/blog/2012/05/10/benchmark-result/#disqus_thread">Comments</a>
+         | <a href="/blog/2013/01/19/pit/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>昨日は、<a href="/blog/2012/05/09/mixing-the-ruby-and-objc/">ベンチマーク用ライブラリ</a> を作ったので、RubyMotion のパフォーマンスと、Objective-C のパフォーマンスをそれぞれ計測してみました。</p>
+  <div class="entry-content"><p>先日、<a href="http://www.pixate.com/">Pixate</a> のライセンスを購入してみました。<a href="http://www.kickstarter.com/projects/pixate/beautiful-native-mobile-apps">kickstarter</a> でデモ動画がアップされたときには、「これだ！」とか意味不明に感動した覚えがあります。</p>
+
+<p>Pixate からユーザ名やライセンスキーがメールで送られてきたのですが、これをプロジェクトを作成するたびに記述するのが面倒、というか GitHub にアップロードしたら悲惨なことになりそうなので、どうにか設定部分を分離したいなと。</p>
+
+<p>自前で、yaml ファイルなどに設定情報を分離して、それを読み込むのもプロジェクトを作るたびごとだと面倒ですね。</p>
+
+<p>ということで、pit というものを使ってみました。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/05/10/benchmark-result/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2013/01/19/pit/">Read on &rarr;</a>
     </footer>
   
 
@@ -166,7 +187,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/05/09/mixing-the-ruby-and-objc/">RubyMotion で Ruby と Objective-C をミックスしてみました</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/12/20/rubymotion-class/">RubyMotion の Class について</a></h1>
     
     
       <p class="meta">
@@ -182,22 +203,24 @@
   
 
 
-<time datetime="2012-05-09T20:24:00+09:00" pubdate data-updated="true">May 9<span>th</span>, 2012</time>
+<time datetime="2012-12-20T17:01:00+09:00" pubdate data-updated="true">Dec 20<span>th</span>, 2012</time>
         
-         | <a href="/blog/2012/05/09/mixing-the-ruby-and-objc/#disqus_thread">Comments</a>
+         | <a href="/blog/2012/12/20/rubymotion-class/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>今日は、RubyMotion でベンチマークを計測してみたいなと思い、いろいろ試行錯誤していました。Ruby には benchmark というライブラリがあるのでそれを使えばすぐなのですが、RubyMotion ではライブラリがないので自作することにしました。そして、Objective-C を使って書いておけば何かの役に立ちそうかと簡単なライブラリをつくりました。</p>
+  <div class="entry-content"><p>この記事は <a href="http://www.adventar.org/calendars/18">RubyMotion Advent Calendar 2012</a> の 20 日目の記事です。</p>
+
+<p>どのような記事を書こうかずいぶん悩んでいたのですが、<a href="http://watson1978.github.com/blog/2012/07/22/meet-up-rubymotionjp/">第一回 RubyMotion 勉強会</a> の資料からクラスの部分を抜き出して手直ししようと言う手抜きぶりです。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/05/09/mixing-the-ruby-and-objc/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2012/12/20/rubymotion-class/">Read on &rarr;</a>
     </footer>
   
 
@@ -209,7 +232,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/05/08/specs-for-stopwatch-app/">RubyMotion で作成したアプリのテストケースを書いてみました</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/12/15/target-cpu-archs/">RubyMotion でビルドする CPU アーキテクチャを指定する</a></h1>
     
     
       <p class="meta">
@@ -225,22 +248,24 @@
   
 
 
-<time datetime="2012-05-08T21:18:00+09:00" pubdate data-updated="true">May 8<span>th</span>, 2012</time>
+<time datetime="2012-12-15T11:08:00+09:00" pubdate data-updated="true">Dec 15<span>th</span>, 2012</time>
         
-         | <a href="/blog/2012/05/08/specs-for-stopwatch-app/#disqus_thread">Comments</a>
+         | <a href="/blog/2012/12/15/target-cpu-archs/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>以前に作成した <a href="/blog/2012/05/03/creating-an-ios-application-using-rubymotion_ja/">StopWatch</a> アプリのテストケースを書いてみました。アクションメソッドを呼び出したりして、インスタンス変数で保持しているオブジェクトが、思い通り生成されているかテストしたくらいですが。</p>
+  <div class="entry-content"><p>この記事は <a href="http://www.adventar.org/calendars/18">RubyMotion Advent Calendar 2012</a> の 15 日目の記事です。</p>
+
+<p>今回はRubyMotion でビルドする際に CPU アーキテクチャを指定する方法について書きます。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/05/08/specs-for-stopwatch-app/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2012/12/15/target-cpu-archs/">Read on &rarr;</a>
     </footer>
   
 
@@ -252,7 +277,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/05/08/using-interactive-shell/">UIView のオブジェクトを Interactive Shell を使って修正する</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/12/10/autorelease-pool/">RubyMotion の Autorelease_pool の使い方</a></h1>
     
     
       <p class="meta">
@@ -268,24 +293,26 @@
   
 
 
-<time datetime="2012-05-08T15:01:00+09:00" pubdate data-updated="true">May 8<span>th</span>, 2012</time>
+<time datetime="2012-12-10T17:15:00+09:00" pubdate data-updated="true">Dec 10<span>th</span>, 2012</time>
         
-         | <a href="/blog/2012/05/08/using-interactive-shell/#disqus_thread">Comments</a>
+         | <a href="/blog/2012/12/10/autorelease-pool/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><a href="http://pragmaticstudio.com/screencasts/rubymotion">RubyMotion Screencast</a> を見ていて、シミュレータで UIView のオブジェクトを選択して Interactive Shell で手直しできるなんて cool ですね。</p>
+  <div class="entry-content"><p>この記事は <a href="http://www.adventar.org/calendars/18">RubyMotion Advent Calendar 2012</a> の 10 日目の記事です。</p>
 
-<p>さて、Screencast でたぶん説明されていたのでしょうが、シミュレータ上に表示されている UIView のパーツをどのように選択するのかがわからなかったので試してみました。</p>
+<p>つい最近ようやく <a href="http://www.rubymotion.com/developer-center/api/index.html">RubyMotion API Reference</a> が公開されましたが、みなさん見ていただけたでしょうか？RubyMotion のバグを取っていて、「このメソッド初めて見るんだけど何もの？」「ドキュメントが必要だよねぇ」みたいなやりとりをしながら、一生懸命リファレンスを作りました。</p>
+
+<p>今回は <a href="http://www.rubymotion.com/developer-center/api/NSObject.html#autorelease_pool-class_method">autorelease_pool</a> の使い方について書きます。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/05/08/using-interactive-shell/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2012/12/10/autorelease-pool/">Read on &rarr;</a>
     </footer>
   
 
@@ -297,7 +324,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/05/03/creating-an-ios-application-using-rubymotion_en/">Creating an iOS Application Using RubyMotion</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/12/09/find-methods/">短いメソッドは Grep で探すの大変ですよね</a></h1>
     
     
       <p class="meta">
@@ -313,32 +340,24 @@
   
 
 
-<time datetime="2012-05-03T00:02:00+09:00" pubdate data-updated="true">May 3<span>rd</span>, 2012</time>
+<time datetime="2012-12-09T12:25:00+09:00" pubdate data-updated="true">Dec 9<span>th</span>, 2012</time>
         
-         | <a href="/blog/2012/05/03/creating-an-ios-application-using-rubymotion_en/#disqus_thread">Comments</a>
+         | <a href="/blog/2012/12/09/find-methods/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>In this article I will explain how to create a simple iOS application using RubyMotion. I will call this application &#8220;StopWatch&#8221;, and MacRuby version of this application is explained in <a href="https://github.com/MacRuby/MacRuby/wiki/Creating-a-simple-application">&#8220;Creating a simple application&#8221;</a>.</p>
+  <div class="entry-content"><p>この記事は <a href="http://www.adventar.org/calendars/18">RubyMotion Advent Calendar 2012</a> の 9 日目の記事です。</p>
 
-<p>The &#8220;StopWatch&#8221; application has the following features.</p>
-
-<ul>
-<li>This application has the user interface which are start buttion, stop button and label.</li>
-<li>Run the timer if the start button is clicked.</li>
-<li>Stop the timer if the stop button is clicked.</li>
-<li>The timer value is displayed in the label.</li>
-</ul>
-
+<p>タイトルそのままなのですが、短いメソッドなどを探すのって大変ですよね。デバッグのために仕込んだ <code>p</code> メソッドを取り外そうと検索すると、いろいろなものに紛れ込んでしまいますよね。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/05/03/creating-an-ios-application-using-rubymotion_en/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2012/12/09/find-methods/">Read on &rarr;</a>
     </footer>
   
 
@@ -350,7 +369,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/05/03/creating-an-ios-application-using-rubymotion_ja/">RubyMotion で簡単な iOS アプリを作ってみよう</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/12/07/jenkins/">RubyMotion アプリを Jenkins でテスト実行してみよう</a></h1>
     
     
       <p class="meta">
@@ -366,34 +385,24 @@
   
 
 
-<time datetime="2012-05-03T00:01:00+09:00" pubdate data-updated="true">May 3<span>rd</span>, 2012</time>
+<time datetime="2012-12-07T00:00:00+09:00" pubdate data-updated="true">Dec 7<span>th</span>, 2012</time>
         
-         | <a href="/blog/2012/05/03/creating-an-ios-application-using-rubymotion_ja/#disqus_thread">Comments</a>
+         | <a href="/blog/2012/12/07/jenkins/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>今回は、RubyMotion で簡単なアプリを作ってみます。ここでは簡単な「StopWatch」アプリケーションを作成し、RubyMotion でどのように iOS アプリを作成するのか説明したいと思います。</p>
+  <div class="entry-content"><p>この記事は <a href="http://www.adventar.org/calendars/18">RubyMotion Advent Calendar 2012</a> の 7 日目の記事です。</p>
 
-<p>StopWatch アプリの簡単な仕様は、</p>
-
-<ul>
-<li>start ボタン、stop ボタンとタイマーの値を表示するラベルを持っています。</li>
-<li>start ボタンが押されると、タイマーがスタートします。</li>
-<li>stop ボタンが押されると、タイマーを停止します。</li>
-<li>タイマーが動作中の値を 0.1 秒刻みでラベルに表示します。</li>
-</ul>
-
-
-<p>です。</p>
+<p>最近になってようやく Jenkins を使い始めてみたので、RubyMotion アプリを Jenkins でテスト実行する方法について調べてみました。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/05/03/creating-an-ios-application-using-rubymotion_ja/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2012/12/07/jenkins/">Read on &rarr;</a>
     </footer>
   
 
@@ -405,7 +414,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/05/03/first-step-in-rubymotion_ja/">RubyMotion、はじめの一歩</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/12/04/proxy-server-for-HTTP-test/">Proxy サーバを用意して HTTP 通信をテストしよう</a></h1>
     
     
       <p class="meta">
@@ -421,22 +430,119 @@
   
 
 
-<time datetime="2012-05-03T00:00:00+09:00" pubdate data-updated="true">May 3<span>rd</span>, 2012</time>
+<time datetime="2012-12-04T00:00:00+09:00" pubdate data-updated="true">Dec 4<span>th</span>, 2012</time>
         
-         | <a href="/blog/2012/05/03/first-step-in-rubymotion_ja/#disqus_thread">Comments</a>
+         | <a href="/blog/2012/12/04/proxy-server-for-HTTP-test/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><a href="http://www.rubymotion.com/">RubyMotion</a> は MacRuby をベースとした、Ruby で iOS アプリを開発するための枠組みを提供します。これまで、iOS アプリを開発するために Objective-C や、JavaScript で開発できる Titanium Mobile などが利用されてきましたが、これからは Ruby でも iOS アプリを開発することができます。</p>
+  <div class="entry-content"><p>この記事は <a href="http://www.adventar.org/calendars/18">RubyMotion Advent Calendar 2012</a> の 4 日目の記事です。</p>
+
+<p>以前「RubyMotion もくもく会」で HTTP 通信のテストはどうすれば良いのだろうかという話題でモックを用意するのですかねと話が収束したのですが、面倒だし極力アプリに手を加えたくないなぁと一人もやもやしておりました。</p>
+
+<p>Proxy サーバを用意すれば比較的簡単にテストできるんじゃないかと思い、ブログに書いてみました。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/05/03/first-step-in-rubymotion_ja/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2012/12/04/proxy-server-for-HTTP-test/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/12/03/dtrace/">RubyMotion アプリで DTrace を使ってみよう</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-12-03T00:00:00+09:00" pubdate data-updated="true">Dec 3<span>rd</span>, 2012</time>
+        
+         | <a href="/blog/2012/12/03/dtrace/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>この記事は <a href="http://www.adventar.org/calendars/18">RubyMotion Advent Calendar 2012</a> の 3 日目の記事です。</p>
+
+<p>DTrace は Sun Microsystems が開発した実行中のアプリの情報を取得する仕組みです。DTrace を使用するとアプリケーションを一切変更することなく情報取得を可能にします。
+Xcode に付属している Instruments が様々な情報を表示できるのは、縁の下に DTrace が存在しているからです。</p>
+
+<p>Ruby 2.0 preview2 でいよいよ DTrace がサポートされましたが、MacRuby や RubyMotion ではすでに DTrace をサポートしています。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/12/03/dtrace/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/19/rubymotion-can-not-launch-simulator-in-tmux/">Tmux を使用しているとシミュレータでアプリが起動しない</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-19T09:06:00+09:00" pubdate data-updated="true">Oct 19<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/10/19/rubymotion-can-not-launch-simulator-in-tmux/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>昨日は「<a href="http://connpass.com/event/1201/">第2回 RubyMotion もくもく会</a>」に参加してきました。参加された皆様お疲れ様でした。</p>
+
+<p>今回はそのときに遭遇した現象について書きます。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/10/19/rubymotion-can-not-launch-simulator-in-tmux/">Read on &rarr;</a>
     </footer>
   
 
@@ -444,6 +550,8 @@
     </article>
   
   <div class="pagination">
+    
+      <a class="prev" href="/blog/page/3/">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -467,23 +575,23 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2012/09/20/push-notifiation-with-rubymotion/">RubyMotion と Parse で Push Notifiation してみたよ〜</a>
+        <a href="/blog/2013/12/02/development-rubymotion-app-with-motion-mode-plus-rubocop/">RubyMotionアプリ開発に、motion-mode + Rubocop を導入</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/09/19/using-parse/">RubyMotion で Parse を使ってみました</a>
+        <a href="/blog/2013/09/10/using-newest-or-previous-rubymotion/">最新の RubyMotion の試し方</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/09/10/bonjour-rubymotion/">Bonjour RubyMotion</a>
+        <a href="/blog/2013/09/10/how-to-use-xcode5/">Xcode 5 Developer Preview を使って RubyMotion アプリをビルドする方法</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/08/30/use-google-analytics/">RubyMotion ではじめるGoogle Analytics for iOS</a>
+        <a href="/blog/2013/07/16/changing-locale/">RubyMotion アプリをシミュレーターで起動する際に言語を指定する</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/08/29/make-an-application-which-target-the-ios-4/">iOS 4.3 を対象としたアプリケーションを作る</a>
+        <a href="/blog/2013/06/06/creating-rubymotion-static-library/">RubyMotion でスタティックライブラリを作成し、 Xcode プロジェクトで利用する</a>
       </li>
     
   </ul>
@@ -516,7 +624,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2012 - Watson -
+  Copyright &copy; 2013 - Watson -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
@@ -543,7 +651,7 @@
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) {return;}
   js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  js.src = "//connect.facebook.net/ja_JP/all.js#appId=141769376031637&xfbml=1";
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 

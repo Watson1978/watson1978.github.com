@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: MacRuby | Watson's Blog]]></title>
-  <link href="http://watson1978.github.com/blog/categories/macruby/atom.xml" rel="self"/>
-  <link href="http://watson1978.github.com/"/>
-  <updated>2012-09-20T18:42:04+09:00</updated>
-  <id>http://watson1978.github.com/</id>
+  <link href="http://watson1978.github.io/blog/categories/macruby/atom.xml" rel="self"/>
+  <link href="http://watson1978.github.io/"/>
+  <updated>2013-12-02T08:12:19+09:00</updated>
+  <id>http://watson1978.github.io/</id>
   <author>
     <name><![CDATA[Watson]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Bonjour RubyMotion]]></title>
-    <link href="http://watson1978.github.com/blog/2012/09/10/bonjour-rubymotion/"/>
+    <link href="http://watson1978.github.io/blog/2012/09/10/bonjour-rubymotion/"/>
     <updated>2012-09-10T17:03:00+09:00</updated>
-    <id>http://watson1978.github.com/blog/2012/09/10/bonjour-rubymotion</id>
+    <id>http://watson1978.github.io/blog/2012/09/10/bonjour-rubymotion</id>
     <content type="html"><![CDATA[<p>今まで主夫兼 MacRuby Team メンバーみたいな肩書きだったのが、9 月 4 日 からは RubyMotion Team メンバーという肩書きが増えました。ありがとうございます。2010 年 8 月に MacRuby Team メンバーに加えていただいてから、少しずつ MacRuby の不具合を取り除いてきましたが、ここまでのものになると参加当時は思ってもみませんでした。Bonjour RubyMotion!</p>
 
 <p>ということで、今日は RubyMotion で Bonjour を使ったものを書いてみました。</p>

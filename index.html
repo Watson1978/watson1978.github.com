@@ -17,7 +17,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://watson1978.github.com/">
+  <link rel="canonical" href="http://watson1978.github.io/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -25,8 +25,21 @@
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="Watson's Blog" type="application/atom+xml">
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<meta name="author" content="Watson" />
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<meta property="article:author" content="https://www.facebook.com/fujita.shizuo" />
+
+<meta property="og:title" content="Watson's Blog" />
+<meta property="og:type" content="website" />
+<meta property="og:description" content="" />
+
+<meta property="og:url" content="http://watson1978.github.io/" />
+<meta property="og:image" content="http://watson1978.github.io/images/RubyMotion_icon.png" />
+<meta property="og:site_name" content="Watson's Blog" />
+<meta property="og:locale" content="ja_JP" />
+<meta property="fb:app_id" content="141769376031637" />
+
 
   
   <script type="text/javascript">
@@ -58,7 +71,7 @@
   
 <form action="http://google.com/search" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:watson1978.github.com" />
+    <input type="hidden" name="q" value="site:watson1978.github.io" />
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
@@ -80,7 +93,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/09/20/push-notifiation-with-rubymotion/">RubyMotion と Parse で Push Notifiation してみたよ〜</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/12/02/development-rubymotion-app-with-motion-mode-plus-rubocop/">RubyMotionアプリ開発に、motion-mode + Rubocop を導入</a></h1>
     
     
       <p class="meta">
@@ -96,22 +109,214 @@
   
 
 
-<time datetime="2012-09-20T16:01:00+09:00" pubdate data-updated="true">Sep 20<span>th</span>, 2012</time>
+<time datetime="2013-12-02T08:05:00+09:00" pubdate data-updated="true">Dec 2<span>nd</span>, 2013</time>
         
-         | <a href="/blog/2012/09/20/push-notifiation-with-rubymotion/#disqus_thread">Comments</a>
+         | <a href="/blog/2013/12/02/development-rubymotion-app-with-motion-mode-plus-rubocop/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>先日に引き続き <a href="https://www.parse.com/">Parse</a> で遊んでいます。今日は<a href="https://www.parse.com/apps/quickstart_push">Push Quick Start Guide</a> を読みながら Push Notifiation に挑戦しました。いろいろ設定することがあって大変ですね。慣れるとそうでもないのでしょうか？(^ ^;)</p>
+  <div class="entry-content"><p>この記事ではmotion-modeとrubocopをEmacsに導入してRubyMotionアプリ開発で活用する方法について扱います。motion-modeについては作者の<a href="http://qiita.com/ainame">ainame</a>さんが何か書いてくださるそうなので期待しましょう。</p>
+
+<p><a href="https://github.com/bbatsov/rubocop">Rubocop</a>はアプリがsnake caseとcamel caseが入り乱れていないかなど、一貫したルールでコードが記述されているかチェックしてくれるツールです。チームで開発する際はもちろん一人でコードを記述する際にも一貫したコードは、可読性が向上し将来的にメンテナンスが容易になることでしょう。</p>
+
+<h2>1. Rubocopをインストール</h2>
+
+<p>RubocopはRubyGems経由でインストールするできます。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>% gem install robocop</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>2.  Emacsのパッケージをインストール</h2>
+
+<p>MELPA経由で以下のパッケージをインストールします。flycheckを導入しておくことで、Rubocopのチェック結果をよりわかりやすく表示できるようになります。</p>
+
+<ul>
+<li><a href="https://github.com/ainame/motion-mode">motion-mode</a></li>
+<li><a href="https://github.com/flycheck/flycheck">flycheck</a></li>
+<li><a href="https://github.com/bbatsov/rubocop-emacs">rubocop</a></li>
+</ul>
+
+
+<h2>3.  Emacsの設定</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+</span><span class='line'>;; motion-mode
+</span><span class='line'>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+</span><span class='line'>(add-to-list 'load-path "~/.emacs.d/elisp/motion-mode")
+</span><span class='line'>(require 'motion-mode)
+</span><span class='line'>;; following adding of hook is very important.
+</span><span class='line'>(add-hook 'ruby-mode-hook 'motion-recognize-project)
+</span><span class='line'>(add-to-list 'ac-modes 'motion-mode)
+</span><span class='line'>(add-to-list 'ac-sources 'ac-source-dictionary)
+</span><span class='line'>;; set keybindings as you like
+</span><span class='line'>(define-key motion-mode-map (kbd "C-c C-c") 'motion-execute-rake)
+</span><span class='line'>(define-key motion-mode-map (kbd "C-c C-d") 'motion-dash-at-point)
+</span><span class='line'>(define-key motion-mode-map (kbd "C-c C-p") 'motion-convert-code-region)
+</span><span class='line'>
+</span><span class='line'>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+</span><span class='line'>;; rubocop
+</span><span class='line'>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+</span><span class='line'>(require 'rubocop)
+</span><span class='line'>(add-hook 'ruby-mode-hook 'rubocop-mode)
+</span><span class='line'>
+</span><span class='line'>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+</span><span class='line'>;; flycheck-mode
+</span><span class='line'>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+</span><span class='line'>;; (add-hook 'after-init-hook #'global-flycheck-mode)
+</span><span class='line'>(require 'flycheck)
+</span><span class='line'>(add-hook 'ruby-mode-hook 'flycheck-mode)
+</span><span class='line'>(flycheck-define-checker ruby-rubocop
+</span><span class='line'>  "A Ruby syntax and style checker using the RuboCop tool.
+</span><span class='line'>
+</span><span class='line'>See URL `http://batsov.com/rubocop/'."
+</span><span class='line'>  :command ("rubocop" "--format" "emacs" "--silent"
+</span><span class='line'>            (config-file "--config" flycheck-rubocoprc)
+</span><span class='line'>            source)
+</span><span class='line'>  :error-patterns
+</span><span class='line'>  ((warning line-start
+</span><span class='line'>            (file-name) ":" line ":" column ": " (or "C" "W") ": " (message)
+</span><span class='line'>            line-end)
+</span><span class='line'>   (error line-start
+</span><span class='line'>          (file-name) ":" line ":" column ": " (or "E" "F") ": " (message)
+</span><span class='line'>          line-end))
+</span><span class='line'>  :modes (enh-ruby-mode motion-mode))</span></code></pre></td></tr></table></div></figure>
+
+
+<p>RubyMotionプロジェクトのファイルを開くと<code>rubocop</code>が動作するように<code>flycheck-define-checker</code>を追加しています。(Rubyのコードを開いたときにも<code>rubocop</code>が動作するようにしています)</p>
+
+<p><img src="https://qiita-image-store.s3.amazonaws.com/0/2075/c33ff190-7337-2d59-0272-c39d43ec51b5.png" title="131128-0001.png" alt="131128-0001.png" /></p>
+
+<p><code>rubocop</code>で指定されているコーディング規約に沿っていない箇所があれば、上の画像のように<code>?</code>が行頭に表示されるようです。</p>
+
+<h2>4. .rubocop.yml</h2>
+
+<p>いくつか<code>rubocop</code>のルールをカスタマイズしました。<code>.rubocop.yml</code>というファイルを<code>~/</code>やプロジェクトのルートに置くと良さそうです。</p>
+
+<p>メソッド名、シンボル名がsnake caseになっているか、コメントがASCII文字だけか、1行あたりの文字数をチェックする機能を外しています。</p>
+
+<figure class='code'><figcaption><span>.rubocop.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="c1"># disable to check whether method name use camel case.</span>
+</span><span class='line'><span class="l-Scalar-Plain">MethodName</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">Enabled</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">false</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># disable to check whether symbol name use camel case.</span>
+</span><span class='line'><span class="l-Scalar-Plain">SymbolName</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">Enabled</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">false</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># disable to check whether only ascii symbols in comments.</span>
+</span><span class='line'><span class="l-Scalar-Plain">AsciiComments</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">Enabled</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">false</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># disable to check whether lines is less than 80 characters.</span>
+</span><span class='line'><span class="l-Scalar-Plain">LineLength</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">Enabled</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">false</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ほかのカスタマイズ項目については<a href="https://github.com/bbatsov/rubocop/tree/master/config">https://github.com/bbatsov/rubocop/tree/master/config</a>の<a href="https://github.com/bbatsov/rubocop/blob/master/config/default.yml">default.yml</a>を参考にすると良さそうです。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/09/10/using-newest-or-previous-rubymotion/">最新の RubyMotion の試し方</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-09-10T21:16:00+09:00" pubdate data-updated="true">Sep 10<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/09/10/using-newest-or-previous-rubymotion/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>RubyMotion の新しいバージョンがリリースされる前に、先行して <a href="https://github.com/HipByte/RubyMotion">https://github.com/HipByte/RubyMotion</a> のリポジトリにパッチが push されている場合があります。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/09/20/push-notifiation-with-rubymotion/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2013/09/10/using-newest-or-previous-rubymotion/">Read on &rarr;</a>
     </footer>
   
 
@@ -123,7 +328,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/09/19/using-parse/">RubyMotion で Parse を使ってみました</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/09/10/how-to-use-xcode5/">Xcode 5 Developer Preview を使って RubyMotion アプリをビルドする方法</a></h1>
     
     
       <p class="meta">
@@ -139,24 +344,26 @@
   
 
 
-<time datetime="2012-09-19T17:15:00+09:00" pubdate data-updated="true">Sep 19<span>th</span>, 2012</time>
+<time datetime="2013-09-10T21:16:00+09:00" pubdate data-updated="true">Sep 10<span>th</span>, 2013</time>
         
-         | <a href="/blog/2012/09/19/using-parse/#disqus_thread">Comments</a>
+         | <a href="/blog/2013/09/10/how-to-use-xcode5/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><a href="https://www.parse.com/">Parse</a> は、ユーザ認証やプッシュ通知といったサーバ側の実装が必要となる機能をあらかじめ用意してくれていて、アプリから単に API を呼び出すだけで簡単にそれらの機能を利用できてしまうという、すごく便利なサービスです。</p>
+  <div class="entry-content"><p><a href="http://rubymotion-tokyo.doorkeeper.jp/events/5652">http://rubymotion-tokyo.doorkeeper.jp/events/5652</a> に参加しながら、もくもくとブログを書いてます。</p>
 
-<p><img src="/images/blog/parse.png" alt="Parse" /></p>
+<p>Xcode 5 Developer Preview を使って RubyMotion アプリをビルドする方法が分からないという方がおりましたので、今回はその方法を書いてみたいと思います。</p>
+
+<p><img src="/images/blog/question_xcode_dp.png" alt="" /></p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/09/19/using-parse/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2013/09/10/how-to-use-xcode5/">Read on &rarr;</a>
     </footer>
   
 
@@ -168,7 +375,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/09/10/bonjour-rubymotion/">Bonjour RubyMotion</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/07/16/changing-locale/">RubyMotion アプリをシミュレーターで起動する際に言語を指定する</a></h1>
     
     
       <p class="meta">
@@ -184,24 +391,22 @@
   
 
 
-<time datetime="2012-09-10T17:03:00+09:00" pubdate data-updated="true">Sep 10<span>th</span>, 2012</time>
+<time datetime="2013-07-16T21:16:00+09:00" pubdate data-updated="true">Jul 16<span>th</span>, 2013</time>
         
-         | <a href="/blog/2012/09/10/bonjour-rubymotion/#disqus_thread">Comments</a>
+         | <a href="/blog/2013/07/16/changing-locale/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>今まで主夫兼 MacRuby Team メンバーみたいな肩書きだったのが、9 月 4 日 からは RubyMotion Team メンバーという肩書きが増えました。ありがとうございます。2010 年 8 月に MacRuby Team メンバーに加えていただいてから、少しずつ MacRuby の不具合を取り除いてきましたが、ここまでのものになると参加当時は思ってもみませんでした。Bonjour RubyMotion!</p>
-
-<p>ということで、今日は RubyMotion で Bonjour を使ったものを書いてみました。</p>
+  <div class="entry-content"><p><a href="http://iphone-dev.g.hatena.ne.jp/ktakayama/20130619/1371621739">Xcode で起動時の言語指定方法</a> がこちらに書かれているのですが、RubyMotion では <code>rake</code> を実行する際に環境変数 <code>args</code> を利用して以下のように指定します。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/09/10/bonjour-rubymotion/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2013/07/16/changing-locale/">Read on &rarr;</a>
     </footer>
   
 
@@ -213,7 +418,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/08/30/use-google-analytics/">RubyMotion ではじめるGoogle Analytics for iOS</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/06/06/creating-rubymotion-static-library/">RubyMotion でスタティックライブラリを作成し、 Xcode プロジェクトで利用する</a></h1>
     
     
       <p class="meta">
@@ -229,24 +434,22 @@
   
 
 
-<time datetime="2012-08-30T08:42:00+09:00" pubdate data-updated="true">Aug 30<span>th</span>, 2012</time>
+<time datetime="2013-06-06T12:32:00+09:00" pubdate data-updated="true">Jun 6<span>th</span>, 2013</time>
         
-         | <a href="/blog/2012/08/30/use-google-analytics/#disqus_thread">Comments</a>
+         | <a href="/blog/2013/06/06/creating-rubymotion-static-library/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>アプリがどれだけダウンロードされているか開発者なら誰もが気になるところでしょうが、どの機能がどれだけ使われているかといったことも気になるところがと思います。</p>
-
-<p>Google Analytics for iOS を利用すると、ユーザが使用している機能を簡単にトラッキングすることができます。</p>
+  <div class="entry-content"><p>RubyMotion Kaigi で質問があったので、RubyMotion を使ったスタティックライブラリの作り方と、Xcode プロジェクトへの組み込み方について書いてみました。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/08/30/use-google-analytics/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2013/06/06/creating-rubymotion-static-library/">Read on &rarr;</a>
     </footer>
   
 
@@ -258,7 +461,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/08/29/make-an-application-which-target-the-ios-4/">iOS 4.3 を対象としたアプリケーションを作る</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/06/03/rubymotion-kaigi-2013/">RubyMotion Kaigi 2013 と簡単に Objective-C を実行する方法</a></h1>
     
     
       <p class="meta">
@@ -274,29 +477,29 @@
   
 
 
-<time datetime="2012-08-29T21:02:00+09:00" pubdate data-updated="true">Aug 29<span>th</span>, 2012</time>
+<time datetime="2013-06-03T10:43:00+09:00" pubdate data-updated="true">Jun 3<span>rd</span>, 2013</time>
         
-         | <a href="/blog/2012/08/29/make-an-application-which-target-the-ios-4/#disqus_thread">Comments</a>
+         | <a href="/blog/2013/06/03/rubymotion-kaigi-2013/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>RubyMotion は、iOS 4.3 以降を対象としたアプリケーションを作ることができます。プロジェクトの設定や、シミュレータの起動方法について書きたいと思います。個人的には世の中が iOS 5.x だけになると、みんなハッピーになれそうな気がするのですが・・・(^ ^;)</p>
+  <div class="entry-content"><p>Ruby Kaigi の前日、5月29日に RubyMotion Kaigi 2013 で発表をしてきました。
+<img src="/images/blog/rubymotion_kaigi2013.jpg" alt="RubyMotion Kaigi" /></p>
 
-<div class="note">
-今のところ OS X 10.8 環境では iOS 4.3 シミュレータをインストールできないようなので、OS X 10.7 環境が必要となるので注意してください。
-</div>
+<p>誰か：「英語が苦手で良く勤まっていますね？」</p>
 
+<p>私：「何を言っているのか わからねーと思うが. おれもどうしてこーなったかわからなかった・・・。」</p>
 
-
+<p>よく分からないけど、気づいたら RubyMotion を開発していたので、発表をすることになりました。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/08/29/make-an-application-which-target-the-ios-4/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2013/06/03/rubymotion-kaigi-2013/">Read on &rarr;</a>
     </footer>
   
 
@@ -308,7 +511,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/08/23/make-a-sublime-text-environment/">Sublime Text を導入して RubyMotion アプリ開発をもっと楽しいものに</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/03/31/rubymotion-conference-2013/">RubyMotion Conference 2013</a></h1>
     
     
       <p class="meta">
@@ -324,24 +527,24 @@
   
 
 
-<time datetime="2012-08-23T22:19:00+09:00" pubdate data-updated="true">Aug 23<span>rd</span>, 2012</time>
+<time datetime="2013-03-31T21:38:00+09:00" pubdate data-updated="true">Mar 31<span>st</span>, 2013</time>
         
-         | <a href="/blog/2012/08/23/make-a-sublime-text-environment/#disqus_thread">Comments</a>
+         | <a href="/blog/2013/03/31/rubymotion-conference-2013/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>Twitter のつぶやきを眺めていると、RubyMotion アプリ開発では <a href="http://www.sublimetext.com/">Sublime Text</a> をエディタに使うのが定番になってきた感じがします。</p>
+  <div class="entry-content"><p><a href="http://www.rubymotion.com/conference/">RubyMotion Conference</a> に参加するため <a href="https://twitter.com/satococoa">@satococoa</a> さんとベルギーへ行ってきました。私の残念な英語力で理解できた範囲でとりとめもなく書いています。</p>
 
-<p>いい加減、私もライセンスを購入しないといけないなと思いつつ、環境構築の手順などをまとめておきます。</p>
+<p><img src="/images/blog/rubymotion_conferece2013_venue.jpg" alt="RUbyMotion Conference 会場" /></p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/08/23/make-a-sublime-text-environment/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2013/03/31/rubymotion-conference-2013/">Read on &rarr;</a>
     </footer>
   
 
@@ -353,7 +556,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/08/22/make-a-gradient/">CGGradient を使ってグラデーションを作る</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/02/12/rubymotion-build-plugin-for-jenkins/">Jenkins-rubymotion-plugin ってものを作ってます</a></h1>
     
     
       <p class="meta">
@@ -369,22 +572,24 @@
   
 
 
-<time datetime="2012-08-22T22:59:00+09:00" pubdate data-updated="true">Aug 22<span>nd</span>, 2012</time>
+<time datetime="2013-02-12T21:34:00+09:00" pubdate data-updated="true">Feb 12<span>th</span>, 2013</time>
         
-         | <a href="/blog/2012/08/22/make-a-gradient/#disqus_thread">Comments</a>
+         | <a href="/blog/2013/02/12/rubymotion-build-plugin-for-jenkins/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>RubyMotion で <a href="https://developer.apple.com/library/mac/#documentation/graphicsimaging/reference/CGGradient/Reference/reference.html">CGGradient</a> を使ってグラデーションを作る際に 2 点ほどポイントがありそうです。</p>
+  <div class="entry-content"><p>以前、<a href="http://watson1978.github.com/blog/2012/12/07/jenkins/">RubyMotion アプリを Jenkins でテスト実行してみよう</a> や <a href="http://watson1978.github.com/blog/2013/01/30/rubymotion-jenkins-tap/">Jenkins に TAP Plugin というものを導入しました</a> で RubyMotion アプリを Jenkins を使ってテストする方法について書きました。</p>
+
+<p>今回はプラグインを作ってみたよってお話です。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/08/22/make-a-gradient/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2013/02/12/rubymotion-build-plugin-for-jenkins/">Read on &rarr;</a>
     </footer>
   
 
@@ -396,7 +601,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/08/01/translating-rubymotion-articles/">RubyMotion の Articles を翻訳しました</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/02/11/tokyo-rubykaigi-3rd/">東京 Ruby 会議 10 3日目にいってきました</a></h1>
     
     
       <p class="meta">
@@ -412,64 +617,22 @@
   
 
 
-<time datetime="2012-08-01T23:31:00+09:00" pubdate data-updated="true">Aug 1<span>st</span>, 2012</time>
+<time datetime="2013-02-11T13:51:00+09:00" pubdate data-updated="true">Feb 11<span>th</span>, 2013</time>
         
-         | <a href="/blog/2012/08/01/translating-rubymotion-articles/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>最近は <a href="https://github.com/RubyMotionJP">RubyMotionJP</a> でちまちま作業しており、RubyMotion の公式サイトの <a href="http://www.rubymotion.com/developer-center/">Developer Center</a> で公開されている記事を翻訳しました。</p>
-
-<p>翻訳した記事は <a href="http://rubymotion.jp/">rubymotion.jp</a> で公開しております。誤訳などありましたら、pull request いただけると大変ありがたいです。</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/22/meet-up-rubymotionjp/">第一回 RubyMotion 勉強会に参加してきました。</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-07-22T21:30:00+09:00" pubdate data-updated="true">Jul 22<span>nd</span>, 2012</time>
-        
-         | <a href="/blog/2012/07/22/meet-up-rubymotionjp/#disqus_thread">Comments</a>
+         | <a href="/blog/2013/02/11/tokyo-rubykaigi-3rd/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>今日は <a href="http://connpass.com/event/665/">RubyMotion 勉強会</a>に参加してきました。</p>
-
-<p>13時半頃に会場最寄りの麹町駅に到着したのですが、駅を出てからの一歩目の方向を間違えてしまい、いきなり迷ってしまいました。しかも会場である「住友不動産麹町ビル３号」とは別に「住友不動産麹ビル」というビルを見つけてしまい、しばらく右往左往してこの時点で無駄に体力を消費してしまい死にそうでした。tweet して助けを求めるとやはり違うところに来てしまったことが判明し、なんとか無事に会場にたどり着くことができました・・・。</p>
+  <div class="entry-content"><p><a href="https://twitter.com/satococoa">@satococoa</a> さんが RubyMotion について話されるというので行ってきましたよ、東京 Ruby 会議 10 の 3 日目に。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/07/22/meet-up-rubymotionjp/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2013/02/11/tokyo-rubykaigi-3rd/">Read on &rarr;</a>
     </footer>
   
 
@@ -481,7 +644,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/06/07/create-static-library/">RubyMotion で使う iOS スタティックライブラリを作る</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/01/30/rubymotion-jenkins-tap/">Jenkins に TAP Plugin というものを導入しました</a></h1>
     
     
       <p class="meta">
@@ -497,26 +660,22 @@
   
 
 
-<time datetime="2012-06-07T14:55:00+09:00" pubdate data-updated="true">Jun 7<span>th</span>, 2012</time>
+<time datetime="2013-01-30T21:45:00+09:00" pubdate data-updated="true">Jan 30<span>th</span>, 2013</time>
         
-         | <a href="/blog/2012/06/07/create-static-library/#disqus_thread">Comments</a>
+         | <a href="/blog/2013/01/30/rubymotion-jenkins-tap/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>今日はどのように iOS スタティックライブラリを作るのか、Xcode と格闘していました。</p>
-
-<p>何も考えずにビルドしてしまうと ARM 用のバイナリのみのライブラリができてしまい、i386 バイナリを必要とするシミュレータ用には使えません。</p>
-
-<p>ビルドの仕方がわからずに、どうすればライブラリが作れるか試行錯誤の課程を書きます。</p>
+  <div class="entry-content"><p><a href="http://www.amazon.co.jp/s/ref=nb_sb_noss_1?__mk_ja_JP=%83J%83%5E%83J%83i&amp;url=search-alias%3Daps&amp;field-keywords=mac+mini">Amazon で手頃な Mac mini</a> を購入して、<a href="http://watson1978.github.com/blog/2012/12/07/jenkins/">Jenkins で日々 RubyMotion をテスト</a>しています。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2012/06/07/create-static-library/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2013/01/30/rubymotion-jenkins-tap/">Read on &rarr;</a>
     </footer>
   
 
@@ -547,23 +706,23 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2012/09/20/push-notifiation-with-rubymotion/">RubyMotion と Parse で Push Notifiation してみたよ〜</a>
+        <a href="/blog/2013/12/02/development-rubymotion-app-with-motion-mode-plus-rubocop/">RubyMotionアプリ開発に、motion-mode + Rubocop を導入</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/09/19/using-parse/">RubyMotion で Parse を使ってみました</a>
+        <a href="/blog/2013/09/10/using-newest-or-previous-rubymotion/">最新の RubyMotion の試し方</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/09/10/bonjour-rubymotion/">Bonjour RubyMotion</a>
+        <a href="/blog/2013/09/10/how-to-use-xcode5/">Xcode 5 Developer Preview を使って RubyMotion アプリをビルドする方法</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/08/30/use-google-analytics/">RubyMotion ではじめるGoogle Analytics for iOS</a>
+        <a href="/blog/2013/07/16/changing-locale/">RubyMotion アプリをシミュレーターで起動する際に言語を指定する</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/08/29/make-an-application-which-target-the-ios-4/">iOS 4.3 を対象としたアプリケーションを作る</a>
+        <a href="/blog/2013/06/06/creating-rubymotion-static-library/">RubyMotion でスタティックライブラリを作成し、 Xcode プロジェクトで利用する</a>
       </li>
     
   </ul>
@@ -596,7 +755,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2012 - Watson -
+  Copyright &copy; 2013 - Watson -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
@@ -623,7 +782,7 @@
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) {return;}
   js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  js.src = "//connect.facebook.net/ja_JP/all.js#appId=141769376031637&xfbml=1";
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 

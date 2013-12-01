@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Pixate | Watson's Blog]]></title>
+  <link href="http://watson1978.github.io/blog/categories/pixate/atom.xml" rel="self"/>
+  <link href="http://watson1978.github.io/"/>
+  <updated>2013-12-02T08:12:19+09:00</updated>
+  <id>http://watson1978.github.io/</id>
+  <author>
+    <name><![CDATA[Watson]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[motion-pixate-observer という gem を作りました]]></title>
+    <link href="http://watson1978.github.io/blog/2013/01/25/motion-pixate-observer/"/>
+    <updated>2013-01-25T00:48:00+09:00</updated>
+    <id>http://watson1978.github.io/blog/2013/01/25/motion-pixate-observer</id>
+    <content type="html"><![CDATA[<p>いやー、<a href="http://www.pixate.com/">Pixate</a> は素晴らしいですね。CSS でデザインできることがこんなに楽だったのかと改めて痛感しております。</p>
+
+<p>ただ使っているうちに CSS を変更するたびに <code>rake</code> を実行し rebuild してデザインを確認するのが面倒くさい、もっと楽にならんのかと欲がでてきてしまいました。</p>
+
+<!-- more -->
+
+
+<p>最初は <a href="https://gist.github.com/4573005">https://gist.github.com/4573005</a> で、</p>
+
+<ol>
+<li>HTTP サーバに CSS ファイルを置いて更新用のボタンなど押す</li>
+<li>HTTP サーバ から CSS をダウンロードしてデザインを更新</li>
+</ol>
+
+
+<p>というフローでやっていたのですが、サーバが決め打ちで柔軟性を持たせようとすると iOS アプリ側でサーバのアドレスを変更できるようにしないといけなくて面倒、さらに更新用のボタンを押すことすら面倒かもと、面倒なことが多すぎ！！</p>
+
+<p>ということで、RubyMotion もくもく会で <a href="https://github.com/Watson1978/motion-pixate-observer">motion-pixate-observer</a> という gem を作ってみました。</p>
+
+<ol>
+<li>iOS 側から Bonjour を使ってサーバを探し、CSS を受信するようになります。</li>
+<li>サーバ側は、更新している CSS を監視し更新されたらその都度 iOS 側に送信します。</li>
+<li>iOS 側で CSS を受信したらデザインを更新します。</li>
+</ol>
+
+
+<p>という感じで、CSS ファイルを変更したら即座に反映される感じで動作します。</p>
+
+<p>gem を組み込んだ後は、何も設定がいらないお手軽仕様となっております。アプリを iOS デバイスに転送したあとでも動作するので、RubyMotion もくもく会でデモをしたらものすごく受けが良かったです。</p>
+
+<p>アプリの実装とデザインが分業で行われているようなところでは、実機に転送したものとサーバを渡してデザインしてもらえばよいので、お財布に優しいかもしれません。</p>
+
+<p>(gem を公開した後で、Pixate の方から「私たちも同じような仕組みを検討している」とメールを頂きました。)</p>
+]]></content>
+  </entry>
+  
+</feed>

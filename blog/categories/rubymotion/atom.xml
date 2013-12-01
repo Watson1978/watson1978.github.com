@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: RubyMotion | Watson's Blog]]></title>
-  <link href="http://watson1978.github.com/blog/categories/rubymotion/atom.xml" rel="self"/>
-  <link href="http://watson1978.github.com/"/>
-  <updated>2012-09-20T18:42:04+09:00</updated>
-  <id>http://watson1978.github.com/</id>
+  <title><![CDATA[Category: RubyMotion, | Watson's Blog]]></title>
+  <link href="http://watson1978.github.io/blog/categories/rubymotion/atom.xml" rel="self"/>
+  <link href="http://watson1978.github.io/"/>
+  <updated>2013-12-02T08:12:19+09:00</updated>
+  <id>http://watson1978.github.io/</id>
   <author>
     <name><![CDATA[Watson]]></name>
     
@@ -14,573 +14,502 @@
 
   
   <entry>
-    <title type="html"><![CDATA[RubyMotion と Parse で Push Notifiation してみたよ〜]]></title>
-    <link href="http://watson1978.github.com/blog/2012/09/20/push-notifiation-with-rubymotion/"/>
-    <updated>2012-09-20T16:01:00+09:00</updated>
-    <id>http://watson1978.github.com/blog/2012/09/20/push-notifiation-with-rubymotion</id>
-    <content type="html"><![CDATA[<p>先日に引き続き <a href="https://www.parse.com/">Parse</a> で遊んでいます。今日は<a href="https://www.parse.com/apps/quickstart_push">Push Quick Start Guide</a> を読みながら Push Notifiation に挑戦しました。いろいろ設定することがあって大変ですね。慣れるとそうでもないのでしょうか？(^ ^;)</p>
+    <title type="html"><![CDATA[motion-pixate-observer という gem を作りました]]></title>
+    <link href="http://watson1978.github.io/blog/2013/01/25/motion-pixate-observer/"/>
+    <updated>2013-01-25T00:48:00+09:00</updated>
+    <id>http://watson1978.github.io/blog/2013/01/25/motion-pixate-observer</id>
+    <content type="html"><![CDATA[<p>いやー、<a href="http://www.pixate.com/">Pixate</a> は素晴らしいですね。CSS でデザインできることがこんなに楽だったのかと改めて痛感しております。</p>
+
+<p>ただ使っているうちに CSS を変更するたびに <code>rake</code> を実行し rebuild してデザインを確認するのが面倒くさい、もっと楽にならんのかと欲がでてきてしまいました。</p>
 
 <!-- more -->
 
 
-<h2>証明書を作成</h2>
+<p>最初は <a href="https://gist.github.com/4573005">https://gist.github.com/4573005</a> で、</p>
 
 <ol>
-<li>「キーチェーンアクセス」を起動します。</li>
-<li>メニューの "キーチェーンアクセス" -> "証明書アシスタント" -> "認証局に証明書を要求" を選択します。</li>
-<li>メールアドレスと名前を記入して、"ディスクに保存" を選択し "続ける" をクリックします。<code>CertificateSigningRequest.certSigningRequest</code> というファイルが保存されます。("CAのメールアドレス" の欄は未記入で良かったみたいです・・・)<br/>
-<img src="/images/blog/parse_push/certificate_signing_request.png" alt="Certificate Signing Request" /></li>
+<li>HTTP サーバに CSS ファイルを置いて更新用のボタンなど押す</li>
+<li>HTTP サーバ から CSS をダウンロードしてデザインを更新</li>
 </ol>
 
 
-<p>次に <a href="https://developer.apple.com/ios/manage/bundles/index.action">iOS Provisioning Portal</a> で App ID の設定をします。</p>
+<p>というフローでやっていたのですが、サーバが決め打ちで柔軟性を持たせようとすると iOS アプリ側でサーバのアドレスを変更できるようにしないといけなくて面倒、さらに更新用のボタンを押すことすら面倒かもと、面倒なことが多すぎ！！</p>
+
+<p>ということで、RubyMotion もくもく会で <a href="https://github.com/Watson1978/motion-pixate-observer">motion-pixate-observer</a> という gem を作ってみました。</p>
 
 <ol>
-<li>"App IDs" というメニューを選択し、"New App ID" ボタンをクリックします。</li>
-<li>"Description" にアプリの内容、"Bundle Identifier" にアプリの識別子を記入します。識別子には <code>*</code> を含めず、アプリ名までしっかり記入する必要があるようです。<br/>
-<img src="/images/blog/parse_push/app_id.png" alt="App IDs" /></li>
-<li>作成したアプリ ID の "Configure" をクリックします。<br/>
-<img src="/images/blog/parse_push/app_id_configure.png" alt="App IDs" /></li>
-<li>"Enable for Apple Push Notification service" のチェックを on にし、"Development Push SSL Certificate" の "Configure" ボタンをクリックします。<br/>
-<img src="/images/blog/parse_push/enable_push_notification.png" alt="App IDs" /></li>
-<li>"Generate a Certificate Signing Request" というポップアップウィンドウが表示されます。"Continnue" ボタンをクリックして次の画面に進みます。</li>
-<li>"Submit Certificate Signing Request" 画面が表示されます。ここで、「キーチェーンアクセス」で作成した <code>CertificateSigningRequest.certSigningRequest</code> ファイルを選択し、"Generate" ボタンをクリックします。<br/>
-<img src="/images/blog/parse_push/submit_certificate_signing_request.png" alt="App IDs" /></li>
-<li><p>"Download &amp; Install 〜" の画面まで進みます。"Download" をクリックして証明書をダウンロードしておきます。<br/>
-<img src="/images/blog/parse_push/download_install_certificate.png" alt="App IDs" /></p></li>
-<li><p>上の作業でダウンロードした証明書をダブルクリックして「キーチェーンアクセス」へ登録します。</p></li>
-<li>キーチェーンアクセスで "ログイン" 項目の、"自分の証明書" を表示すると先ほど登録した証明書があります。右クリックして「書き出す」を選択します。<br/>
-<img src="/images/blog/parse_push/keychain_export.png" alt="KeyChain Export" /></li>
-<li>".p12" という形式でファイルを保存します。<br/>
-<img src="/images/blog/parse_push/export_p12.png" alt="KeyChain Export" /></li>
-<li>".p12" 形式のファイルを保存する際にパスワードを求められますが、空欄のままにしておくようです。<br/>
-<img src="/images/blog/parse_push/export_p12_password.png" alt="KeyChain Export" /></li>
+<li>iOS 側から Bonjour を使ってサーバを探し、CSS を受信するようになります。</li>
+<li>サーバ側は、更新している CSS を監視し更新されたらその都度 iOS 側に送信します。</li>
+<li>iOS 側で CSS を受信したらデザインを更新します。</li>
 </ol>
 
 
-<h2>Provisioning Profile を作成</h2>
+<p>という感じで、CSS ファイルを変更したら即座に反映される感じで動作します。</p>
 
-<p>ここまでの作業ですでに心が折れそうなくらい、設定が面倒くさいですね。Parse がさっぱり出てこないし・・・。</p>
+<p>gem を組み込んだ後は、何も設定がいらないお手軽仕様となっております。アプリを iOS デバイスに転送したあとでも動作するので、RubyMotion もくもく会でデモをしたらものすごく受けが良かったです。</p>
 
-<p><a href="https://developer.apple.com/ios/manage/bundles/index.action">iOS Provisioning Portal</a> へ戻り、Provisioning Profile を作成しましょう。</p>
+<p>アプリの実装とデザインが分業で行われているようなところでは、実機に転送したものとサーバを渡してデザインしてもらえばよいので、お財布に優しいかもしれません。</p>
 
-<ol>
-<li>"Provisioning" メニューを選択し、"New Profile" ボタンをクリックします。</li>
-<li>わかりやすい "Profile Name" を記入し、プッシュ通知するアプリを選択します。<br/>
-<img src="/images/blog/parse_push/provisioning.png" alt="Provisioning" /></li>
-<li>"New Profile" ボタンをクリックした画面に戻り、Provisioning をダウンロードしておきます。<br/>
-<img src="/images/blog/parse_push/download_provisioning.png" alt="Provisioning" /></li>
-<li>ダウンロードした Provisioning Profile をダブルクリックし Xcode へ登録しておきます。</li>
-</ol>
-
-
-<h2>Parse へ .p12 ファイルを登録</h2>
-
-<ol>
-<li>Parse の <a href="https://www.parse.com/apps/">Dashboard</a> を開きます。</li>
-<li>プッシュ通知を行うアプリの "Setting" 画面を開きます。</li>
-<li>キーチェーンアクセスで作成した ".p12" ファイルを登録します。<br/>
-<img src="/images/blog/parse_push/parse_dashboard.png" alt="Dashboard" /></li>
-</ol>
-
-
-<h2>プッシュ通知を受け付けるアプリを作成</h2>
-
-<h3>Rakefile を編集</h3>
-
-<p>昨日作成した <code>Rakefile</code> に <code>identifier</code>、<code>provisioning_profile</code>、<code>entitlements</code> の設定を追加します。</p>
-
-<p><code>ruby
-Motion::Project::App.setup do |app|
-...
-  app.identifier = 'com.yourcompany.HelloParsePush'
-  app.provisioning_profile = "/Users/watson/Library/MobileDevice/Provisioning Profiles/CE5E34BE-FDEB-43C5-860A-9301122AB46D.mobileprovision"
-  app.entitlements['aps-environment'] = 'development'
-end
-</code></p>
-
-<p><code>provisioning_profile</code> に設定する Provisioning Profile のパスは Xcode の Organizer で確認することができます。該当する Profile 上で右クリック "Reveal Profile in Finder" を選択すると、Finder 上で確認できます。</p>
-
-<h3>アプリを作成</h3>
-
-<p><code>app/app_delegate.rb</code> に、次のようなコードを記述します。</p>
-
-<p>```ruby app/app_delegate.rb
-class AppDelegate
-  def application(application, didFinishLaunchingWithOptions:launchOptions)</p>
-
-<pre><code>Parse.setApplicationId("&lt;Application-Id&gt;", 
-                       clientKey:"&lt;Client-Key&gt;")
-
-application.registerForRemoteNotificationTypes(UIRemoteNotificationTypeBadge|
-                                            UIRemoteNotificationTypeAlert|
-                                            UIRemoteNotificationTypeSound)
-
-true
-</code></pre>
-
-<p>  end</p>
-
-<p>  def application(application,</p>
-
-<pre><code>    didRegisterForRemoteNotificationsWithDeviceToken:newDeviceToken)
-# Tell Parse about the device token.
-PFPush.storeDeviceToken(newDeviceToken)
-# Subscribe to the global broadcast channel.
-PFPush.subscribeToChannelInBackground("")
-</code></pre>
-
-<p>  end</p>
-
-<p>  def application(application,</p>
-
-<pre><code>    didReceiveRemoteNotification:userInfo)
-PFPush.handlePush(userInfo)
-</code></pre>
-
-<p>  end</p>
-
-<p>  def application(application,</p>
-
-<pre><code>    didFailToRegisterForRemoteNotificationsWithError:error)
-if error.code == 3010
-  NSLog("Push notifications don't work in the simulator!")
-else
-  NSLog("didFailToRegisterForRemoteNotificationsWithError: %@", error)
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>プッシュ通知はシミュレータ上で動作確認できないようなので、デバイスへアプリを転送します。</p>
-
-<p>```
-$ rake device</p>
-
-<p>```
-デバイス上でアプリを起動したら、<a href="https://www.parse.com/apps/quickstart_push">Push Quick Start Guide</a> ページの "Send Push Test" ボタンをクリックします。</p>
-
-<p>正しく動作すると、</p>
-
-<p><img src="/images/blog/parse_push/receive_push.png" alt="Push Notification" /></p>
-
-<p>のように、通知を受け取ることができます！</p>
-
-<p>これで、Apple が何か発表したか監視するものを用意すれば、簡単にストーカー行為ができますね！</p>
+<p>(gem を公開した後で、Pixate の方から「私たちも同じような仕組みを検討している」とメールを頂きました。)</p>
 ]]></content>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[RubyMotion で Parse を使ってみました]]></title>
-    <link href="http://watson1978.github.com/blog/2012/09/19/using-parse/"/>
-    <updated>2012-09-19T17:15:00+09:00</updated>
-    <id>http://watson1978.github.com/blog/2012/09/19/using-parse</id>
-    <content type="html"><![CDATA[<p><a href="https://www.parse.com/">Parse</a> は、ユーザ認証やプッシュ通知といったサーバ側の実装が必要となる機能をあらかじめ用意してくれていて、アプリから単に API を呼び出すだけで簡単にそれらの機能を利用できてしまうという、すごく便利なサービスです。</p>
+    <title type="html"><![CDATA[RubyMotion アプリで DTrace を使ってみよう]]></title>
+    <link href="http://watson1978.github.io/blog/2012/12/03/dtrace/"/>
+    <updated>2012-12-03T00:00:00+09:00</updated>
+    <id>http://watson1978.github.io/blog/2012/12/03/dtrace</id>
+    <content type="html"><![CDATA[<p>この記事は <a href="http://www.adventar.org/calendars/18">RubyMotion Advent Calendar 2012</a> の 3 日目の記事です。</p>
 
-<p><img src="/images/blog/parse.png" alt="Parse" /></p>
+<p>DTrace は Sun Microsystems が開発した実行中のアプリの情報を取得する仕組みです。DTrace を使用するとアプリケーションを一切変更することなく情報取得を可能にします。
+Xcode に付属している Instruments が様々な情報を表示できるのは、縁の下に DTrace が存在しているからです。</p>
+
+<p>Ruby 2.0 preview2 でいよいよ DTrace がサポートされましたが、MacRuby や RubyMotion ではすでに DTrace をサポートしています。</p>
 
 <!-- more -->
 
 
-<h2>ユーザ登録</h2>
+<h2>プローブを確認してみる</h2>
 
-<p>さっそく、ユーザ登録をして Parse を使ってみましょう。「Try it for free」ボタンをクリックすると無料でユーザ登録できます。</p>
+<p>DTrace では、アプリに埋め込まれている「プローブ」と呼ばれる計測ポイントを用い、追跡をおこないます。</p>
 
-<p><img src="/images/blog/parse_sign_up.png" alt="sign up" /></p>
+<p>現在利用可能なプローブの一覧は <code>sudo dtrace -l</code> で確認することができます。シミュレータで RubyMotion アプリを実行した状態で確認してみましょう。</p>
 
-<p>メールアドレスとパスワードを入力すると、次に Parse を使うアプリ名を聞かれます。後ほど変更することもできるので適当な名前を入力しておきましょう。私は「HelloParse」と安易な名前を入力しました。</p>
+<p><code>
+$ motion create HelloDTrace
+$ cd HelloDTrace
+$ rake
+</code></p>
 
-<p><img src="/images/blog/parse_get_started.png" alt="get started" /></p>
-
-<h2>Parse SDK をダウンロード</h2>
-
-<p><a href="https://www.parse.com/apps/quickstart">Quick Start</a> ページで Parse SDK の簡単な導入方法について説明が書かれていますので、これに従って作業してみましょう。</p>
-
-<p>「1 Choose your platform」で、"iOS" と "Existing Project" を選択しておきます。("Existing Project" を選択しておくと、SDK のみをダウンロードしやすいので)。</p>
-
-<p><img src="/images/blog/parse_choose_platform.png" alt="Choose your platform" /></p>
-
-<p>「3 Download &amp; install the SDK」で、Parse SDK をダウンロードしておきます。</p>
-
-<p><img src="/images/blog/parse_download_sdk.png" alt="Download &amp; install the SDK" /></p>
-
-<h2>RubyMotion アプリを作成</h2>
-
-<p>それでは、Parse SDK を使用した RubyMotion で「HelloParse」というアプリを作ってみましょう。</p>
+<p>別の Terminal ウィンドウで <code>sudo dtrace -l</code> を実行してみます。</p>
 
 <p>```
-$ motion create HelloParse</p>
+$ sudo dtrace -l
+   ID   PROVIDER            MODULE                          FUNCTION NAME</p>
 
-<pre><code>Create HelloParse
-Create HelloParse/.gitignore
-Create HelloParse/Rakefile
-Create HelloParse/app
-Create HelloParse/app/app_delegate.rb
-Create HelloParse/resources
-Create HelloParse/spec
-Create HelloParse/spec/main_spec.rb
+<pre><code>1     dtrace                                                     BEGIN
+2     dtrace                                                     END
+3     dtrace                                                     ERROR
+4   lockstat       mach_kernel                      lck_mtx_lock adaptive-acquire
+5   lockstat       mach_kernel                      lck_mtx_lock adaptive-spin
 </code></pre>
 
-<p>```</p>
-
-<p>先ほどダウンロードした Parse SDK を <code>vendor</code> ディレクトリに配置します。</p>
-
-<p><code>
-$ cd HelloParse
-$ mkdir vendor
-</code></p>
-
-<p><code>parse-library-1.1.6.zip</code> を解凍すると <code>Parse.framework</code> というディレクトリが展開されるので、このディレクトリを <code>vendor</code> ディレクトリにコピーします。</p>
-
-<p>```
-$ tree vendor/
-vendor/
-└── Parse.framework</p>
-
-<pre><code>├── Headers -&gt; Versions/Current/Headers
-</code></pre>
-
-<p>...
+<p>&hellip;
 ```</p>
 
-<h3>Rakefile を編集</h3>
+<p>各列の説明を簡単にします。</p>
 
-<p>アプリで Parse SDK が使われるように <code>Rakefile</code> を編集し設定します。以下のように <code>vendor_project</code>、<code>frameworks</code>、<code>libs</code> を設定します。</p>
-
-<p><code>``ruby
-Motion::Project::App.setup do |app|
-  # Use</code>rake config' to see complete project settings.
-  app.name = 'HelloParse'</p>
-
-<p>  # Parse SDK
-  app.vendor_project('vendor/Parse.framework',</p>
-
-<pre><code>                  :static,
-                  :products =&gt; ['Parse'],
-                  :headers_dir =&gt; 'Headers')
-</code></pre>
-
-<p>  app.frameworks += %w(AudioToolbox CFNetwork MobileCoreServices QuartzCore Security StoreKit SystemConfiguration)
-  app.libs += %W(/usr/lib/libz.dylib /usr/lib/libsqlite3.dylib)
-end
-```</p>
-
-<h3>Parse SDK API を使ってみよう</h3>
-
-<p>```ruby app/app_delegate.rb
-class AppDelegate
-  def application(application, didFinishLaunchingWithOptions:launchOptions)</p>
-
-<pre><code>Parse.setApplicationId("&lt;Application-Id&gt;", 
-                       clientKey:"&lt;Client-Key&gt;")
-
-obj = PFObject.objectWithClassName("TestObject")
-obj.setObject("bar", forKey:"foo")
-obj.save()
-true
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p><code>setApplicationId</code> メソッドで使用している <code>&lt;Application-Id&gt;</code> と <code>&lt;Client-Key&gt;</code> は <a href="https://www.parse.com/apps/quickstart">Quick Start</a> に書かれていたものを使用します。</p>
-
-<p><img src="/images/blog/parse_app_id_client_key.png" alt="Application ID &amp; Client Key" /></p>
-
-<p><code>rake</code> でアプリを実行してみましょう。Quick Start に設置されていた「Test」というボタンをクリックすると、正しく動作したか確認することができます。</p>
-
-<p><img src="/images/blog/parse_test.png" alt="Test" /></p>
-
-<p>次は Parse SDK を使って Push Notification に挑戦してみたいなと思います。Enjoy!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[RubyMotion ではじめるGoogle Analytics for iOS]]></title>
-    <link href="http://watson1978.github.com/blog/2012/08/30/use-google-analytics/"/>
-    <updated>2012-08-30T08:42:00+09:00</updated>
-    <id>http://watson1978.github.com/blog/2012/08/30/use-google-analytics</id>
-    <content type="html"><![CDATA[<p>アプリがどれだけダウンロードされているか開発者なら誰もが気になるところでしょうが、どの機能がどれだけ使われているかといったことも気になるところがと思います。</p>
-
-<p>Google Analytics for iOS を利用すると、ユーザが使用している機能を簡単にトラッキングすることができます。</p>
-
-<!-- more -->
+<ul>
+<li><code>PROVIDER</code> は、プローブを提供しているプログラムの識別子のようなものです。</li>
+<li><code>MODULE</code> は、プローブが属するカーネルモジュール名やライブラリ名が入ります。上のように、存在しない場合もあります。</li>
+<li><code>FUNCTION</code> は、プローブが属するプログラムの関数名を表します。上の例のように、存在しない場合もあります。</li>
+<li><code>NAME</code> は、プローブの機能を表す名前を表します。</li>
+</ul>
 
 
-<h2>トラッキング ID を発行する</h2>
-
-<p>Google Analytics の「アカウントの管理」画面で新しいアカウントを追加します。</p>
-
-<p><img src="/images/blog/analytics_add_account.png" alt="アカウントの管理" /></p>
-
-<p>次にアカウント名などの情報を記入します。</p>
-
-<p><img src="/images/blog/analytics_create_account.png" alt="アカウントの追加" /></p>
-
-<p>「ウェブサイトのURL」では "ウェブサイト以外"、「タイムゾーン」は "日本" を選択しておくとよいでしょう。</p>
-
-<p>アカウントを作成した後、"UA-xxxxxxxx-1" のようなトラッキング ID が発行されます。あとで使用するので控えておいてください。</p>
-
-<h2>Google Analytics SDK for iOS をダウンロード</h2>
-
-<p><a href="https://developers.google.com/analytics/devguides/collection/ios/resources">Google Analytics SDK for iOS</a> から、SDK をダウンロードしておきます。</p>
-
-<p><img src="/images/blog/analytics_sdk.png" alt="SDK のダウンロード" /></p>
-
-<h2>RubyMotion プロジェクトを作成</h2>
-
-<p>それでは、アプリに Google Analytics を組み込んでいきましょう。今回は「HelloAnalytics」という名前でアプリを作成します。</p>
+<p>大量に表示されるプローブの一覧から RubyMotion が提供しているものを探し出すのは不可能に近いので <code>grep</code> で検索してみましょう。</p>
 
 <p><code>
-$ motion create HelloAnalytics
+$ sudo dtrace -l | grep HelloDTrace
+ 8037 macruby2577       HelloDTrace                    rb_vm_dispatch method-entry
+ 8038 macruby2577       HelloDTrace                    rb_vm_dispatch method-return
+ 8039 macruby2577       HelloDTrace   _ZL10__vm_raisev [__vm_raise()] raise
 </code></p>
 
-<p>先ほどダウンロードした SDK のアーカイブを展開し、"Library" ディレクトリをプロジェクトに追加します。まずプロジェクトに "vendor" ディレクトリを作成しましょう。</p>
+<p>RubyMotion は MacRuby と同様に <code>macruby</code> というプロバイダ名でプローブを提供しています。プローブは <code>method-entry</code>、 <code>method-return</code> と <code>raise</code> の 3 種類あることが分かります。</p>
 
-<p><code>
-$ cd HelloAnalytics/
-$ mkdir vendor
-</code></p>
-
-<p>作成したディレクトリに SDK の "Library" を追加します。以下のようなファイル構成になります。</p>
-
-<p>```
-$ tree vendor/
-vendor/
-└── Library</p>
-
-<pre><code>├── GANTracker.h
-├── libGoogleAnalytics.a
-└── libGoogleAnalytics_NoThumb.a
-</code></pre>
-
-<p>```</p>
-
-<h2>プロジェクトの設定</h2>
-
-<p>プロジェクトの <code>Rakefile</code> をエディタで開き SDK を使うための設定をします。</p>
-
-<p>```ruby</p>
-
-<h1>-<em>- coding: utf-8 -</em>-</h1>
-
-<p>$:.unshift("/Library/RubyMotion/lib")
-require 'motion/project'</p>
-
-<p>Motion::Project::App.setup do |app|
-  # Use `rake config' to see complete project settings.
-  app.name = 'HelloAnalytics'
-  app.vendor_project('vendor/Library',</p>
-
-<pre><code>:static, :products =&gt; ['libGoogleAnalytics.a'], :headers_dir =&gt; '.')
-</code></pre>
-
-<p>  app.frameworks &lt;&lt; "CFNetwork"
-  app.libs &lt;&lt; "/usr/lib/libsqlite3.dylib"
-end
-```</p>
-
-<p><code>vendor_project</code> を設定し Google Analytics SDK を利用できるようにします。SDK は CFNetwork.framework と libsqlite3.dylib を使用するようなので、<code>frameworks</code> と <code>libs</code> でそれぞれ設定します。</p>
-
-<p>これでアプリで Google Analytics SDK を使えるようになります！</p>
-
-<h2>トラッキングを開始</h2>
-
-<p>それでは、以下のようなコードをアプリに追加してトラッキングを開始してみましょう。</p>
-
-<p>```ruby
-class AppDelegate
-  def application(application, didFinishLaunchingWithOptions:launchOptions)</p>
-
-<pre><code>GANTracker.sharedTracker.startTrackerWithAccountID("UA-xxxxxxxx-1",
-                                                   dispatchPeriod: 10,
-                                                   delegate: nil)
-
-
-error = Pointer.new(:object)
-unless GANTracker.sharedTracker.trackPageview("/app_entry_point",
-                                              withError: error)
-  # Handle error here
-end
-
-true
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p><code>startTrackerWithAccountID</code> メソッドには、先ほど発行されたトラッキング ID を記述します。</p>
-
-<p>アプリを実行すると、計測結果が Google Analytics で確認できるようになります。</p>
-
-<p><img src="/images/blog/analytics_result.png" alt="計測結果" /></p>
-
-<p><a href="https://developers.google.com/analytics/devguides/collection/ios/devguide">https://developers.google.com/analytics/devguides/collection/ios/devguide</a> に SDK の使い方について詳しく書かれていますので、必要なトラッキング処理をアプリに追加しいろいろ計測してみてください！</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS 4.3 を対象としたアプリケーションを作る]]></title>
-    <link href="http://watson1978.github.com/blog/2012/08/29/make-an-application-which-target-the-ios-4/"/>
-    <updated>2012-08-29T21:02:00+09:00</updated>
-    <id>http://watson1978.github.com/blog/2012/08/29/make-an-application-which-target-the-ios-4</id>
-    <content type="html"><![CDATA[<p>RubyMotion は、iOS 4.3 以降を対象としたアプリケーションを作ることができます。プロジェクトの設定や、シミュレータの起動方法について書きたいと思います。個人的には世の中が iOS 5.x だけになると、みんなハッピーになれそうな気がするのですが・・・(^ ^;)</p>
-
-<div class="note">
-今のところ OS X 10.8 環境では iOS 4.3 シミュレータをインストールできないようなので、OS X 10.7 環境が必要となるので注意してください。
-</div>
-
-
-
-
-<!-- more -->
-
-
-<h2>iOS 4.3 シミュレータをインストール</h2>
-
-<p>もし、iOS 4.3 シミュレータをお持ちでなければインストールしておきます。Xcode の [Preferences...] メニューの [Downloads] タブでシミュレータをインストールすることができます。</p>
-
-<p><img src="/images/blog/install_ios43_simulator.png" alt="install iOS 4.3 simulator" /></p>
-
-<div class="note">
-OS X 10.7 環境では「iOS 4.3 Simulator」項目があるのですが、OS X 10.8 では表示されずインストールできないようです。
-</div>
-
-
-<h2>プロジェクトの設定</h2>
-
-<p>プロジェクトの <code>Rakefile</code> で <code>deployment_target</code> を設定し、アプリケーションのターゲットを iOS 4.3 にします。</p>
-
-<p>```ruby</p>
-
-<h1>-<em>- coding: utf-8 -</em>-</h1>
-
-<p>$:.unshift("/Library/RubyMotion/lib")
-require 'motion/project'</p>
-
-<p>Motion::Project::App.setup do |app|
-  # Use `rake config' to see complete project settings.
-  app.name = 'your app name'
-  app.deployment_target = "4.3"
-end
-```</p>
-
-<h2>アプリケーションを実行</h2>
-
-<p>単に <code>rake</code> を実行すると iOS 5.1 用のシミュレータが起動しますので、環境変数 <code>target</code> でiOS 4.3 シミュレータを起動するように指定します。</p>
-
-<p><code>
-$ rake target=4.3
-</code></p>
-
-<p>ほかの環境変数とあわせて利用できるので、たとえば iPad シミュレータを起動する場合には以下のように実行します。</p>
-
-<p><code>
-$ rake target=4.3 device_family=ipad
-</code></p>
-
-<p>あとはアプリケーションのコードをひたすら記述するだけですね！</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Sublime Text を導入して RubyMotion アプリ開発をもっと楽しいものに]]></title>
-    <link href="http://watson1978.github.com/blog/2012/08/23/make-a-sublime-text-environment/"/>
-    <updated>2012-08-23T22:19:00+09:00</updated>
-    <id>http://watson1978.github.com/blog/2012/08/23/make-a-sublime-text-environment</id>
-    <content type="html"><![CDATA[<p>Twitter のつぶやきを眺めていると、RubyMotion アプリ開発では <a href="http://www.sublimetext.com/">Sublime Text</a> をエディタに使うのが定番になってきた感じがします。</p>
-
-<p>いい加減、私もライセンスを購入しないといけないなと思いつつ、環境構築の手順などをまとめておきます。</p>
-
-<!-- more -->
-
-
-<h2>1. Sublime Text をインストール</h2>
-
-<p><a href="http://www.sublimetext.com/">公式サイト</a> から Sublime Text をダウンロードしてインストールします。</p>
-
-<h2>2. Sublime Package Control をインストール</h2>
-
-<p>Sublime Text は Python で plugin を作成でき、さまざまな機能追加ができるようになっています。Github などを眺めていると便利な plugin がパッケージとしていろいろあります。<a href="http://wbond.net/sublime_packages/package_control">Package Control</a> は、それらパッケージのインストールや不要になった際にはアンインストールしたりと、文字通りパッケージの管理が簡単になります。</p>
-
-<p>Sublime Text を起動し、[View] -> [Show Console] とメニューを選択し (ショートカット : <kbd>control</kbd> + <kbd>`</kbd>)、コンソールに次の文をコピー&amp;ペーストし <kbd>Enter</kbd> を押下して実行します。</p>
-
-<p><code>
-import urllib2,os; pf='Package Control.sublime-package'; ipp=sublime.installed_packages_path(); os.makedirs(ipp) if not os.path.exists(ipp) else None; urllib2.install_opener(urllib2.build_opener(urllib2.ProxyHandler())); open(os.path.join(ipp,pf),'wb').write(urllib2.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read()); print 'Please restart Sublime Text to finish installation'
-</code></p>
-
-<p>Sublime Text を再起動すると、Package Control が利用できるようになります。</p>
-
-<h2>3. SublimeRubyMotionBuilder をインストール</h2>
-
-<p>次に、<a href="https://twitter.com/haraken3">@haraken3</a> さんが開発されている <a href="https://github.com/haraken3/SublimeRubyMotionBuilder">SublimeRubyMotionBuilder</a> プラグインを導入します。コード補完や、アプリ開発に便利な機能が追加されます。</p>
-
-<p>[Tools] -> [Command Palette...] とメニューを選択し (ショートカット : <kbd>command</kbd> + <kbd>shift</kbd> + <kbd>p</kbd>)、表示されるダイアログに「install package」と入力し実行します。</p>
-
-<p><img src="/images/blog/sublime-install-package.png" alt="install package dialog" /></p>
-
-<p>次に、「RubyMotionBuilder」と入力し <kbd>Enter</kbd> を押下するとプラグインがインストールされます。</p>
-
-<p><img src="/images/blog/sublime-RubyMotionBuilder.png" alt="RubyMotionBuilder" /></p>
-
-<p>RubyMotion のコード(*.rb) か Rakefile を開いた状態にしておくと、以下のようなコマンドが使えるようになり、いちいち Terminal に戻ってでビルドしたりする必要がなくなり便利です。</p>
+<h2>プローブ説明</h2>
 
 <table class="table">
-<tr><th>内容</th><th>ショートカット</th></tr>
-<tr>
-    <td>Build</td>
-    <td><kbd>command</kbd> + <kbd>b</kbd> <br />(エラーがあった場合 <kbd>F4</kbd> でジャンプ)</td>
-</tr>
-<tr>
-    <td>Clean</td>
-    <td><kbd>command</kbd> + <kbd>shift</kbd> + <kbd>p</kbd> の後、「clean」と入力</td>
-</tr>
-<tr>
-    <td>Run</td>
-    <td><kbd>command</kbd> + <kbd>r</kbd> <br />(シミュレータを Retina モードにする場合、<kbd>command</kbd> + <kbd>shift</kbd> + <kbd>r</kbd> )</td>
-</tr>
-<tr>
-    <td>Deploy</td>
-    <td><kbd>command</kbd> + <kbd>option</kbd> + <kbd>b</kbd></td>
-</tr>
-
+<tr><th>プローブ名</th><th>実行タイミング</th><th>変数 arg0</th><th>変数 arg1</th><th>変数 arg2</th><th>変数 arg3</th></tr>
+<tr><td>method-entry</td><td>メソッド呼出開始</td><td>クラス名</td><td>メソッド名</td><td>ソースファイル名</td><td>行番号</td></tr>
+<td>method-return</td><td>メソッド呼出終了</td><td>クラス名</td><td>メソッド名</td><td>ソースファイル名</td><td>行番号</td></tr>
+<td>raise</td><td>例外発生時</td><td>クラス名</td><td>ソースファイル名</td><td>行番号</td><td>-</td></tr>
 </table>
 
 
-<h2>4. SublimeLinter をインストール</h2>
+<p><code>method-entry</code> プローブが実行されるとき、変数 arg0 にはクラス名、変数 arg1 には メソッド名が格納されています。(ソースファイル名と行番号は正しく格納されていない)</p>
 
-<p><a href="http://www.willprater.me/blog/2012/07/24/rubymotion-linting-and-highlighting-with-sublime-text/">RubyMotion Linting and Highlighting With Sublime Text</a> で知ったのですが、<a href="https://github.com/SublimeLinter/SublimeLinter">SublimeLinter</a> を導入すると、アプリをコンパイルする前に文法エラーとなる箇所を教えてくれるようになります。</p>
+<h2>とりあえず動かしてみよう</h2>
 
-<p><img src="/images/blog/sublime-SublimeLinter.png" alt="SublimeLinter" /></p>
+<h3>準備</h3>
 
-<p>さっそく、SublimeLinter をインストールしてみましょう(上のサイトに書いてあるとおりですが・・・)。</p>
+<p>最初に作成した HelloDTrace アプリの <code>app/app_delegate.rb</code> を以下のように変更しておきます。</p>
 
-<p>[Tools] -> [Command Palette...] とメニューを選択し (ショートカット : <kbd>command</kbd> + <kbd>shift</kbd> + <kbd>p</kbd>)、表示されるダイアログに「install package」と入力し実行します。「SublimeLinter」と入力し <kbd>Enter</kbd> を押下します。</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>app/app_delegate.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">hello_dtrace</span>
+</span><span class='line'>  <span class="n">time</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span>
+</span><span class='line'>  <span class="no">UIAlertView</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithTitle</span><span class="p">(</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;&quot;Hello DTrace&quot;,</span>
+</span><span class='line'><span class="sr">message: &quot;Current time is </span><span class="si">#{</span><span class="n">time</span><span class="o">.</span><span class="n">to_s</span><span class="si">}</span><span class="sr">&quot;,</span>
+</span><span class='line'><span class="sr">delegate: nil,</span>
+</span><span class='line'><span class="sr">cancelButtonTitle: nil,</span>
+</span><span class='line'><span class="sr">otherButtonTitles: &quot;OK&quot;,</span>
+</span><span class='line'><span class="sr">nil</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  ).show</span>
+</span><span class='line'><span class="sr">end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">AppDelegate</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="ss">didFinishLaunchingWithOptions</span><span class="p">:</span><span class="n">launchOptions</span><span class="p">)</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;true</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end</span>
+</span><span class='line'><span class="sr">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>つぎに [Preferences] -> [Browse Packages...] を選択します。</p>
+<p>次に以下のような DTrace 用のスクリプト <code>trace.d</code> を用意します。
+<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>trace.d </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='d'><span class='line'><span class="c1">// メソッドの開始と終了の出力をインデント (&amp;ndash;&gt;) を付けて表示させる&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">h1</span><span class="p">&gt;</span><span class="k">pragma</span> <span class="n">D</span> <span class="n">option</span> <span class="n">flowindent</span><span class="p">&lt;/</span><span class="n">h1</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;</span><span class="n">macruby</span><span class="p">$</span><span class="n">target</span><span class="p">:::</span><span class="n">method</span><span class="p">-</span><span class="n">entry</span><span class="p">,</span>
+</span><span class='line'><span class="n">macruby</span><span class="p">$</span><span class="n">target</span><span class="p">:::</span><span class="n">method</span><span class="p">-</span><span class="k">return</span>
+</span><span class='line'><span class="p">{&lt;/</span><span class="n">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">pre</span><span class="p">&gt;&lt;</span><span class="n">code</span><span class="p">&gt;</span><span class="cm">/* arg0 にはクラス名、 arg1 にはメソッド名が格納されています */</span>
+</span><span class='line'><span class="n">printf</span><span class="p">(</span><span class="s">&quot;(%s#%s)&quot;</span><span class="p">,</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg0</span><span class="p">),</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg1</span><span class="p">))</span>
+</span><span class='line'><span class="p">&lt;/</span><span class="n">code</span><span class="p">&gt;&lt;/</span><span class="n">pre</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p><img src="/images/blog/sublime-browse-package.png" alt="Browse Packages" /></p>
+<h3>実行してみよう</h3>
 
-<p>パッケージがインストールされているディレクトリが、Finder で開かれます。 Finder で <code>SublimeLinter/sublimelinter/modules</code> のディレクトリまで行き、<code>ruby_motion.py</code> というファイルを作成し、次の内容をコピー&amp;ペースとします。</p>
+<p>まずは RubyMotion アプリを <code>rake</code> コマンドで起動します。</p>
 
-<p>```python ruby_motion.py
-from ruby import Linter</p>
+<p>シミュレータが起動したところで、別の Terminal ウィンドウで起動したアプリのプロセス ID を <code>ps</code> コマンドやアクティビティモニターで調べておきます。DTrace を実行する際にこのプロセス ID を使用します。</p>
 
-<p>CONFIG = {</p>
+<p><code>
+$ ps cux | grep HelloDTrace
+watson  5140   0.0  0.3   875476  21148   ??  S     6:04PM   0:00.31 HelloDTrace
+</code></p>
 
-<pre><code>'language': 'RubyMotion',
-'executable': '/Library/RubyMotion/bin/ruby',
-'lint_args': '-wc'
-</code></pre>
+<p>プロセス ID は 5140 でした。</p>
 
-<p>}
+<p>次に DTrace を実行します。<code>dtrace</code> の後に <code>-s</code> オプションで用意した DTrace 用のスクリプト、<code>-p</code> で情報を取得するプロセスの ID を指定します。</p>
+
+<p><code>
+$ sudo dtrace -s trace.d -p 5140
+</code></p>
+
+<p>マウスカーソルを移動するたびに DTrace の実行画面にトレース情報が表示されるかと思います。シミュレータ上でマウスオーバーを検出するためにマウスカーソルのイベントが発生するとやりとりしているようです。(キーボード操作だけで乗り切ると、余計なログが表示されず見やすくなります)</p>
+
+<p>RubyMotion の REPL で <code>hello_dtrace</code> メソッドを実行してみましょう。シミュレータにはアラートビューが表示され、DTrace を実行している Terminal には以下のように DTrace を起動した後に実行されたメソッドが表示されます。
+<code>
+  0  -&gt; rb_vm_dispatch                        (TopLevel#inspect)
+  0  &lt;- rb_vm_dispatch                        (TopLevel#inspect)
+  1  -&gt; rb_vm_dispatch                        (TopLevel#hello_dtrace)
+  1    -&gt; rb_vm_dispatch                      (Class#now)
+  1      -&gt; rb_vm_dispatch                    (Class#alloc)
+  1      &lt;- rb_vm_dispatch                    (Class#alloc)
+  1      -&gt; rb_vm_dispatch                    (Time#initialize)
+  1      &lt;- rb_vm_dispatch                    (Time#initialize)
+  1    &lt;- rb_vm_dispatch                      (Class#now)
+  1    -&gt; rb_vm_dispatch                      (Time#to_s)
+  1    &lt;- rb_vm_dispatch                      (Time#to_s)
+  1    -&gt; rb_vm_dispatch                      (UIAlertView#inspect)
+  1      -&gt; rb_vm_dispatch                    (UIAlertView#to_s)
+  1      &lt;- rb_vm_dispatch                    (UIAlertView#to_s)
+  1    &lt;- rb_vm_dispatch                      (UIAlertView#inspect)
+  3  &lt;- rb_vm_dispatch                        (TopLevel#hello_dtrace)
+^C
+</code></p>
+
+<p>インデントの深さに応じて、メソッドがどのような順序で呼び出されているかが分かります。</p>
+
+<p><kbd>CTRL</kbd> + <kbd>c</kbd> か RubyMotion アプリを終了させると DTrace が終了します。</p>
+
+<h2>メソッドの実行時間を計測してみよう</h2>
+
+<p>今度はメソッドの実行時間を計測してみよう。使用するスクリプトは以下のようになります。</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>time.d </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='d'><span class='line'><span class="p">&lt;/</span><span class="n">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">h1</span><span class="p">&gt;</span><span class="k">pragma</span> <span class="n">D</span> <span class="n">option</span> <span class="n">quiet</span><span class="p">&lt;/</span><span class="n">h1</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;</span><span class="n">macruby</span><span class="p">$</span><span class="n">target</span><span class="p">:::</span><span class="n">method</span><span class="p">-</span><span class="n">entry</span>
+</span><span class='line'><span class="p">/</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg0</span><span class="p">)</span> <span class="p">==</span> <span class="p">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">String</span><span class="p">&amp;</span><span class="n">rdquo</span><span class="p">;</span> <span class="p">/</span>  <span class="p">/&lt;</span><span class="n">em</span><span class="p">&gt;</span> <span class="n">String</span> <span class="err">クラスだけを計測する</span> <span class="p">&lt;/</span><span class="n">em</span><span class="p">&gt;/</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">self</span><span class="p">-&gt;</span><span class="n">starttime</span> <span class="p">=</span> <span class="n">walltimestamp</span> <span class="p">/</span> <span class="mi">1000</span><span class="p">;</span>
+</span><span class='line'><span class="p">}&lt;/</span><span class="n">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;</span><span class="n">macruby</span><span class="p">$</span><span class="n">target</span><span class="p">:::</span><span class="n">method</span><span class="p">-</span><span class="k">return</span>
+</span><span class='line'><span class="p">/</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg0</span><span class="p">)</span> <span class="p">==</span> <span class="p">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">String</span><span class="p">&amp;</span><span class="n">rdquo</span><span class="p">;</span> <span class="p">/</span>  <span class="p">/&lt;</span><span class="n">em</span><span class="p">&gt;</span> <span class="n">String</span> <span class="err">クラスだけを計測する</span> <span class="p">&lt;/</span><span class="n">em</span><span class="p">&gt;/</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="err">@</span><span class="n">invoked_time</span><span class="p">[</span><span class="n">copyinstr</span><span class="p">(</span><span class="n">arg0</span><span class="p">),</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg1</span><span class="p">)]</span> <span class="p">=</span> <span class="n">sum</span><span class="p">((</span><span class="n">walltimestamp</span> <span class="p">/</span> <span class="mi">1000</span><span class="p">)</span> <span class="p">&amp;</span><span class="n">ndash</span><span class="p">;</span> <span class="n">self</span><span class="p">-&gt;</span><span class="n">starttime</span><span class="p">);</span>
+</span><span class='line'><span class="p">}&lt;/</span><span class="n">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;</span><span class="n">END</span>
+</span><span class='line'><span class="p">{&lt;/</span><span class="n">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">pre</span><span class="p">&gt;&lt;</span><span class="n">code</span><span class="p">&gt;</span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;\n&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="n">printf</span><span class="p">(</span><span class="s">&quot;%-10s  %-15s  %s\n&quot;</span><span class="p">,</span> <span class="s">&quot;CLASS&quot;</span><span class="p">,</span> <span class="s">&quot;METHOD&quot;</span><span class="p">,</span> <span class="s">&quot;TOTAL TIME µsec&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="n">printf</span><span class="p">(</span><span class="s">&quot;--------------------------------------------------------------------------------\n&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="n">printa</span><span class="p">(</span><span class="s">&quot;%-10s  %-15s  %@d\n&quot;</span><span class="p">,</span> <span class="err">@</span><span class="n">invoked_time</span><span class="p">);</span>
+</span><span class='line'><span class="p">&lt;/</span><span class="n">code</span><span class="p">&gt;&lt;/</span><span class="n">pre</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><code>/ copyinstr(arg0) == "String" /</code> という記述を追加すると、変数 arg0 が &ldquo;String&rdquo; と一致するときだけ計測されるようになります。</p>
+
+<p>DTrace で上のスクリプトを実行すると次のように、String クラスのメソッドの実行時間の合計が表示されます。</p>
+
+<p>```</p>
+
+<h2>CLASS       METHOD           TOTAL TIME µsec</h2>
+
+<p>String      +:               64
+String      *:               71
+String      index:           68125
 ```</p>
 
-<p>これで RubyMotion アプリ開発がもっと楽になるのではないでしょうか〜。 Enjoy!</p>
+<p>わざわざアプリにパフォーマンスを計測するためのコードを追加しなくても、どのメソッドの処理が重たいのかが分かります。</p>
+
+<h2>まとめ</h2>
+
+<p>DTrace を利用すると、アプリケーションは全く変更しなくても実行をトレースすることができます。RubyMotion アプリはもちろん、Ruby 2.0 で DTrace がサポートされると Web アプリでも同様にトレースできることでしょう。</p>
+
+<h2>参考</h2>
+
+<p>MacRuby の DTrace のサンプルです。メソッドの実行回数を計測するスクリプトがあったりします。</p>
+
+<ul>
+<li><a href="https://github.com/MacRuby/MacRubySamples/tree/master/DTrace">https://github.com/MacRuby/MacRubySamples/tree/master/DTrace</a></li>
+</ul>
+
+
+<p>DTrace の基本が書かれています。</p>
+
+<ul>
+<li><a href="http://nippondanji.blogspot.jp/2010/02/ddtrace.html">D言語基礎文法最速マスター（DTraceのほう）</a></li>
+</ul>
+
+
+<p>DTrace についてはオラクルのドキュメントが一番詳しいです。</p>
+
+<ul>
+<li><a href="http://docs.oracle.com/cd/E19253-01/819-0395/">http://docs.oracle.com/cd/E19253-01/819-0395/</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Bonjour RubyMotion]]></title>
+    <link href="http://watson1978.github.io/blog/2012/09/10/bonjour-rubymotion/"/>
+    <updated>2012-09-10T17:03:00+09:00</updated>
+    <id>http://watson1978.github.io/blog/2012/09/10/bonjour-rubymotion</id>
+    <content type="html"><![CDATA[<p>今まで主夫兼 MacRuby Team メンバーみたいな肩書きだったのが、9 月 4 日 からは RubyMotion Team メンバーという肩書きが増えました。ありがとうございます。2010 年 8 月に MacRuby Team メンバーに加えていただいてから、少しずつ MacRuby の不具合を取り除いてきましたが、ここまでのものになると参加当時は思ってもみませんでした。Bonjour RubyMotion!</p>
+
+<p>ということで、今日は RubyMotion で Bonjour を使ったものを書いてみました。</p>
+
+<!-- more -->
+
+
+<p>NSNetServiceBrowser と NSNetService というクラスを使って、iOS 側から Web サーバを探して接続するものとなっています。</p>
+
+<p>```ruby app/app_delegate.rb
+class BJController &lt; UIViewController
+  def viewDidLoad</p>
+
+<pre><code>super
+
+# NSNetServiceBrowser を使ってサービスを検索
+@netServiceBrowser = NSNetServiceBrowser.alloc.init
+@netServiceBrowser.delegate = self
+@netServiceBrowser.searchForServicesOfType("_http._tcp", inDomain:"local")
+self
+</code></pre>
+
+<p>  end</p>
+
+<p>  def netServiceBrowser(netServiceBrowser,</p>
+
+<pre><code>                    didFindService: service,
+                    moreComing: moreComing)
+@netServiceBrowser.stop
+
+# NSNetService を使って接続先のアドレスを解決
+@service = NSNetService.alloc.initWithDomain(service.domain, type:service.type, name:service.name)
+@service.delegate = self
+@service.resolveWithTimeout(5.0)
+</code></pre>
+
+<p>  end</p>
+
+<p>  def netServiceDidResolveAddress(service)</p>
+
+<pre><code>@service.stop
+
+url = "http://#{@service.hostName}:#{@service.port}/"
+@webview = UIWebView.new.tap do |v|
+  v.frame = self.view.bounds
+  v.scalesPageToFit = true
+  v.loadRequest(NSURLRequest.requestWithURL(NSURL.URLWithString(url)))
+  v.delegate = self
+  view.addSubview(v)
+end    
+</code></pre>
+
+<p>  end
+end</p>
+
+<p>class AppDelegate
+  def application(application, didFinishLaunchingWithOptions:launchOptions)</p>
+
+<pre><code>@window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)
+@window.rootViewController = BJController.alloc.initWithNibName(nil, bundle: nil)
+@window.makeKeyAndVisible
+true
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Web サーバはどうするかというと、<a href="https://github.com/MacRuby/MacRubySamples/blob/master/Scripts/webrick.rb">https://github.com/MacRuby/MacRubySamples/blob/master/Scripts/webrick.rb</a> のサンプルを利用すると、すでに Bonjour が使われているので簡単ですね〜。</p>
+
+<p>あらかじめ、MacRuby で書かれたサーバを起動しておいて、上記の iOS アプリを実行します。あとは、Bonjour を使って見つかったサーバに接続し UIWebView で表示しています。iPhone で URL を入力するのが面倒なので、そんな手間なしでさくっと Web ページを確認したいときとかに便利・・・かもしれませんね。</p>
+
+<p><img src="/images/blog/bonjour.png" alt="Bonjour" /></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion で使う iOS スタティックライブラリを作る]]></title>
+    <link href="http://watson1978.github.io/blog/2012/06/07/create-static-library/"/>
+    <updated>2012-06-07T14:55:00+09:00</updated>
+    <id>http://watson1978.github.io/blog/2012/06/07/create-static-library</id>
+    <content type="html"><![CDATA[<p>今日はどのように iOS スタティックライブラリを作るのか、Xcode と格闘していました。</p>
+
+<p>何も考えずにビルドしてしまうと ARM 用のバイナリのみのライブラリができてしまい、i386 バイナリを必要とするシミュレータ用には使えません。</p>
+
+<p>ビルドの仕方がわからずに、どうすればライブラリが作れるか試行錯誤の課程を書きます。</p>
+
+<!-- more -->
+
+
+<h2>ライブラリ用のプロジェクトを作成</h2>
+
+<p>Xcode で &ldquo;Cocoa Touch Static Library&rdquo; というテンプレートを選択し、スタティックライブラリ用のプロジェクトを作成します。</p>
+
+<p><img src="/images/blog/cocoa_touch_static_library.png" alt="cocoa touch static library" /></p>
+
+<p>あとは、ライブラリで必要なプログラムを書きます。</p>
+
+<h2>ビルドする</h2>
+
+<p>ARMv6、ARMv7、i386 バイナリを含むユニバーサルなライブラリが欲しいのですが、Xcode でどのようにビルドすれば良いのかわからず途中であきらめ、Terminal 上での操作しました。</p>
+
+<p>Terminal で作成したプロジェクトのディレクトリに移動します。今回は &ldquo;foo&rdquo; という名前でプロジェクトを作成しています。</p>
+
+<p><code>
+$ ls
+foo/           foo.xcodeproj/
+</code></p>
+
+<p>ARM バイナリを作成します。</p>
+
+<p><code>
+$ xcodebuild -arch armv6 -arch armv7 -arch armv7s
+$ file build/Release-iphoneos/libfoo.a
+build/Release-iphoneos/libfoo.a: Mach-O universal binary with 2 architectures
+build/Release-iphoneos/libfoo.a (for architecture armv6):   current ar archive random library
+build/Release-iphoneos/libfoo.a (for architecture armv7):   current ar archive random library
+</code></p>
+
+<p>i386 バイナリは SDK に iphonesimulator を指定するとビルドされるようです。</p>
+
+<p><code>
+$ xcodebuild -sdk iphonesimulator
+$ file build/Release-iphonesimulator/libfoo.a
+build/Release-iphonesimulator/libfoo.a: current ar archive random library
+</code></p>
+
+<p>ライブラリファイルが 2 つになってしまったので、<code>lipo</code> コマンドを使って 1 つに結合します。</p>
+
+<p><code>
+$ lipo -create build/Release-iphoneos/libfoo.a build/Release-iphonesimulator/libfoo.a -output libfoo.a
+$ file libfoo.a
+libfoo.a: Mach-O universal binary with 3 architectures
+libfoo.a (for architecture armv6): current ar archive random library
+libfoo.a (for architecture armv7): current ar archive random library
+libfoo.a (for architecture i386):  current ar archive random library
+</code></p>
+
+<p>これで欲しかったライブラリができあがりました。</p>
+
+<p>もっと簡単に作れる方法をご存じの方がおられましたら、ご教示ください。</p>
 ]]></content>
   </entry>
   

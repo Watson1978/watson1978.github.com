@@ -1,0 +1,459 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Proxy サーバを用意して HTTP 通信をテストしよう - Watson's Blog</title>
+  <meta name="author" content="Watson">
+
+  
+  <meta name="description" content="この記事は RubyMotion Advent Calendar 2012 の 4 日目の記事です。 以前「RubyMotion もくもく会」で HTTP 通信のテストはどうすれば良いのだろうかという話題でモックを用意するのですかねと話が収束したのですが、 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://watson1978.github.io/blog/2012/12/04/proxy-server-for-HTTP-test/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Watson's Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<meta name="author" content="Watson" />
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<meta property="article:author" content="https://www.facebook.com/fujita.shizuo" />
+
+<meta property="og:title" content="Proxy サーバを用意して HTTP 通信をテストしよう - Watson's Blog" />
+<meta property="og:type" content="article" />
+<meta property="og:description" content="この記事は RubyMotion Advent Calendar 2012 の 4 日目の記事です。 以前「RubyMotion もくもく会」で HTTP 通信のテストはどうすれば良いのだろうかという話題でモックを用意するのですかねと話が収束したのですが、 &hellip;" />
+
+<meta property="og:url" content="http://watson1978.github.io/blog/2012/12/04/proxy-server-for-HTTP-test/" />
+<meta property="og:image" content="http://watson1978.github.io/images/RubyMotion_icon.png" />
+<meta property="og:site_name" content="Watson's Blog" />
+<meta property="og:locale" content="ja_JP" />
+<meta property="fb:app_id" content="141769376031637" />
+
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-31153551-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Watson's Blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:watson1978.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/MacRuby-DoJo/">MacRuby DoJo</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Proxy サーバを用意して HTTP 通信をテストしよう</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-12-04T00:00:00+09:00" pubdate data-updated="true">Dec 4<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>この記事は <a href="http://www.adventar.org/calendars/18">RubyMotion Advent Calendar 2012</a> の 4 日目の記事です。</p>
+
+<p>以前「RubyMotion もくもく会」で HTTP 通信のテストはどうすれば良いのだろうかという話題でモックを用意するのですかねと話が収束したのですが、面倒だし極力アプリに手を加えたくないなぁと一人もやもやしておりました。</p>
+
+<p>Proxy サーバを用意すれば比較的簡単にテストできるんじゃないかと思い、ブログに書いてみました。</p>
+
+<!-- more -->
+
+
+<h2>きっかけは</h2>
+
+<p>何を検索していてたどり着いたのかは忘れましたが、<a href="http://ja.favstar.fm/users/Psychs/status/3507370903">http://ja.favstar.fm/users/Psychs/status/3507370903</a> というツイートを見かけ、</p>
+
+<p><img src="/images/blog/psychs_tweet_nsconnection.png" alt="Psychs 先生のツイート" /></p>
+
+<p>さすが @Psychs 先生。神！と思った次第です。iOS シミュレータなど Cocoa API を使ったアプリの HTTP 通信は簡単に Proxy を経由するように設定できるわけですね。</p>
+
+<h2>Proxy サーバを作る</h2>
+
+<p>CRuby には WEBrick というライブラリが付属しています。このライブラリは HTTP サーバはもちろん Proxy サーバも作ることができます。今回はこれを使ってみます。</p>
+
+<figure class='code'><figcaption><span>proxy.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
+</span><span class='line'><span class="c1"># -*- coding: utf-8 -*-</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;webrick&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;webrick/httpproxy&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;uri&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">handler</span> <span class="o">=</span> <span class="no">Proc</span><span class="o">.</span><span class="n">new</span><span class="p">()</span> <span class="k">do</span> <span class="o">|</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="o">|</span>
+</span><span class='line'>  <span class="c1"># クライアントに対してテストしたいレスポンスを返す</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">s</span> <span class="o">=</span> <span class="ss">WEBrick</span><span class="p">:</span><span class="ss">:HTTPProxyServer</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+</span><span class='line'>       <span class="ss">:BindAddress</span> <span class="o">=&gt;</span> <span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span>
+</span><span class='line'>       <span class="ss">:Port</span> <span class="o">=&gt;</span> <span class="mi">8080</span><span class="p">,</span>
+</span><span class='line'>       <span class="ss">:ProxyContentHandler</span> <span class="o">=&gt;</span> <span class="n">handler</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Signal</span><span class="o">.</span><span class="n">trap</span><span class="p">(</span><span class="s1">&#39;INT&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">s</span><span class="o">.</span><span class="n">shutdown</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">s</span><span class="o">.</span><span class="n">start</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上記の proxy.rb を実行すると 8080 ポートで Proxy サーバが起動します。</p>
+
+<p>あとはハンドラの処理をテスト内容に応じて追加してあげると良いでしょう。たとえば画像に対しては 404 Not Found を返してあげたい場合には</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">handler</span> <span class="o">=</span> <span class="no">Proc</span><span class="o">.</span><span class="n">new</span><span class="p">()</span> <span class="k">do</span> <span class="o">|</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="o">|</span>
+</span><span class='line'>  <span class="k">if</span> <span class="n">res</span><span class="o">[</span><span class="s2">&quot;content-type&quot;</span><span class="o">]</span> <span class="o">=~</span> <span class="sr">/image/</span>
+</span><span class='line'>    <span class="n">res</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="s2">&quot;Not Found&quot;</span>
+</span><span class='line'>    <span class="n">res</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="mi">404</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>といったような処理を追加すると良いでしょう。特定の URL に対するアクセスも同じように簡単に処理できるかと思います。あるいは、sleep を追加して一定時間レスポンスを返さないテストも行えるかと思います。</p>
+
+<h2>プロキシを設定し利用してみよう</h2>
+
+<p>[システム環境設定] の [ネットワーク] でプロキシを設定します。</p>
+
+<p><img src="/images/blog/proxy_setting_on_osx.png" alt="プロキシを設定" /></p>
+
+<p>これで Cocoa API を使用したアプリの通信がプロキシを経由するようになります。</p>
+
+<p>あとは、先ほど作成した <code>proxy.rb</code> を起動した状態で RubyMotion アプリを <code>rake</code> コマンドで実行するだけです。シミュレータ上での HTTP 通信もプロキシを経由するようになります。</p>
+
+<p>プロキシサーバのログにはいろいろ出力されることでしょう。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="err">$</span> <span class="n">ruby</span> <span class="n">proxy</span><span class="o">.</span><span class="n">rb</span>
+</span><span class='line'><span class="o">[</span><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">02</span> <span class="mi">19</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">14</span><span class="o">]</span> <span class="no">INFO</span>  <span class="no">WEBrick</span> <span class="mi">1</span><span class="o">.</span><span class="mi">3</span><span class="o">.</span><span class="mi">1</span>
+</span><span class='line'><span class="o">[</span><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">02</span> <span class="mi">19</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">14</span><span class="o">]</span> <span class="no">INFO</span>  <span class="n">ruby</span> <span class="mi">1</span><span class="o">.</span><span class="mi">9</span><span class="o">.</span><span class="mi">3</span> <span class="p">(</span><span class="mi">2012</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">10</span><span class="p">)</span> <span class="o">[</span><span class="n">x86_64</span><span class="o">-</span><span class="n">darwin12</span><span class="o">.</span><span class="mi">2</span><span class="o">.</span><span class="mi">0</span><span class="o">]</span>
+</span><span class='line'><span class="o">[</span><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mo">02</span> <span class="mi">19</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">14</span><span class="o">]</span> <span class="no">INFO</span>  <span class="ss">WEBrick</span><span class="p">:</span><span class="ss">:HTTPProxyServer</span><span class="c1">#start: pid=55229 port=8080</span>
+</span><span class='line'><span class="n">localhost</span> <span class="o">-</span> <span class="o">-</span> <span class="o">[</span><span class="mo">02</span><span class="o">/</span><span class="no">Dec</span><span class="o">/</span><span class="mi">2012</span><span class="p">:</span><span class="mi">19</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">20</span> <span class="no">JST</span><span class="o">]</span> <span class="s2">&quot;GET http://gspa21.ls.apple.com/config/prod-resources-lodpi-18 HTTP/1.1&quot;</span> <span class="mi">200</span> <span class="mi">8088</span>
+</span><span class='line'><span class="o">-</span> <span class="o">-&gt;</span> <span class="ss">http</span><span class="p">:</span><span class="sr">//</span><span class="n">gspa21</span><span class="o">.</span><span class="n">ls</span><span class="o">.</span><span class="n">apple</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">config</span><span class="o">/</span><span class="n">prod</span><span class="o">-</span><span class="n">resources</span><span class="o">-</span><span class="n">lodpi</span><span class="o">-</span><span class="mi">18</span>
+</span><span class='line'><span class="n">localhost</span> <span class="o">-</span> <span class="o">-</span> <span class="o">[</span><span class="mo">02</span><span class="o">/</span><span class="no">Dec</span><span class="o">/</span><span class="mi">2012</span><span class="p">:</span><span class="mi">19</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">19</span> <span class="no">JST</span><span class="o">]</span> <span class="s2">&quot;GET http://gsp1.apple.com/pep/gcc HTTP/1.1&quot;</span> <span class="mi">200</span> <span class="mi">2</span>
+</span><span class='line'><span class="o">-</span> <span class="o">-&gt;</span> <span class="ss">http</span><span class="p">:</span><span class="sr">//</span><span class="n">gsp1</span><span class="o">.</span><span class="n">apple</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">pep</span><span class="o">/</span><span class="n">gcc</span>
+</span><span class='line'><span class="n">localhost</span> <span class="o">-</span> <span class="o">-</span> <span class="o">[</span><span class="mo">02</span><span class="o">/</span><span class="no">Dec</span><span class="o">/</span><span class="mi">2012</span><span class="p">:</span><span class="mi">19</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">20</span> <span class="no">JST</span><span class="o">]</span> <span class="s2">&quot;GET http://gspa23.ls.apple.com/tile?style=13&amp;size=2&amp;scale=0&amp;v=46&amp;z=6&amp;x=33&amp;y=21&amp;lang=en&amp;sid=120413474228982680818307689923224195391&amp;tk=11e206b6e88472f89a46a8358fe131fe&amp;mapkey=1354448060_71cded0e981b896e87214a6be0d8e71d HTTP/1.1&quot;</span> <span class="mi">200</span> <span class="mi">1160</span>
+</span><span class='line'><span class="o">-</span> <span class="o">-&gt;</span> <span class="ss">http</span><span class="p">:</span><span class="sr">//</span><span class="n">gspa23</span><span class="o">.</span><span class="n">ls</span><span class="o">.</span><span class="n">apple</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">tile?style</span><span class="o">=</span><span class="mi">13</span><span class="o">&amp;</span><span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="o">&amp;</span><span class="n">scale</span><span class="o">=</span><span class="mi">0</span><span class="o">&amp;</span><span class="n">v</span><span class="o">=</span><span class="mi">46</span><span class="o">&amp;</span><span class="n">z</span><span class="o">=</span><span class="mi">6</span><span class="o">&amp;</span><span class="n">x</span><span class="o">=</span><span class="mi">33</span><span class="o">&amp;</span><span class="n">y</span><span class="o">=</span><span class="mi">21</span><span class="o">&amp;</span><span class="n">lang</span><span class="o">=</span><span class="n">en</span><span class="o">&amp;</span><span class="n">sid</span><span class="o">=</span><span class="mi">120413474228982680818307689923224195391</span><span class="o">&amp;</span><span class="n">tk</span><span class="o">=</span><span class="mi">11</span><span class="n">e206b6e88472f89a46a8358fe131fe</span><span class="o">&amp;</span><span class="n">mapkey</span><span class="o">=</span><span class="mi">1354448060_71</span><span class="n">cded0e981b896e87214a6be0d8e71d</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>この Proxy サーバは iPhone などの実機からも利用することができます。[設定] の [Wi-Fi] からプロキシを設定してください。</p>
+
+<p><img src="/images/blog/proxy_setting_on_ios.png" alt="プロキシを設定" /></p>
+
+<p>テストが終わりましたら、プロキシの設定は元に戻してくださいね。</p>
+
+<h2>まとめ</h2>
+
+<p>この記事を書いてみて分かったのですが RubyMotion に関するコードが全く出てきませんでした、、、が、RubyMotion アプリのテストに限らず、iOS アプリ全般で簡単に HTTP 通信のテストができるようになるかと思います。</p>
+
+<h2>参考</h2>
+
+<ul>
+<li><a href="http://jp.rubyist.net/magazine/?0002-WEBrickProxy">WEBrickでプロキシサーバを作って遊ぶ</a></li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Watson</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-12-04T00:00:00+09:00" pubdate data-updated="true">Dec 4<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/rubymotion/'>RubyMotion</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard"><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+  
+  
+  <a href="http://www.delicious.com/save" class="delicious-bookmark-button" onclick="window.open('http://www.delicious.com/save?v=5&noui&jump=close&url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title), 'delicious','toolbar=no,width=550,height=550'); return false;"><img src="http://previous.delicious.com/static/img/delicious.small.gif" height="20" width="20" style="border: none;" alt="Delicious" /></a>
+  
+  
+  <script type="text/javascript" src="http://static.evernote.com/noteit.js"></script>
+  <a href="#" onclick="Evernote.doClip({}); return false;"><img src="http://static.evernote.com/site-mem-32.png"  height="20" width="20" style="border: none;" alt="Clip to Evernote" /></a>
+  
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://watson1978.github.io/blog/2012/12/04/proxy-server-for-HTTP-test/" data-via="watson1978" data-counturl="http://watson1978.github.io/blog/2012/12/04/proxy-server-for-HTTP-test/" >Tweet</a>
+  
+  
+  <div class="fb-like" data-send="false" data-layout="button_count" data-show-faces="true"></div>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/12/03/dtrace/" title="Previous Post: RubyMotion アプリで DTrace を使ってみよう">&laquo; RubyMotion アプリで DTrace を使ってみよう</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/12/07/jenkins/" title="Next Post: RubyMotion アプリを Jenkins でテスト実行してみよう">RubyMotion アプリを Jenkins でテスト実行してみよう &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <img src="/images/watson.jpg"/>
+  <ul>
+    <li>Author: Watson</li>
+    <li><a href="https://github.com/MacRuby/MacRuby">MacRuby</a> / <a href="http://www.rubymotion.com/">RubyMotion</a> チームのメンバー</li>
+    <li><a href="https://twitter.com/watson1978">Twitter</a>, <a href="https://github.com/Watson1978">Github</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/12/02/development-rubymotion-app-with-motion-mode-plus-rubocop/">RubyMotionアプリ開発に、motion-mode + Rubocop を導入</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/10/using-newest-or-previous-rubymotion/">最新の RubyMotion の試し方</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/10/how-to-use-xcode5/">Xcode 5 Developer Preview を使って RubyMotion アプリをビルドする方法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/16/changing-locale/">RubyMotion アプリをシミュレーターで起動する際に言語を指定する</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/06/creating-rubymotion-static-library/">RubyMotion でスタティックライブラリを作成し、 Xcode プロジェクトで利用する</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("watson1978", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/watson1978" class="twitter-follow-button" data-show-count="false">Follow @watson1978</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Watson -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'watsonsblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://watson1978.github.io/blog/2012/12/04/proxy-server-for-HTTP-test/';
+        var disqus_url = 'http://watson1978.github.io/blog/2012/12/04/proxy-server-for-HTTP-test/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/ja_JP/all.js#appId=141769376031637&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

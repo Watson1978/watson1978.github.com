@@ -1,0 +1,466 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>RubyMotion の class について - Watson's Blog</title>
+  <meta name="author" content="Watson">
+
+  
+  <meta name="description" content="この記事は RubyMotion Advent Calendar 2012 の 20 日目の記事です。 どのような記事を書こうかずいぶん悩んでいたのですが、第一回 RubyMotion 勉強会 の資料からクラスの部分を抜き出して手直ししようと言う手抜きぶりです。 RubyMotion はすべて &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://watson1978.github.io/blog/2012/12/20/rubymotion-class/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Watson's Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<meta name="author" content="Watson" />
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<meta property="article:author" content="https://www.facebook.com/fujita.shizuo" />
+
+<meta property="og:title" content="RubyMotion の class について - Watson's Blog" />
+<meta property="og:type" content="article" />
+<meta property="og:description" content="この記事は RubyMotion Advent Calendar 2012 の 20 日目の記事です。 どのような記事を書こうかずいぶん悩んでいたのですが、第一回 RubyMotion 勉強会 の資料からクラスの部分を抜き出して手直ししようと言う手抜きぶりです。 RubyMotion はすべて &hellip;" />
+
+<meta property="og:url" content="http://watson1978.github.io/blog/2012/12/20/rubymotion-class/" />
+<meta property="og:image" content="http://watson1978.github.io/images/RubyMotion_icon.png" />
+<meta property="og:site_name" content="Watson's Blog" />
+<meta property="og:locale" content="ja_JP" />
+<meta property="fb:app_id" content="141769376031637" />
+
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-31153551-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Watson's Blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:watson1978.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/MacRuby-DoJo/">MacRuby DoJo</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">RubyMotion の Class について</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-12-20T17:01:00+09:00" pubdate data-updated="true">Dec 20<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>この記事は <a href="http://www.adventar.org/calendars/18">RubyMotion Advent Calendar 2012</a> の 20 日目の記事です。</p>
+
+<p>どのような記事を書こうかずいぶん悩んでいたのですが、<a href="http://watson1978.github.com/blog/2012/07/22/meet-up-rubymotionjp/">第一回 RubyMotion 勉強会</a> の資料からクラスの部分を抜き出して手直ししようと言う手抜きぶりです。</p>
+
+<!-- more -->
+
+
+<h2>RubyMotion はすべて Objective-C のクラス</h2>
+
+<p>CRuby ではルートクラスとして Object というクラスが存在します(Ruby 1.9 からだと BasicObject というのもありますが)。これに対して Objective-C では NSObject というクラスがルートクラスとして存在しています。似たようなクラスがお互いにルートクラスに存在していますね。</p>
+
+<p>RubyMotion では NSObject を Ruby の Object として利用し、ほかのルビーのクラスを構築しています。RubyMotion の REPL で簡単に確認することができます。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(main)&gt; Object.new
+</span><span class='line'>=&gt; #&lt;NSObject:0x937e410&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>NSObject をベースとしてクラスを構築しているため、すべてのオブジェクトは何らかの Objective-C のメソッドを持っています。</p>
+
+<p>Objective-C の performSelector で、 Ruby の to_s というメソッドを実行してみました。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(main)&gt; Object.new.performSelector("to_s")
+</span><span class='line'>=&gt; "#&lt;NSObject:0xe13efc0&gt;"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(ちなみに Objective-C ではセレクタを指定する際 <code>@selector(to_s)</code> のように指定しますが、RubyMotion では単に文字列を渡すだけで良いようになっています)</p>
+
+<h2>String/Array/Hash/Numeric/Time</h2>
+
+<p>Ruby の String, Array, Hash, Numeric, Time クラスと同様のクラスが Objective-C でも存在しています。RubyMotion では Objective-C のクラスを継承する形でそれらのクラスが作られています。</p>
+
+<table class="table">
+<tr><th>クラス</th><th>クラスの継承関係</th></tr>
+<tr><td>String</td><td>String → NSMutableString → NSString → NSObject</td></tr>
+<tr><td>Array</td><td>Array → NSMutableArray → NSArray → NSObject</td></tr>
+<tr><td>Hash</td><td>Hash → NSMutableDictionary → NSDictionary → NSObject</td></tr>
+<tr><td>Numeric</td><td>Numeric → NSNumber → NSValue → NSObject </td></tr>
+<tr><td>Time</td><td>Time → NSDate → NSObject</td></tr>
+</table>
+
+
+<p>この継承関係のおかげで、Ruby の Time として作ったオブジェクトでも、NSDate のメソッドを使うことができたりします。</p>
+
+<p>Objective-C で書かれたプログラムに Time オブジェクトを渡しても NSDate として振る舞ってくれるので Objective-C にとっても都合が良いということですね。私たちにとってはオブジェクトを変換する手間が不要で嬉しい！！</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># Ruby メソッドでオブジェクトを作成
+</span><span class='line'>(main)&gt; time = Time.now
+</span><span class='line'>
+</span><span class='line'># Objective-C メソッドを使う
+</span><span class='line'>(main)&gt; time.timeIntervalSince1970
+</span><span class='line'>=&gt; 1355993088.0</span></code></pre></td></tr></table></div></figure>
+
+
+<p>親のクラスである NSString, NSArray, NSDictionary, NSNumber, NSDate には互換性のために Ruby メソッドが追加されています。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># Objective-C メソッドでオブジェクトを作成
+</span><span class='line'>(main)&gt; dateFormatter = NSDateFormatter.alloc.init
+</span><span class='line'>(main)&gt; dateFormatter.setDateFormat("yyyy-MM-dd'T'HH:mm:ss+09:00")
+</span><span class='line'>(main)&gt; date = dateFormatter.dateFromString("2012-12-15T11:43:09+09:00")
+</span><span class='line'>
+</span><span class='line'># Ruby メソッドを使う
+</span><span class='line'>(main)&gt; date.strftime("%Y")
+</span><span class='line'>=&gt; "2012"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>というように、 どのメソッドで作られたか、どのメソッドを呼び出すのか意識しなくても Ruby が書けるようになっています。</p>
+
+<h2>オープンクラスでメソッドを追加する場合は上位クラスに</h2>
+
+<p>メソッドを使うぶんには、Ruby なのか Objective-C なのか意識しなくても良いようになっていますが、オープンクラスでメソッドを追加するときだけは少し注意してください。</p>
+
+<p>オープンクラスで String に何かメソッドを追加した場合ですが、そのメソッドは継承元の NSString のメソッドで作られたオブジェクトからは利用することができません。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(main)&gt; class String
+</span><span class='line'>(main)&gt;   def foo
+</span><span class='line'>(main)&gt;   end
+</span><span class='line'>(main)&gt; end
+</span><span class='line'>
+</span><span class='line'>(main)&gt; str = NSString.stringWithString("abc")
+</span><span class='line'>
+</span><span class='line'>(main)&gt; str.foo
+</span><span class='line'>2012-12-20 18:10:04.523 test[3295:c07] undefined method `foo' for "abc":String (NoMethodError)
+</span><span class='line'>test(3295,0xac2ada28) malloc: *** error for object 0xa896f30: pointer being freed was not allocated
+</span><span class='line'>*** set a breakpoint in malloc_error_break to debug
+</span><span class='line'>=&gt; #&lt;NoMethodError: undefined method `foo' for "abc":String&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>オープンクラスでメソッドを追加する場合は上位の NSString や NSArray に追加するとハマることが少なくなるかと思います。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(main)&gt; class NSString
+</span><span class='line'>(main)&gt;   def hello
+</span><span class='line'>(main)&gt;     "hello"
+</span><span class='line'>(main)&gt;   end
+</span><span class='line'>(main)&gt; end
+</span><span class='line'>
+</span><span class='line'>(main)&gt; str = NSString.stringWithString("abc")
+</span><span class='line'>(main)&gt; str.hello
+</span><span class='line'>=&gt; "hello"
+</span><span class='line'>
+</span><span class='line'>(main)&gt; "abc".hello
+</span><span class='line'>=&gt; "hello"</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Watson</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-12-20T17:01:00+09:00" pubdate data-updated="true">Dec 20<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/rubymotion/'>RubyMotion</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard"><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+  
+  
+  <a href="http://www.delicious.com/save" class="delicious-bookmark-button" onclick="window.open('http://www.delicious.com/save?v=5&noui&jump=close&url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title), 'delicious','toolbar=no,width=550,height=550'); return false;"><img src="http://previous.delicious.com/static/img/delicious.small.gif" height="20" width="20" style="border: none;" alt="Delicious" /></a>
+  
+  
+  <script type="text/javascript" src="http://static.evernote.com/noteit.js"></script>
+  <a href="#" onclick="Evernote.doClip({}); return false;"><img src="http://static.evernote.com/site-mem-32.png"  height="20" width="20" style="border: none;" alt="Clip to Evernote" /></a>
+  
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://watson1978.github.io/blog/2012/12/20/rubymotion-class/" data-via="watson1978" data-counturl="http://watson1978.github.io/blog/2012/12/20/rubymotion-class/" >Tweet</a>
+  
+  
+  <div class="fb-like" data-send="false" data-layout="button_count" data-show-faces="true"></div>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/12/15/target-cpu-archs/" title="Previous Post: RubyMotion でビルドする CPU アーキテクチャを指定する">&laquo; RubyMotion でビルドする CPU アーキテクチャを指定する</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/01/19/pit/" title="Next Post: 設定情報の管理に pit を使ってみた">設定情報の管理に pit を使ってみた &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <img src="/images/watson.jpg"/>
+  <ul>
+    <li>Author: Watson</li>
+    <li><a href="https://github.com/MacRuby/MacRuby">MacRuby</a> / <a href="http://www.rubymotion.com/">RubyMotion</a> チームのメンバー</li>
+    <li><a href="https://twitter.com/watson1978">Twitter</a>, <a href="https://github.com/Watson1978">Github</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/12/02/development-rubymotion-app-with-motion-mode-plus-rubocop/">RubyMotionアプリ開発に、motion-mode + Rubocop を導入</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/10/using-newest-or-previous-rubymotion/">最新の RubyMotion の試し方</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/10/how-to-use-xcode5/">Xcode 5 Developer Preview を使って RubyMotion アプリをビルドする方法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/16/changing-locale/">RubyMotion アプリをシミュレーターで起動する際に言語を指定する</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/06/creating-rubymotion-static-library/">RubyMotion でスタティックライブラリを作成し、 Xcode プロジェクトで利用する</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("watson1978", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/watson1978" class="twitter-follow-button" data-show-count="false">Follow @watson1978</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Watson -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'watsonsblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://watson1978.github.io/blog/2012/12/20/rubymotion-class/';
+        var disqus_url = 'http://watson1978.github.io/blog/2012/12/20/rubymotion-class/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/ja_JP/all.js#appId=141769376031637&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

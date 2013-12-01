@@ -1,0 +1,413 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Jenkins に TAP Plugin というものを導入しました - Watson's Blog</title>
+  <meta name="author" content="Watson">
+
+  
+  <meta name="description" content="Amazon で手頃な Mac mini を購入して、Jenkins で日々 RubyMotion をテストしています。 テスト実行結果の出力形式として Test Anything Protocol (TAP) というものがあります。 RubyMotion では Spec を実行する際に &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://watson1978.github.io/blog/2013/01/30/rubymotion-jenkins-tap/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Watson's Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<meta name="author" content="Watson" />
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<meta property="article:author" content="https://www.facebook.com/fujita.shizuo" />
+
+<meta property="og:title" content="Jenkins に TAP Plugin というものを導入しました - Watson's Blog" />
+<meta property="og:type" content="article" />
+<meta property="og:description" content="Amazon で手頃な Mac mini を購入して、Jenkins で日々 RubyMotion をテストしています。 テスト実行結果の出力形式として Test Anything Protocol (TAP) というものがあります。 RubyMotion では Spec を実行する際に &hellip;" />
+
+<meta property="og:url" content="http://watson1978.github.io/blog/2013/01/30/rubymotion-jenkins-tap/" />
+<meta property="og:image" content="http://watson1978.github.io/images/RubyMotion_icon.png" />
+<meta property="og:site_name" content="Watson's Blog" />
+<meta property="og:locale" content="ja_JP" />
+<meta property="fb:app_id" content="141769376031637" />
+
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-31153551-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Watson's Blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:watson1978.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/MacRuby-DoJo/">MacRuby DoJo</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Jenkins に TAP Plugin というものを導入しました</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-30T21:45:00+09:00" pubdate data-updated="true">Jan 30<span>th</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><a href="http://www.amazon.co.jp/s/ref=nb_sb_noss_1?__mk_ja_JP=%83J%83%5E%83J%83i&amp;url=search-alias%3Daps&amp;field-keywords=mac+mini">Amazon で手頃な Mac mini</a> を購入して、<a href="http://watson1978.github.com/blog/2012/12/07/jenkins/">Jenkins で日々 RubyMotion をテスト</a>しています。</p>
+
+<!-- more -->
+
+
+<p>テスト実行結果の出力形式として <a href="http://testanything.org/wiki/index.php/Main_Page">Test Anything Protocol (TAP)</a> というものがあります。</p>
+
+<p>RubyMotion では Spec を実行する際に <code>output</code> という環境変数で出力形式を TAP にすることができます(他にも <code>spec_dox</code>, <code>fast</code>,  <code>test_unit</code>, <code>knock</code>, <code>rubymine</code> を指定できます)。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ rake spec output=tap</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Jenkins では <a href="https://wiki.jenkins-ci.org/display/JENKINS/TAP+Plugin">TAP Plugin</a> というプラグインを導入すると、この TAP 形式に対応することができます。これを導入するとテスト数の増減(Faild が増えたとか)がグラフ表示されておしゃれな感じです。</p>
+
+<p><img src="/images/blog/jenkins/tap.png" alt="TAP のグラフ" />
+<img src="/images/blog/jenkins/tap2.png" alt="TAP のグラフ" /></p>
+
+<h2>TAP Plugin の導入</h2>
+
+<p>Jenkins のプラグイン管理画面で &ldquo;Jenkins TAP Plugin&rdquo; にチェックを入れます。</p>
+
+<p><img src="/images/blog/jenkins/tap_plugin.png" alt="Jenkins TAP Plugin" /></p>
+
+<h2>プロジェクトの設定</h2>
+
+<p>&ldquo;Jenkins TAP Plugin&rdquo; を導入するとプロジェクトの設定画面で、ビルド後の処理に TAP Plugin に関する設定項目が追加されます。</p>
+
+<p><img src="/images/blog/jenkins/tap_result.png" alt="Jenkins TAP Plugin" /></p>
+
+<p>テスト結果をいったんファイルに保存し、そのテスト結果が書かれたファイルを TAP Plugin が読み込んで処理をするようです。</p>
+
+<p>以下のような、Jenkins で spec を実行するためのスクリプトを用意しました。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
+</span><span class='line'><span class="c1"># -*- coding: utf-8 -*-</span>
+</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;optparse&quot;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;tempfile&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">stderr_file</span> <span class="o">=</span> <span class="no">Tempfile</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;stderr&quot;</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">opt</span> <span class="o">=</span>  <span class="no">OptionParser</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'><span class="n">rake</span> <span class="o">=</span> <span class="s2">&quot;rake&quot;</span>
+</span><span class='line'><span class="n">output_path</span> <span class="o">=</span> <span class="kp">nil</span>
+</span><span class='line'><span class="n">opt</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;--bundle&#39;</span><span class="p">)</span> <span class="p">{</span><span class="o">|</span><span class="n">v</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">rake</span> <span class="o">=</span> <span class="s2">&quot;bundle exec </span><span class="si">#{</span><span class="n">rake</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="n">opt</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;--output=filename&#39;</span><span class="p">)</span> <span class="p">{</span><span class="o">|</span><span class="n">v</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">output_path</span> <span class="o">=</span> <span class="n">v</span>
+</span><span class='line'>  <span class="nb">system</span> <span class="s2">&quot;rm -rf </span><span class="si">#{</span><span class="n">output_path</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">opt</span><span class="o">.</span><span class="n">parse!</span><span class="p">(</span><span class="no">ARGV</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># run spec</span>
+</span><span class='line'><span class="nb">system</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">rake</span><span class="si">}</span><span class="s2"> clean&quot;</span>
+</span><span class='line'><span class="nb">system</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">rake</span><span class="si">}</span><span class="s2"> spec output=tap SIM_STDOUT_PATH=</span><span class="si">#{</span><span class="n">output_path</span><span class="si">}</span><span class="s2"> SIM_STDERR_PATH=</span><span class="si">#{</span><span class="n">stderr_file</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>あとは、Jenkins でプロジェクト毎に以下のようなコマンドを記述して、テストを実行するようにしてます。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">run_spec</span> <span class="o">--</span><span class="n">bundle</span> <span class="o">--</span><span class="n">output</span><span class="o">=</span><span class="vg">$WORKSPACE</span><span class="o">/</span><span class="n">result</span><span class="o">.</span><span class="n">txt</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="/images/blog/jenkins/shell_command2.png" alt="Jenkins shell command" /></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Watson</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-30T21:45:00+09:00" pubdate data-updated="true">Jan 30<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/rubymotion/'>RubyMotion</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard"><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+  
+  
+  <a href="http://www.delicious.com/save" class="delicious-bookmark-button" onclick="window.open('http://www.delicious.com/save?v=5&noui&jump=close&url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title), 'delicious','toolbar=no,width=550,height=550'); return false;"><img src="http://previous.delicious.com/static/img/delicious.small.gif" height="20" width="20" style="border: none;" alt="Delicious" /></a>
+  
+  
+  <script type="text/javascript" src="http://static.evernote.com/noteit.js"></script>
+  <a href="#" onclick="Evernote.doClip({}); return false;"><img src="http://static.evernote.com/site-mem-32.png"  height="20" width="20" style="border: none;" alt="Clip to Evernote" /></a>
+  
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://watson1978.github.io/blog/2013/01/30/rubymotion-jenkins-tap/" data-via="watson1978" data-counturl="http://watson1978.github.io/blog/2013/01/30/rubymotion-jenkins-tap/" >Tweet</a>
+  
+  
+  <div class="fb-like" data-send="false" data-layout="button_count" data-show-faces="true"></div>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/01/25/motion-pixate-observer/" title="Previous Post: motion-pixate-observer という gem を作りました">&laquo; motion-pixate-observer という gem を作りました</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/02/11/tokyo-rubykaigi-3rd/" title="Next Post: 東京 Ruby 会議 10 3日目にいってきました">東京 Ruby 会議 10 3日目にいってきました &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <img src="/images/watson.jpg"/>
+  <ul>
+    <li>Author: Watson</li>
+    <li><a href="https://github.com/MacRuby/MacRuby">MacRuby</a> / <a href="http://www.rubymotion.com/">RubyMotion</a> チームのメンバー</li>
+    <li><a href="https://twitter.com/watson1978">Twitter</a>, <a href="https://github.com/Watson1978">Github</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/12/02/development-rubymotion-app-with-motion-mode-plus-rubocop/">RubyMotionアプリ開発に、motion-mode + Rubocop を導入</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/10/using-newest-or-previous-rubymotion/">最新の RubyMotion の試し方</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/10/how-to-use-xcode5/">Xcode 5 Developer Preview を使って RubyMotion アプリをビルドする方法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/16/changing-locale/">RubyMotion アプリをシミュレーターで起動する際に言語を指定する</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/06/creating-rubymotion-static-library/">RubyMotion でスタティックライブラリを作成し、 Xcode プロジェクトで利用する</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("watson1978", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/watson1978" class="twitter-follow-button" data-show-count="false">Follow @watson1978</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Watson -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'watsonsblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://watson1978.github.io/blog/2013/01/30/rubymotion-jenkins-tap/';
+        var disqus_url = 'http://watson1978.github.io/blog/2013/01/30/rubymotion-jenkins-tap/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/ja_JP/all.js#appId=141769376031637&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

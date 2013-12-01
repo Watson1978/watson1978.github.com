@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Library | Watson's Blog]]></title>
-  <link href="http://watson1978.github.com/blog/categories/library/atom.xml" rel="self"/>
-  <link href="http://watson1978.github.com/"/>
-  <updated>2012-09-20T18:42:04+09:00</updated>
-  <id>http://watson1978.github.com/</id>
+  <link href="http://watson1978.github.io/blog/categories/library/atom.xml" rel="self"/>
+  <link href="http://watson1978.github.io/"/>
+  <updated>2013-12-02T08:12:19+09:00</updated>
+  <id>http://watson1978.github.io/</id>
   <author>
     <name><![CDATA[Watson]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[RubyMotion で使う iOS スタティックライブラリを作る]]></title>
-    <link href="http://watson1978.github.com/blog/2012/06/07/create-static-library/"/>
+    <link href="http://watson1978.github.io/blog/2012/06/07/create-static-library/"/>
     <updated>2012-06-07T14:55:00+09:00</updated>
-    <id>http://watson1978.github.com/blog/2012/06/07/create-static-library</id>
+    <id>http://watson1978.github.io/blog/2012/06/07/create-static-library</id>
     <content type="html"><![CDATA[<p>今日はどのように iOS スタティックライブラリを作るのか、Xcode と格闘していました。</p>
 
 <p>何も考えずにビルドしてしまうと ARM 用のバイナリのみのライブラリができてしまい、i386 バイナリを必要とするシミュレータ用には使えません。</p>
@@ -29,7 +29,7 @@
 
 <h2>ライブラリ用のプロジェクトを作成</h2>
 
-<p>Xcode で "Cocoa Touch Static Library" というテンプレートを選択し、スタティックライブラリ用のプロジェクトを作成します。</p>
+<p>Xcode で &ldquo;Cocoa Touch Static Library&rdquo; というテンプレートを選択し、スタティックライブラリ用のプロジェクトを作成します。</p>
 
 <p><img src="/images/blog/cocoa_touch_static_library.png" alt="cocoa touch static library" /></p>
 
@@ -39,7 +39,7 @@
 
 <p>ARMv6、ARMv7、i386 バイナリを含むユニバーサルなライブラリが欲しいのですが、Xcode でどのようにビルドすれば良いのかわからず途中であきらめ、Terminal 上での操作しました。</p>
 
-<p>Terminal で作成したプロジェクトのディレクトリに移動します。今回は "foo" という名前でプロジェクトを作成しています。</p>
+<p>Terminal で作成したプロジェクトのディレクトリに移動します。今回は &ldquo;foo&rdquo; という名前でプロジェクトを作成しています。</p>
 
 <p><code>
 $ ls
@@ -49,7 +49,7 @@ foo/           foo.xcodeproj/
 <p>ARM バイナリを作成します。</p>
 
 <p><code>
-$ xcodebuild -arch armv6 -arch armv7
+$ xcodebuild -arch armv6 -arch armv7 -arch armv7s
 $ file build/Release-iphoneos/libfoo.a
 build/Release-iphoneos/libfoo.a: Mach-O universal binary with 2 architectures
 build/Release-iphoneos/libfoo.a (for architecture armv6):   current ar archive random library

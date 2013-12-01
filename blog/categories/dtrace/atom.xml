@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: DTrace | Watson's Blog]]></title>
+  <link href="http://watson1978.github.io/blog/categories/dtrace/atom.xml" rel="self"/>
+  <link href="http://watson1978.github.io/"/>
+  <updated>2013-12-02T08:12:19+09:00</updated>
+  <id>http://watson1978.github.io/</id>
+  <author>
+    <name><![CDATA[Watson]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[RubyMotion アプリで DTrace を使ってみよう]]></title>
+    <link href="http://watson1978.github.io/blog/2012/12/03/dtrace/"/>
+    <updated>2012-12-03T00:00:00+09:00</updated>
+    <id>http://watson1978.github.io/blog/2012/12/03/dtrace</id>
+    <content type="html"><![CDATA[<p>この記事は <a href="http://www.adventar.org/calendars/18">RubyMotion Advent Calendar 2012</a> の 3 日目の記事です。</p>
+
+<p>DTrace は Sun Microsystems が開発した実行中のアプリの情報を取得する仕組みです。DTrace を使用するとアプリケーションを一切変更することなく情報取得を可能にします。
+Xcode に付属している Instruments が様々な情報を表示できるのは、縁の下に DTrace が存在しているからです。</p>
+
+<p>Ruby 2.0 preview2 でいよいよ DTrace がサポートされましたが、MacRuby や RubyMotion ではすでに DTrace をサポートしています。</p>
+
+<!-- more -->
+
+
+<h2>プローブを確認してみる</h2>
+
+<p>DTrace では、アプリに埋め込まれている「プローブ」と呼ばれる計測ポイントを用い、追跡をおこないます。</p>
+
+<p>現在利用可能なプローブの一覧は <code>sudo dtrace -l</code> で確認することができます。シミュレータで RubyMotion アプリを実行した状態で確認してみましょう。</p>
+
+<p><code>
+$ motion create HelloDTrace
+$ cd HelloDTrace
+$ rake
+</code></p>
+
+<p>別の Terminal ウィンドウで <code>sudo dtrace -l</code> を実行してみます。</p>
+
+<p>```
+$ sudo dtrace -l
+   ID   PROVIDER            MODULE                          FUNCTION NAME</p>
+
+<pre><code>1     dtrace                                                     BEGIN
+2     dtrace                                                     END
+3     dtrace                                                     ERROR
+4   lockstat       mach_kernel                      lck_mtx_lock adaptive-acquire
+5   lockstat       mach_kernel                      lck_mtx_lock adaptive-spin
+</code></pre>
+
+<p>&hellip;
+```</p>
+
+<p>各列の説明を簡単にします。</p>
+
+<ul>
+<li><code>PROVIDER</code> は、プローブを提供しているプログラムの識別子のようなものです。</li>
+<li><code>MODULE</code> は、プローブが属するカーネルモジュール名やライブラリ名が入ります。上のように、存在しない場合もあります。</li>
+<li><code>FUNCTION</code> は、プローブが属するプログラムの関数名を表します。上の例のように、存在しない場合もあります。</li>
+<li><code>NAME</code> は、プローブの機能を表す名前を表します。</li>
+</ul>
+
+
+<p>大量に表示されるプローブの一覧から RubyMotion が提供しているものを探し出すのは不可能に近いので <code>grep</code> で検索してみましょう。</p>
+
+<p><code>
+$ sudo dtrace -l | grep HelloDTrace
+ 8037 macruby2577       HelloDTrace                    rb_vm_dispatch method-entry
+ 8038 macruby2577       HelloDTrace                    rb_vm_dispatch method-return
+ 8039 macruby2577       HelloDTrace   _ZL10__vm_raisev [__vm_raise()] raise
+</code></p>
+
+<p>RubyMotion は MacRuby と同様に <code>macruby</code> というプロバイダ名でプローブを提供しています。プローブは <code>method-entry</code>、 <code>method-return</code> と <code>raise</code> の 3 種類あることが分かります。</p>
+
+<h2>プローブ説明</h2>
+
+<table class="table">
+<tr><th>プローブ名</th><th>実行タイミング</th><th>変数 arg0</th><th>変数 arg1</th><th>変数 arg2</th><th>変数 arg3</th></tr>
+<tr><td>method-entry</td><td>メソッド呼出開始</td><td>クラス名</td><td>メソッド名</td><td>ソースファイル名</td><td>行番号</td></tr>
+<td>method-return</td><td>メソッド呼出終了</td><td>クラス名</td><td>メソッド名</td><td>ソースファイル名</td><td>行番号</td></tr>
+<td>raise</td><td>例外発生時</td><td>クラス名</td><td>ソースファイル名</td><td>行番号</td><td>-</td></tr>
+</table>
+
+
+<p><code>method-entry</code> プローブが実行されるとき、変数 arg0 にはクラス名、変数 arg1 には メソッド名が格納されています。(ソースファイル名と行番号は正しく格納されていない)</p>
+
+<h2>とりあえず動かしてみよう</h2>
+
+<h3>準備</h3>
+
+<p>最初に作成した HelloDTrace アプリの <code>app/app_delegate.rb</code> を以下のように変更しておきます。</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>app/app_delegate.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">hello_dtrace</span>
+</span><span class='line'>  <span class="n">time</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span>
+</span><span class='line'>  <span class="no">UIAlertView</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithTitle</span><span class="p">(</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;&quot;Hello DTrace&quot;,</span>
+</span><span class='line'><span class="sr">message: &quot;Current time is </span><span class="si">#{</span><span class="n">time</span><span class="o">.</span><span class="n">to_s</span><span class="si">}</span><span class="sr">&quot;,</span>
+</span><span class='line'><span class="sr">delegate: nil,</span>
+</span><span class='line'><span class="sr">cancelButtonTitle: nil,</span>
+</span><span class='line'><span class="sr">otherButtonTitles: &quot;OK&quot;,</span>
+</span><span class='line'><span class="sr">nil</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  ).show</span>
+</span><span class='line'><span class="sr">end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">AppDelegate</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="ss">didFinishLaunchingWithOptions</span><span class="p">:</span><span class="n">launchOptions</span><span class="p">)</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;true</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end</span>
+</span><span class='line'><span class="sr">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>次に以下のような DTrace 用のスクリプト <code>trace.d</code> を用意します。
+<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>trace.d </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='d'><span class='line'><span class="c1">// メソッドの開始と終了の出力をインデント (&amp;ndash;&gt;) を付けて表示させる&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">h1</span><span class="p">&gt;</span><span class="k">pragma</span> <span class="n">D</span> <span class="n">option</span> <span class="n">flowindent</span><span class="p">&lt;/</span><span class="n">h1</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;</span><span class="n">macruby</span><span class="p">$</span><span class="n">target</span><span class="p">:::</span><span class="n">method</span><span class="p">-</span><span class="n">entry</span><span class="p">,</span>
+</span><span class='line'><span class="n">macruby</span><span class="p">$</span><span class="n">target</span><span class="p">:::</span><span class="n">method</span><span class="p">-</span><span class="k">return</span>
+</span><span class='line'><span class="p">{&lt;/</span><span class="n">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">pre</span><span class="p">&gt;&lt;</span><span class="n">code</span><span class="p">&gt;</span><span class="cm">/* arg0 にはクラス名、 arg1 にはメソッド名が格納されています */</span>
+</span><span class='line'><span class="n">printf</span><span class="p">(</span><span class="s">&quot;(%s#%s)&quot;</span><span class="p">,</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg0</span><span class="p">),</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg1</span><span class="p">))</span>
+</span><span class='line'><span class="p">&lt;/</span><span class="n">code</span><span class="p">&gt;&lt;/</span><span class="n">pre</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h3>実行してみよう</h3>
+
+<p>まずは RubyMotion アプリを <code>rake</code> コマンドで起動します。</p>
+
+<p>シミュレータが起動したところで、別の Terminal ウィンドウで起動したアプリのプロセス ID を <code>ps</code> コマンドやアクティビティモニターで調べておきます。DTrace を実行する際にこのプロセス ID を使用します。</p>
+
+<p><code>
+$ ps cux | grep HelloDTrace
+watson  5140   0.0  0.3   875476  21148   ??  S     6:04PM   0:00.31 HelloDTrace
+</code></p>
+
+<p>プロセス ID は 5140 でした。</p>
+
+<p>次に DTrace を実行します。<code>dtrace</code> の後に <code>-s</code> オプションで用意した DTrace 用のスクリプト、<code>-p</code> で情報を取得するプロセスの ID を指定します。</p>
+
+<p><code>
+$ sudo dtrace -s trace.d -p 5140
+</code></p>
+
+<p>マウスカーソルを移動するたびに DTrace の実行画面にトレース情報が表示されるかと思います。シミュレータ上でマウスオーバーを検出するためにマウスカーソルのイベントが発生するとやりとりしているようです。(キーボード操作だけで乗り切ると、余計なログが表示されず見やすくなります)</p>
+
+<p>RubyMotion の REPL で <code>hello_dtrace</code> メソッドを実行してみましょう。シミュレータにはアラートビューが表示され、DTrace を実行している Terminal には以下のように DTrace を起動した後に実行されたメソッドが表示されます。
+<code>
+  0  -&gt; rb_vm_dispatch                        (TopLevel#inspect)
+  0  &lt;- rb_vm_dispatch                        (TopLevel#inspect)
+  1  -&gt; rb_vm_dispatch                        (TopLevel#hello_dtrace)
+  1    -&gt; rb_vm_dispatch                      (Class#now)
+  1      -&gt; rb_vm_dispatch                    (Class#alloc)
+  1      &lt;- rb_vm_dispatch                    (Class#alloc)
+  1      -&gt; rb_vm_dispatch                    (Time#initialize)
+  1      &lt;- rb_vm_dispatch                    (Time#initialize)
+  1    &lt;- rb_vm_dispatch                      (Class#now)
+  1    -&gt; rb_vm_dispatch                      (Time#to_s)
+  1    &lt;- rb_vm_dispatch                      (Time#to_s)
+  1    -&gt; rb_vm_dispatch                      (UIAlertView#inspect)
+  1      -&gt; rb_vm_dispatch                    (UIAlertView#to_s)
+  1      &lt;- rb_vm_dispatch                    (UIAlertView#to_s)
+  1    &lt;- rb_vm_dispatch                      (UIAlertView#inspect)
+  3  &lt;- rb_vm_dispatch                        (TopLevel#hello_dtrace)
+^C
+</code></p>
+
+<p>インデントの深さに応じて、メソッドがどのような順序で呼び出されているかが分かります。</p>
+
+<p><kbd>CTRL</kbd> + <kbd>c</kbd> か RubyMotion アプリを終了させると DTrace が終了します。</p>
+
+<h2>メソッドの実行時間を計測してみよう</h2>
+
+<p>今度はメソッドの実行時間を計測してみよう。使用するスクリプトは以下のようになります。</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>time.d </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='d'><span class='line'><span class="p">&lt;/</span><span class="n">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">h1</span><span class="p">&gt;</span><span class="k">pragma</span> <span class="n">D</span> <span class="n">option</span> <span class="n">quiet</span><span class="p">&lt;/</span><span class="n">h1</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;</span><span class="n">macruby</span><span class="p">$</span><span class="n">target</span><span class="p">:::</span><span class="n">method</span><span class="p">-</span><span class="n">entry</span>
+</span><span class='line'><span class="p">/</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg0</span><span class="p">)</span> <span class="p">==</span> <span class="p">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">String</span><span class="p">&amp;</span><span class="n">rdquo</span><span class="p">;</span> <span class="p">/</span>  <span class="p">/&lt;</span><span class="n">em</span><span class="p">&gt;</span> <span class="n">String</span> <span class="err">クラスだけを計測する</span> <span class="p">&lt;/</span><span class="n">em</span><span class="p">&gt;/</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">self</span><span class="p">-&gt;</span><span class="n">starttime</span> <span class="p">=</span> <span class="n">walltimestamp</span> <span class="p">/</span> <span class="mi">1000</span><span class="p">;</span>
+</span><span class='line'><span class="p">}&lt;/</span><span class="n">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;</span><span class="n">macruby</span><span class="p">$</span><span class="n">target</span><span class="p">:::</span><span class="n">method</span><span class="p">-</span><span class="k">return</span>
+</span><span class='line'><span class="p">/</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg0</span><span class="p">)</span> <span class="p">==</span> <span class="p">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">String</span><span class="p">&amp;</span><span class="n">rdquo</span><span class="p">;</span> <span class="p">/</span>  <span class="p">/&lt;</span><span class="n">em</span><span class="p">&gt;</span> <span class="n">String</span> <span class="err">クラスだけを計測する</span> <span class="p">&lt;/</span><span class="n">em</span><span class="p">&gt;/</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="err">@</span><span class="n">invoked_time</span><span class="p">[</span><span class="n">copyinstr</span><span class="p">(</span><span class="n">arg0</span><span class="p">),</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg1</span><span class="p">)]</span> <span class="p">=</span> <span class="n">sum</span><span class="p">((</span><span class="n">walltimestamp</span> <span class="p">/</span> <span class="mi">1000</span><span class="p">)</span> <span class="p">&amp;</span><span class="n">ndash</span><span class="p">;</span> <span class="n">self</span><span class="p">-&gt;</span><span class="n">starttime</span><span class="p">);</span>
+</span><span class='line'><span class="p">}&lt;/</span><span class="n">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;</span><span class="n">END</span>
+</span><span class='line'><span class="p">{&lt;/</span><span class="n">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">pre</span><span class="p">&gt;&lt;</span><span class="n">code</span><span class="p">&gt;</span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;\n&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="n">printf</span><span class="p">(</span><span class="s">&quot;%-10s  %-15s  %s\n&quot;</span><span class="p">,</span> <span class="s">&quot;CLASS&quot;</span><span class="p">,</span> <span class="s">&quot;METHOD&quot;</span><span class="p">,</span> <span class="s">&quot;TOTAL TIME µsec&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="n">printf</span><span class="p">(</span><span class="s">&quot;--------------------------------------------------------------------------------\n&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="n">printa</span><span class="p">(</span><span class="s">&quot;%-10s  %-15s  %@d\n&quot;</span><span class="p">,</span> <span class="err">@</span><span class="n">invoked_time</span><span class="p">);</span>
+</span><span class='line'><span class="p">&lt;/</span><span class="n">code</span><span class="p">&gt;&lt;/</span><span class="n">pre</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><code>/ copyinstr(arg0) == "String" /</code> という記述を追加すると、変数 arg0 が &ldquo;String&rdquo; と一致するときだけ計測されるようになります。</p>
+
+<p>DTrace で上のスクリプトを実行すると次のように、String クラスのメソッドの実行時間の合計が表示されます。</p>
+
+<p>```</p>
+
+<h2>CLASS       METHOD           TOTAL TIME µsec</h2>
+
+<p>String      +:               64
+String      *:               71
+String      index:           68125
+```</p>
+
+<p>わざわざアプリにパフォーマンスを計測するためのコードを追加しなくても、どのメソッドの処理が重たいのかが分かります。</p>
+
+<h2>まとめ</h2>
+
+<p>DTrace を利用すると、アプリケーションは全く変更しなくても実行をトレースすることができます。RubyMotion アプリはもちろん、Ruby 2.0 で DTrace がサポートされると Web アプリでも同様にトレースできることでしょう。</p>
+
+<h2>参考</h2>
+
+<p>MacRuby の DTrace のサンプルです。メソッドの実行回数を計測するスクリプトがあったりします。</p>
+
+<ul>
+<li><a href="https://github.com/MacRuby/MacRubySamples/tree/master/DTrace">https://github.com/MacRuby/MacRubySamples/tree/master/DTrace</a></li>
+</ul>
+
+
+<p>DTrace の基本が書かれています。</p>
+
+<ul>
+<li><a href="http://nippondanji.blogspot.jp/2010/02/ddtrace.html">D言語基礎文法最速マスター（DTraceのほう）</a></li>
+</ul>
+
+
+<p>DTrace についてはオラクルのドキュメントが一番詳しいです。</p>
+
+<ul>
+<li><a href="http://docs.oracle.com/cd/E19253-01/819-0395/">http://docs.oracle.com/cd/E19253-01/819-0395/</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>
