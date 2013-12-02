@@ -4,7 +4,7 @@
   <title><![CDATA[Watson's Blog]]></title>
   <link href="http://watson1978.github.io/atom.xml" rel="self"/>
   <link href="http://watson1978.github.io/"/>
-  <updated>2013-12-02T08:29:33+09:00</updated>
+  <updated>2013-12-03T01:38:13+09:00</updated>
   <id>http://watson1978.github.io/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -30,7 +30,7 @@
 <p>RubocopはRubyGems経由でインストールするできます。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>% gem install robocop</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class=''><span class='line'>% gem install rubocop</span></code></pre></td></tr></table></div></figure>
 
 
 <h2>2.  Emacsのパッケージをインストール</h2>
