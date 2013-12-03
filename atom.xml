@@ -4,7 +4,7 @@
   <title><![CDATA[Watson's Blog]]></title>
   <link href="http://watson1978.github.io/atom.xml" rel="self"/>
   <link href="http://watson1978.github.io/"/>
-  <updated>2013-12-03T01:38:13+09:00</updated>
+  <updated>2013-12-04T01:06:22+09:00</updated>
   <id>http://watson1978.github.io/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -12,6 +12,159 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[問題：次のRubyMotionアプリにはメモリ関連の不具合があります。5分以内に原因箇所を特定せよ。]]></title>
+    <link href="http://watson1978.github.io/blog/2013/12/04/memory-problem/"/>
+    <updated>2013-12-04T01:03:00+09:00</updated>
+    <id>http://watson1978.github.io/blog/2013/12/04/memory-problem</id>
+    <content type="html"><![CDATA[<!-- more -->
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">MyController</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span>
+</span><span class='line'>    <span class="vi">@button</span> <span class="o">=</span> <span class="no">NSButton</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithFrame</span><span class="p">(</span><span class="no">NSMakeRect</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
+</span><span class='line'>    <span class="vi">@button</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Timer Start&quot;</span>
+</span><span class='line'>    <span class="vi">@button</span><span class="o">.</span><span class="n">action</span> <span class="o">=</span> <span class="s2">&quot;actionTapped&quot;</span>
+</span><span class='line'>    <span class="vi">@button</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="nb">self</span>
+</span><span class='line'>    <span class="vi">@button</span><span class="o">.</span><span class="n">bezelStyle</span> <span class="o">=</span> <span class="no">NSRoundedBezelStyle</span>
+</span><span class='line'>    <span class="vi">@button</span><span class="o">.</span><span class="n">autoresizingMask</span> <span class="o">=</span> <span class="no">NSViewMinXMargin</span><span class="o">|</span><span class="no">NSViewMinYMargin</span>
+</span><span class='line'>    <span class="n">app</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">contentView</span><span class="o">.</span><span class="n">addSubview</span><span class="p">(</span><span class="vi">@button</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="vi">@state</span> <span class="o">=</span> <span class="no">NSTextField</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithFrame</span><span class="p">(</span><span class="no">NSMakeRect</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">22</span><span class="p">))</span>
+</span><span class='line'>    <span class="vi">@state</span><span class="o">.</span><span class="n">stringValue</span> <span class="o">=</span> <span class="s2">&quot;0.0&quot;</span>
+</span><span class='line'>    <span class="vi">@state</span><span class="o">.</span><span class="n">autoresizingMask</span> <span class="o">=</span> <span class="no">NSViewMinXMargin</span><span class="o">|</span><span class="no">NSViewMinYMargin</span><span class="o">|</span><span class="no">NSViewWidthSizable</span>
+</span><span class='line'>    <span class="n">app</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">contentView</span><span class="o">.</span><span class="n">addSubview</span><span class="p">(</span><span class="vi">@state</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="vi">@timer</span> <span class="o">=</span> <span class="kp">nil</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">app</span>
+</span><span class='line'>    <span class="no">NSApp</span><span class="o">.</span><span class="n">delegate</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">actionTapped</span>
+</span><span class='line'>    <span class="k">if</span> <span class="vi">@timer</span>
+</span><span class='line'>      <span class="vi">@button</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Timer Start&quot;</span>
+</span><span class='line'>      <span class="vi">@timer</span><span class="o">.</span><span class="n">invalidate</span>
+</span><span class='line'>      <span class="vi">@timer</span> <span class="o">=</span> <span class="kp">nil</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'>      <span class="vi">@button</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Timer Stop&quot;</span>
+</span><span class='line'>      <span class="vi">@duration</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>      <span class="vi">@timer</span> <span class="o">=</span> <span class="no">NSTimer</span><span class="o">.</span><span class="n">scheduledTimerWithTimeInterval</span><span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="ss">target</span><span class="p">:</span><span class="nb">self</span><span class="p">,</span> <span class="ss">selector</span><span class="p">:</span><span class="s1">&#39;timerFired&#39;</span><span class="p">,</span> <span class="ss">userInfo</span><span class="p">:</span><span class="kp">nil</span><span class="p">,</span> <span class="ss">repeats</span><span class="p">:</span><span class="kp">true</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">timerFired</span>
+</span><span class='line'>      <span class="vi">@state</span><span class="o">.</span><span class="n">stringValue</span> <span class="o">=</span> <span class="s2">&quot;%.1f&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="vi">@duration</span> <span class="o">+=</span> <span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>   <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
+</span><span class='line'>  <span class="kp">attr_reader</span> <span class="ss">:window</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">applicationDidFinishLaunching</span><span class="p">(</span><span class="n">notification</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">buildMenu</span>
+</span><span class='line'>    <span class="n">buildWindow</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="no">MyController</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">buildWindow</span>
+</span><span class='line'>    <span class="vi">@window</span> <span class="o">=</span> <span class="no">NSWindow</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithContentRect</span><span class="p">(</span><span class="o">[[</span><span class="mi">240</span><span class="p">,</span> <span class="mi">180</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="mi">240</span><span class="p">,</span> <span class="mi">240</span><span class="o">]]</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">styleMask</span><span class="p">:</span> <span class="no">NSTitledWindowMask</span><span class="o">|</span><span class="no">NSClosableWindowMask</span><span class="o">|</span><span class="no">NSMiniaturizableWindowMask</span><span class="o">|</span><span class="no">NSResizableWindowMask</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">backing</span><span class="p">:</span> <span class="no">NSBackingStoreBuffered</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">defer</span><span class="p">:</span> <span class="kp">false</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="no">NSBundle</span><span class="o">.</span><span class="n">mainBundle</span><span class="o">.</span><span class="n">infoDictionary</span><span class="o">[</span><span class="s1">&#39;CFBundleName&#39;</span><span class="o">]</span>
+</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">orderFrontRegardless</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>再現方法</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sx">% motion </span><span class="n">create</span> <span class="no">Timer</span> <span class="o">--</span><span class="n">template</span><span class="o">=</span><span class="n">osx</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>とRubyMotionアプリのプロジェクトを作成し、`app/app_delegate.rb&#8217;のコードを上記のものに置き換えます。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">%</span> <span class="n">rake</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>を実行するとMacアプリが起動しますので、&#8221;Timer Start&#8221;というボタンをクリックしてください。アプリがクラッシュしますので、原因となっている箇所を探し出してみてください。</p>
+
+<p>問題箇所が分かった場合でも、公にしないでくださいね(。・ω・。)</p>
+
+<h3>解答編</h3>
+
+<p><a href="http://qiita.com/advent-calendar/2013/rubymotion">RubyMotion Advent Calendar 2013</a>の12月7日に簡単に場所を特定する方法を書きたいと思います。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[RubyMotionアプリ開発に、motion-mode + Rubocop を導入]]></title>
@@ -2066,58 +2219,6 @@ Xcode に付属している Instruments が様々な情報を表示できるの�
 <li><a href="http://docs.oracle.com/cd/E19253-01/819-0395/">http://docs.oracle.com/cd/E19253-01/819-0395/</a></li>
 </ul>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[tmux を使用しているとシミュレータでアプリが起動しない]]></title>
-    <link href="http://watson1978.github.io/blog/2012/10/19/rubymotion-can-not-launch-simulator-in-tmux/"/>
-    <updated>2012-10-19T09:06:00+09:00</updated>
-    <id>http://watson1978.github.io/blog/2012/10/19/rubymotion-can-not-launch-simulator-in-tmux</id>
-    <content type="html"><![CDATA[<p>昨日は「<a href="http://connpass.com/event/1201/">第2回 RubyMotion もくもく会</a>」に参加してきました。参加された皆様お疲れ様でした。</p>
-
-<p>今回はそのときに遭遇した現象について書きます。</p>
-
-<!-- more -->
-
-
-<p>「RubyMotion をアップデートした後で、シミュレータが起動しなくなりました」と質問があったので見せていただいたら、<code>rake</code> コマンドでシミュレータを起動しようとすると、以下のようなログが表示されたきり、その後アプリが動き出すこともないしシミュレータが前面に表示されることもありません。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ rake
-</span><span class='line'>     Build ./build/iPhoneSimulator-6.0-Development
-</span><span class='line'>   Compile ./app/app_delegate.rb
-</span><span class='line'>   Compile ./app/hello_view.rb
-</span><span class='line'>   Compile ./app/hello_view_controller.rb
-</span><span class='line'>    Create ./build/iPhoneSimulator-6.0-Development/Hello.app
-</span><span class='line'>      Link ./build/iPhoneSimulator-6.0-Development/Hello.app/Hello
-</span><span class='line'>    Create ./build/iPhoneSimulator-6.0-Development/Hello.app/Info.plist
-</span><span class='line'>    Create ./build/iPhoneSimulator-6.0-Development/Hello.app/PkgInfo
-</span><span class='line'>      Copy ./resources/icon.png
-</span><span class='line'>    Create ./build/iPhoneSimulator-6.0-Development/Hello.dSYM
-</span><span class='line'>  Simulate ./build/iPhoneSimulator-6.0-Development/Hello.app</span></code></pre></td></tr></table></div></figure>
-
-
-<p>CPU 使用率が跳ね上がることもなく、<code>rake debug=1</code> や <code>rake mode=release</code> といろいろ起動方法を変えても、RubyMotion をダウングレードしても Mac を再起動しても相変わらずシミュレータはうんともすんとも言ってくれません。どうやら tmux の問題らしく、<a href="https://twitter.com/satococoa">@satococoa</a> さんに教えていただいた回避方法は、以下のものです。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew install reattach-to-user-namespace
-</span><span class='line'>$ echo 'set-option -g default-command "reattach-to-user-namespace -l zsh"' &gt;&gt; .tmux.conf</span></code></pre></td></tr></table></div></figure>
-
-
-<p>tmux を使っていると何か問題があるというのは聞いたことがあるのですが、こんな現象だとは初めて知りました。知らないとずっとハマってしまいそうな現象ですね。tmux を使われている方はご注意ください。</p>
 ]]></content>
   </entry>
   
