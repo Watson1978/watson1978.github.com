@@ -72,7 +72,7 @@
   
 </ul>
   
-<form action="http://google.com/search" method="get">
+<form action="https://www.google.com/search" method="get">
   <fieldset role="search">
     <input type="hidden" name="q" value="site:watson1978.github.io" />
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
@@ -146,7 +146,7 @@
 <p>アプリケーションが起動する際にインスタンス化され呼び出されるクラスとして、<code>AppDelegate</code> があります。Xcode でプロジェクトを作成する際にも同盟のクラスが自動的に作成されます。シンボルが衝突したりすると面倒なので、クラス名を <code>AppDelegate</code> から <code>StaticAppDelegate</code> などに変更しておきます (<code>AppDelegate</code> そのものを削除しても良いのですが、RubyMotion で動作確認できなくなってしまうので、このようにしてます)。</p>
 
 <figure class='code'><figcaption><span>app/app_delegate.rb </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -162,7 +162,7 @@
 <p><code>Rakefile</code> を修正し <code>app.delegate_class</code> を設定して delegate クラスを変更したことを設定しておきます。</p>
 
 <figure class='code'><figcaption><span>Rakefile </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -180,7 +180,7 @@
 <p>ライブラリ化するコードを記述していきます。ここでは、文字列から UIColor オブジェクトを作成するものを書きました。</p>
 
 <figure class='code'><figcaption><span>app/app_delegate.rb </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -252,7 +252,7 @@
 <p>次に <code>main.m</code> をに以下のようにコードを追加します。<code>RubyMotionInit()</code> を呼び出すと、RubyMotion で用意したコードの初期処理が行われ、クラスなどが構築され Objective-C から利用できるようになります。</p>
 
 <figure class='code'><figcaption><span>main.m </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -268,7 +268,7 @@
 <p>あとは Objective-C から利用します。</p>
 
 <figure class='code'><figcaption><span>AppDelegate.m </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>

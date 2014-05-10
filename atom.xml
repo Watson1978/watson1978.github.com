@@ -4,7 +4,7 @@
   <title><![CDATA[Watson's Blog]]></title>
   <link href="http://watson1978.github.io/atom.xml" rel="self"/>
   <link href="http://watson1978.github.io/"/>
-  <updated>2014-02-05T14:22:49+09:00</updated>
+  <updated>2014-05-10T23:09:26+09:00</updated>
   <id>http://watson1978.github.io/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -639,7 +639,7 @@
 <p>アプリケーションが起動する際にインスタンス化され呼び出されるクラスとして、<code>AppDelegate</code> があります。Xcode でプロジェクトを作成する際にも同盟のクラスが自動的に作成されます。シンボルが衝突したりすると面倒なので、クラス名を <code>AppDelegate</code> から <code>StaticAppDelegate</code> などに変更しておきます (<code>AppDelegate</code> そのものを削除しても良いのですが、RubyMotion で動作確認できなくなってしまうので、このようにしてます)。</p>
 
 <figure class='code'><figcaption><span>app/app_delegate.rb </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -655,7 +655,7 @@
 <p><code>Rakefile</code> を修正し <code>app.delegate_class</code> を設定して delegate クラスを変更したことを設定しておきます。</p>
 
 <figure class='code'><figcaption><span>Rakefile </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -673,7 +673,7 @@
 <p>ライブラリ化するコードを記述していきます。ここでは、文字列から UIColor オブジェクトを作成するものを書きました。</p>
 
 <figure class='code'><figcaption><span>app/app_delegate.rb </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -745,7 +745,7 @@
 <p>次に <code>main.m</code> をに以下のようにコードを追加します。<code>RubyMotionInit()</code> を呼び出すと、RubyMotion で用意したコードの初期処理が行われ、クラスなどが構築され Objective-C から利用できるようになります。</p>
 
 <figure class='code'><figcaption><span>main.m </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -761,7 +761,7 @@
 <p>あとは Objective-C から利用します。</p>
 
 <figure class='code'><figcaption><span>AppDelegate.m </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -799,7 +799,7 @@
 
 
 
-<script async class="speakerdeck-embed" data-id="9f6aa220aaaa01303c9b3e7747c857c8" data-ratio="1.2994923857868" src="http://watson1978.github.io//speakerdeck.com/assets/embed.js"></script>
+<script async class="speakerdeck-embed" data-id="9f6aa220aaaa01303c9b3e7747c857c8" data-ratio="1.2994923857868" src="//speakerdeck.com/assets/embed.js"></script>
 
 
 <p>話した内容はひととおりスライドに書いてあるので、補足的に Ruby と Objective-C のコードを組み合わせて実行しているところを説明したいと思います。</p>
@@ -1590,7 +1590,7 @@
 <h2>検索するツールを作りました</h2>
 
 <figure class='code'><figcaption><span>rbfind </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -1834,7 +1834,7 @@
 <p>Jenkins はスクリプトの終了コードを見て、成功なのか失敗なのかを判断しているようです。テストがすべて成功したときだけ SUCCESS としてほしいところです。そこで次の <code>run_spec</code> というファイルを作成してパスが通っているところに配置し、Jenkins で実行するようにしました。</p>
 
 <figure class='code'><figcaption><span>run_spec </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
