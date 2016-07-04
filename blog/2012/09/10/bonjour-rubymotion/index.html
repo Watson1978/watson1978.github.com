@@ -107,7 +107,7 @@
   
 
 
-<time datetime="2012-09-10T17:03:00+09:00" pubdate data-updated="true">Sep 10<span>th</span>, 2012</time>
+<time datetime="2012-09-10T17:03:00+09:00" pubdate data-updated="true"></time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -176,17 +176,17 @@
 </span><span class='line'>    <span class="c1"># NSNetServiceBrowser を使ってサービスを検索</span>
 </span><span class='line'>    <span class="vi">@netServiceBrowser</span> <span class="o">=</span> <span class="no">NSNetServiceBrowser</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">init</span>
 </span><span class='line'>    <span class="vi">@netServiceBrowser</span><span class="o">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="nb">self</span>
-</span><span class='line'>    <span class="vi">@netServiceBrowser</span><span class="o">.</span><span class="n">searchForServicesOfType</span><span class="p">(</span><span class="s2">&quot;_http._tcp&quot;</span><span class="p">,</span> <span class="n">inDomain</span><span class="ss">:&quot;local&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@netServiceBrowser</span><span class="o">.</span><span class="n">searchForServicesOfType</span><span class="p">(</span><span class="s2">&quot;_http._tcp&quot;</span><span class="p">,</span> <span class="ss">inDomain</span><span class="p">:</span><span class="s2">&quot;local&quot;</span><span class="p">)</span>
 </span><span class='line'>    <span class="nb">self</span>
 </span><span class='line'>  <span class="k">end</span>
 </span><span class='line'>
 </span><span class='line'>  <span class="k">def</span> <span class="nf">netServiceBrowser</span><span class="p">(</span><span class="n">netServiceBrowser</span><span class="p">,</span>
-</span><span class='line'>                        <span class="n">didFindService</span><span class="p">:</span> <span class="n">service</span><span class="p">,</span>
-</span><span class='line'>                        <span class="n">moreComing</span><span class="p">:</span> <span class="n">moreComing</span><span class="p">)</span>
+</span><span class='line'>                        <span class="ss">didFindService</span><span class="p">:</span> <span class="n">service</span><span class="p">,</span>
+</span><span class='line'>                        <span class="ss">moreComing</span><span class="p">:</span> <span class="n">moreComing</span><span class="p">)</span>
 </span><span class='line'>    <span class="vi">@netServiceBrowser</span><span class="o">.</span><span class="n">stop</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="c1"># NSNetService を使って接続先のアドレスを解決</span>
-</span><span class='line'>    <span class="vi">@service</span> <span class="o">=</span> <span class="no">NSNetService</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithDomain</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">type</span><span class="ss">:service</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="nb">name</span><span class="ss">:service</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@service</span> <span class="o">=</span> <span class="no">NSNetService</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithDomain</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="ss">type</span><span class="p">:</span><span class="n">service</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="nb">name</span><span class="ss">:service</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </span><span class='line'>    <span class="vi">@service</span><span class="o">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="nb">self</span>
 </span><span class='line'>    <span class="vi">@service</span><span class="o">.</span><span class="n">resolveWithTimeout</span><span class="p">(</span><span class="mi">5</span><span class="o">.</span><span class="mi">0</span><span class="p">)</span>
 </span><span class='line'>  <span class="k">end</span>
@@ -206,9 +206,9 @@
 </span><span class='line'><span class="k">end</span>
 </span><span class='line'>
 </span><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="ss">:launchOptions</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="ss">didFinishLaunchingWithOptions</span><span class="p">:</span><span class="n">launchOptions</span><span class="p">)</span>
 </span><span class='line'>    <span class="vi">@window</span> <span class="o">=</span> <span class="no">UIWindow</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithFrame</span><span class="p">(</span><span class="no">UIScreen</span><span class="o">.</span><span class="n">mainScreen</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
-</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">rootViewController</span> <span class="o">=</span> <span class="no">BJController</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithNibName</span><span class="p">(</span><span class="kp">nil</span><span class="p">,</span> <span class="n">bundle</span><span class="p">:</span> <span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">rootViewController</span> <span class="o">=</span> <span class="no">BJController</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithNibName</span><span class="p">(</span><span class="kp">nil</span><span class="p">,</span> <span class="ss">bundle</span><span class="p">:</span> <span class="kp">nil</span><span class="p">)</span>
 </span><span class='line'>    <span class="vi">@window</span><span class="o">.</span><span class="n">makeKeyAndVisible</span>
 </span><span class='line'>    <span class="kp">true</span>
 </span><span class='line'>  <span class="k">end</span>
@@ -243,12 +243,12 @@
   
 
 
-<time datetime="2012-09-10T17:03:00+09:00" pubdate data-updated="true">Sep 10<span>th</span>, 2012</time>
+<time datetime="2012-09-10T17:03:00+09:00" pubdate data-updated="true"></time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/macruby/'>MacRuby</a>, <a class='category' href='/blog/categories/rubymotion/'>RubyMotion,</a>
+    <a class='category' href='/blog/categories/macruby/'>macruby</a>, <a class='category' href='/blog/categories/rubymotion/'>rubymotion,</a>
   
 </span>
 
@@ -313,6 +313,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/07/04/how-to-setup-android-environment/">Android セットアップ手順</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/12/08/find-memory-problem-2/">RubyMotion アプリのメモリ関連の不具合を簡単に探す方法(2)</a>
       </li>
     
@@ -326,10 +330,6 @@
     
       <li class="post">
         <a href="/blog/2013/12/02/development-rubymotion-app-with-motion-mode-plus-rubocop/">RubyMotionアプリ開発に、motion-mode + Rubocop を導入</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/09/10/using-newest-or-previous-rubymotion/">最新の RubyMotion の試し方</a>
       </li>
     
   </ul>
@@ -363,7 +363,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Watson -
+  Copyright &copy; 2016 - Watson -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

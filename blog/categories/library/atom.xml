@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Library | Watson's Blog]]></title>
+  <title><![CDATA[Category: library | Watson's Blog]]></title>
   <link href="http://watson1978.github.io/blog/categories/library/atom.xml" rel="self"/>
   <link href="http://watson1978.github.io/"/>
-  <updated>2014-05-10T23:09:26+09:00</updated>
+  <updated>2016-07-04T18:10:46+09:00</updated>
   <id>http://watson1978.github.io/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -41,39 +41,35 @@
 
 <p>Terminal で作成したプロジェクトのディレクトリに移動します。今回は &ldquo;foo&rdquo; という名前でプロジェクトを作成しています。</p>
 
-<p><code>
-$ ls
+<pre><code>$ ls
 foo/           foo.xcodeproj/
-</code></p>
+</code></pre>
 
 <p>ARM バイナリを作成します。</p>
 
-<p><code>
-$ xcodebuild -arch armv6 -arch armv7 -arch armv7s
-$ file build/Release-iphoneos/libfoo.a
+<pre><code>$ xcodebuild -arch armv6 -arch armv7 -arch armv7s
+$ file build/Release-iphoneos/libfoo.a 
 build/Release-iphoneos/libfoo.a: Mach-O universal binary with 2 architectures
 build/Release-iphoneos/libfoo.a (for architecture armv6):   current ar archive random library
 build/Release-iphoneos/libfoo.a (for architecture armv7):   current ar archive random library
-</code></p>
+</code></pre>
 
 <p>i386 バイナリは SDK に iphonesimulator を指定するとビルドされるようです。</p>
 
-<p><code>
-$ xcodebuild -sdk iphonesimulator
-$ file build/Release-iphonesimulator/libfoo.a
+<pre><code>$ xcodebuild -sdk iphonesimulator
+$ file build/Release-iphonesimulator/libfoo.a 
 build/Release-iphonesimulator/libfoo.a: current ar archive random library
-</code></p>
+</code></pre>
 
 <p>ライブラリファイルが 2 つになってしまったので、<code>lipo</code> コマンドを使って 1 つに結合します。</p>
 
-<p><code>
-$ lipo -create build/Release-iphoneos/libfoo.a build/Release-iphonesimulator/libfoo.a -output libfoo.a
-$ file libfoo.a
+<pre><code>$ lipo -create build/Release-iphoneos/libfoo.a build/Release-iphonesimulator/libfoo.a -output libfoo.a
+$ file libfoo.a 
 libfoo.a: Mach-O universal binary with 3 architectures
 libfoo.a (for architecture armv6): current ar archive random library
 libfoo.a (for architecture armv7): current ar archive random library
 libfoo.a (for architecture i386):  current ar archive random library
-</code></p>
+</code></pre>
 
 <p>これで欲しかったライブラリができあがりました。</p>
 

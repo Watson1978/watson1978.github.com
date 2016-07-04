@@ -107,7 +107,7 @@
   
 
 
-<time datetime="2012-08-30T08:42:00+09:00" pubdate data-updated="true">Aug 30<span>th</span>, 2012</time>
+<time datetime="2012-08-30T08:42:00+09:00" pubdate data-updated="true"></time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -133,9 +133,9 @@
 
 <p><img src="/images/blog/analytics_create_account.png" alt="アカウントの追加" /></p>
 
-<p>「ウェブサイトのURL」では &ldquo;ウェブサイト以外&#8221;、「タイムゾーン」は &#8220;日本&rdquo; を選択しておくとよいでしょう。</p>
+<p>「ウェブサイトのURL」では &ldquo;ウェブサイト以外"、「タイムゾーン」は "日本&rdquo; を選択しておくとよいでしょう。</p>
 
-<p>アカウントを作成した後、&#8221;UA-xxxxxxxx-1&#8221; のようなトラッキング ID が発行されます。あとで使用するので控えておいてください。</p>
+<p>アカウントを作成した後、"UA-xxxxxxxx-1" のようなトラッキング ID が発行されます。あとで使用するので控えておいてください。</p>
 
 <h2>Google Analytics SDK for iOS をダウンロード</h2>
 
@@ -151,7 +151,7 @@
 </pre></td><td class='code'><pre><code class=''><span class='line'>$ motion create HelloAnalytics</span></code></pre></td></tr></table></div></figure>
 
 
-<p>先ほどダウンロードした SDK のアーカイブを展開し、&#8221;Library&#8221; ディレクトリをプロジェクトに追加します。まずプロジェクトに &ldquo;vendor&rdquo; ディレクトリを作成しましょう。</p>
+<p>先ほどダウンロードした SDK のアーカイブを展開し、"Library" ディレクトリをプロジェクトに追加します。まずプロジェクトに &ldquo;vendor&rdquo; ディレクトリを作成しましょう。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -195,7 +195,7 @@
 </span><span class='line'><span class="vg">$:</span><span class="o">.</span><span class="n">unshift</span><span class="p">(</span><span class="s2">&quot;/Library/RubyMotion/lib&quot;</span><span class="p">)</span>
 </span><span class='line'><span class="nb">require</span> <span class="s1">&#39;motion/project&#39;</span>
 </span><span class='line'>
-</span><span class='line'><span class="no">Motion</span><span class="o">::</span><span class="no">Project</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
+</span><span class='line'><span class="ss">Motion</span><span class="p">:</span><span class="ss">:Project</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
 </span><span class='line'>  <span class="c1"># Use `rake config&#39; to see complete project settings.</span>
 </span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;HelloAnalytics&#39;</span>
 </span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">vendor_project</span><span class="p">(</span><span class="s1">&#39;vendor/Library&#39;</span><span class="p">,</span>
@@ -231,15 +231,15 @@
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="ss">:launchOptions</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="ss">didFinishLaunchingWithOptions</span><span class="p">:</span><span class="n">launchOptions</span><span class="p">)</span>
 </span><span class='line'>    <span class="no">GANTracker</span><span class="o">.</span><span class="n">sharedTracker</span><span class="o">.</span><span class="n">startTrackerWithAccountID</span><span class="p">(</span><span class="s2">&quot;UA-xxxxxxxx-1&quot;</span><span class="p">,</span>
-</span><span class='line'>                                                       <span class="n">dispatchPeriod</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-</span><span class='line'>                                                       <span class="n">delegate</span><span class="p">:</span> <span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>                                                       <span class="ss">dispatchPeriod</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+</span><span class='line'>                                                       <span class="ss">delegate</span><span class="p">:</span> <span class="kp">nil</span><span class="p">)</span>
 </span><span class='line'>
 </span><span class='line'>
 </span><span class='line'>    <span class="n">error</span> <span class="o">=</span> <span class="no">Pointer</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:object</span><span class="p">)</span>
 </span><span class='line'>    <span class="k">unless</span> <span class="no">GANTracker</span><span class="o">.</span><span class="n">sharedTracker</span><span class="o">.</span><span class="n">trackPageview</span><span class="p">(</span><span class="s2">&quot;/app_entry_point&quot;</span><span class="p">,</span>
-</span><span class='line'>                                                  <span class="n">withError</span><span class="p">:</span> <span class="n">error</span><span class="p">)</span>
+</span><span class='line'>                                                  <span class="ss">withError</span><span class="p">:</span> <span class="n">error</span><span class="p">)</span>
 </span><span class='line'>      <span class="c1"># Handle error here</span>
 </span><span class='line'>    <span class="k">end</span>
 </span><span class='line'>
@@ -278,12 +278,12 @@
   
 
 
-<time datetime="2012-08-30T08:42:00+09:00" pubdate data-updated="true">Aug 30<span>th</span>, 2012</time>
+<time datetime="2012-08-30T08:42:00+09:00" pubdate data-updated="true"></time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/rubymotion/'>RubyMotion</a>
+    <a class='category' href='/blog/categories/rubymotion/'>rubymotion</a>
   
 </span>
 
@@ -348,6 +348,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/07/04/how-to-setup-android-environment/">Android セットアップ手順</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/12/08/find-memory-problem-2/">RubyMotion アプリのメモリ関連の不具合を簡単に探す方法(2)</a>
       </li>
     
@@ -361,10 +365,6 @@
     
       <li class="post">
         <a href="/blog/2013/12/02/development-rubymotion-app-with-motion-mode-plus-rubocop/">RubyMotionアプリ開発に、motion-mode + Rubocop を導入</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/09/10/using-newest-or-previous-rubymotion/">最新の RubyMotion の試し方</a>
       </li>
     
   </ul>
@@ -398,7 +398,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Watson -
+  Copyright &copy; 2016 - Watson -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

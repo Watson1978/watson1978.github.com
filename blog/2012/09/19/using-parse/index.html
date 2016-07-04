@@ -107,7 +107,7 @@
   
 
 
-<time datetime="2012-09-19T17:15:00+09:00" pubdate data-updated="true">Sep 19<span>th</span>, 2012</time>
+<time datetime="2012-09-19T17:15:00+09:00" pubdate data-updated="true"></time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -137,7 +137,7 @@
 
 <p><a href="https://www.parse.com/apps/quickstart">Quick Start</a> ページで Parse SDK の簡単な導入方法について説明が書かれていますので、これに従って作業してみましょう。</p>
 
-<p>「1 Choose your platform」で、&#8221;iOS&#8221; と &ldquo;Existing Project&rdquo; を選択しておきます。(&ldquo;Existing Project&rdquo; を選択しておくと、SDK のみをダウンロードしやすいので)。</p>
+<p>「1 Choose your platform」で、"iOS" と &ldquo;Existing Project&rdquo; を選択しておきます。(&ldquo;Existing Project&rdquo; を選択しておくと、SDK のみをダウンロードしやすいので)。</p>
 
 <p><img src="/images/blog/parse_choose_platform.png" alt="Choose your platform" /></p>
 
@@ -207,7 +207,7 @@
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Motion</span><span class="o">::</span><span class="no">Project</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="ss">Motion</span><span class="p">:</span><span class="ss">:Project</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
 </span><span class='line'>  <span class="c1"># Use `rake config&#39; to see complete project settings.</span>
 </span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;HelloParse&#39;</span>
 </span><span class='line'>
@@ -236,12 +236,12 @@
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="ss">:launchOptions</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="ss">didFinishLaunchingWithOptions</span><span class="p">:</span><span class="n">launchOptions</span><span class="p">)</span>
 </span><span class='line'>    <span class="no">Parse</span><span class="o">.</span><span class="n">setApplicationId</span><span class="p">(</span><span class="s2">&quot;&lt;Application-Id&gt;&quot;</span><span class="p">,</span>
-</span><span class='line'>                           <span class="n">clientKey</span><span class="ss">:&quot;&lt;Client-Key&gt;&quot;</span><span class="p">)</span>
+</span><span class='line'>                           <span class="ss">clientKey</span><span class="p">:</span><span class="s2">&quot;&lt;Client-Key&gt;&quot;</span><span class="p">)</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="n">obj</span> <span class="o">=</span> <span class="no">PFObject</span><span class="o">.</span><span class="n">objectWithClassName</span><span class="p">(</span><span class="s2">&quot;TestObject&quot;</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">obj</span><span class="o">.</span><span class="n">setObject</span><span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="n">forKey</span><span class="ss">:&quot;foo&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">obj</span><span class="o">.</span><span class="n">setObject</span><span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="ss">forKey</span><span class="p">:</span><span class="s2">&quot;foo&quot;</span><span class="p">)</span>
 </span><span class='line'>    <span class="n">obj</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
 </span><span class='line'>    <span class="kp">true</span>
 </span><span class='line'>  <span class="k">end</span>
@@ -287,12 +287,12 @@ Facebook SDK を追加していただくか、<a href="http://stackoverflow.com/
   
 
 
-<time datetime="2012-09-19T17:15:00+09:00" pubdate data-updated="true">Sep 19<span>th</span>, 2012</time>
+<time datetime="2012-09-19T17:15:00+09:00" pubdate data-updated="true"></time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/rubymotion/'>RubyMotion</a>
+    <a class='category' href='/blog/categories/rubymotion/'>rubymotion</a>
   
 </span>
 
@@ -357,6 +357,10 @@ Facebook SDK を追加していただくか、<a href="http://stackoverflow.com/
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/07/04/how-to-setup-android-environment/">Android セットアップ手順</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/12/08/find-memory-problem-2/">RubyMotion アプリのメモリ関連の不具合を簡単に探す方法(2)</a>
       </li>
     
@@ -370,10 +374,6 @@ Facebook SDK を追加していただくか、<a href="http://stackoverflow.com/
     
       <li class="post">
         <a href="/blog/2013/12/02/development-rubymotion-app-with-motion-mode-plus-rubocop/">RubyMotionアプリ開発に、motion-mode + Rubocop を導入</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/09/10/using-newest-or-previous-rubymotion/">最新の RubyMotion の試し方</a>
       </li>
     
   </ul>
@@ -407,7 +407,7 @@ Facebook SDK を追加していただくか、<a href="http://stackoverflow.com/
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Watson -
+  Copyright &copy; 2016 - Watson -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

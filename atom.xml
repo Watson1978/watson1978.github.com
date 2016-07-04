@@ -4,7 +4,7 @@
   <title><![CDATA[Watson's Blog]]></title>
   <link href="http://watson1978.github.io/atom.xml" rel="self"/>
   <link href="http://watson1978.github.io/"/>
-  <updated>2014-05-10T23:09:26+09:00</updated>
+  <updated>2016-07-04T18:10:46+09:00</updated>
   <id>http://watson1978.github.io/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -12,6 +12,163 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Android セットアップ手順]]></title>
+    <link href="http://watson1978.github.io/blog/2016/07/04/how-to-setup-android-environment/"/>
+    <updated>2016-07-04T17:29:54+09:00</updated>
+    <id>http://watson1978.github.io/blog/2016/07/04/how-to-setup-android-environment</id>
+    <content type="html"><![CDATA[<!-- more -->
+
+
+<h2>SDK / NDK をインストール</h2>
+
+<p>あらかじめ JDK 7 か JDK 8 をインストールしておいてください。</p>
+
+<p>RubyMotion をインストールした後、<code>motion android-setup</code> とターミナルでコマンドを実行し必要となる SDK や NDK をインストールします。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ motion android-setup</span></code></pre></td></tr></table></div></figure>
+
+
+<p>途中で、以下のようにライセンスの同意を求められる場合があるので、<code>y</code> で同意し進みます。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>November 20, 2015
+</span><span class='line'>Do you accept the license 'android-sdk-license-c81a61d9' [y/n]: </span></code></pre></td></tr></table></div></figure>
+
+
+<p>最低限必要となる SDK や NDK がインストールされると、Android SDK Manager のウィンドウが表示されます。</p>
+
+<p><img src="http://watson1978.github.io/images/blog/Android/Android_SDK_Manager.png" alt="Android SDK Manager" /></p>
+
+<p><code>motion android-setup</code> は、SDK や NDK をデフォルトで <code>~/.rubymotion-android</code> ディレクトリにインストールします。</p>
+
+<p>開発の際にはエミュレータを用意することで、Android のデバイスがなくても開発できるようになります。</p>
+
+<p>ここでは、Genymotion と Android エミュレータのセットアップ方法を示してますが、どちらかお好みの方だけで良いです。Genymotion を利用する方が簡単なのでお勧めです。</p>
+
+<h2>Genymotion のセットアップ</h2>
+
+<p><a href="https://www.genymotion.com">https://www.genymotion.com</a> からインストーラをダウンロードするか、<a href="https://caskroom.github.io">Homebrew Cask</a> を利用しインストールします。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew cask install genymotion</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>Genymotion.app</code> を起動すると次のようなウィンドウが表示されます。
+<img src="http://watson1978.github.io/images/blog/Android/Genymotion.png" alt="Genymotion" /></p>
+
+<p><code>Add</code> をクリックしデバイスを追加し、使用したいデバイスを選択しインストールします。
+<img src="http://watson1978.github.io/images/blog/Android/Virtual_device_creation_wizard.png" alt="Virtual device creation wizard" /></p>
+
+<p><code>Next</code>をクリックしデバイスを作成します。
+<img src="http://watson1978.github.io/images/blog/Android/Create_a_new_virtual_device.png" alt="Create a new virtual device.png (113.5 kB)" /></p>
+
+<p>インストールが完了したあと、最初の画面で <code>Start</code> をクリックするとデバイスが起動し開発に利用できるようになります。</p>
+
+<h2>Android エミュレータのセットアップ</h2>
+
+<h3>1. System Image と Accelerator をインストール</h3>
+
+<p>エミュレータのセットアップに System Image と Accelerator が必要となるのでインストールします。</p>
+
+<p>System Image は Android のバージョンが書かれた項目にある、以下の 2 項目をチェックします。
+- Intel x86 Atom System Image
+- Google APIs Intel x86 Atom System Image</p>
+
+<p><img src="http://watson1978.github.io/images/blog/Android/Android_SDK_Manager_System_Image.png" alt="Android SDK Manager System Image" /></p>
+
+<p>Accelerator は Extras という項目にある
+- Intel x86 Emulator Accelerator (HAXM installer)
+をチェックします。</p>
+
+<p><img src="http://watson1978.github.io/images/blog/Android/Android_SDK_Manager_Accelerator.png" alt="Android SDK Manager Accelerator" /></p>
+
+<p>”install 3 packages&hellip;&ldquo; のように表示されているボタンをクリックし、ライセンスに同意するとインストールされます。</p>
+
+<h3>2. Accelerator をセットアップ</h3>
+
+<p>上記でダウンロードした Intel x86 Emulator Accelerator (HAXM installer) をセットアップします。<code>~/.rubymotion-android/sdk/extras/intel/Hardware_Accelerated_Execution_Manager/</code> にダウンロードされます。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$find ~/.rubymotion-android/sdk/extras -name "IntelHAXM_*.dmg" | xargs open</span></code></pre></td></tr></table></div></figure>
+
+
+<p>のようにインストーラを開きインストールします。</p>
+
+<p><img src="http://watson1978.github.io/images/blog/Android/Intel_Hardware_Accelerated_Execution_Manager.png" alt="Intel Hardware Accelerated Execution Manager" /></p>
+
+<h3>3. エミュレータをセットアップ</h3>
+
+<p><code>Android Virtual Device (AVD) Manager</code> を使ってセットアップします。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ ~/.rubymotion-android/sdk/tools/android avd</span></code></pre></td></tr></table></div></figure>
+
+
+<p>とコマンドをターミナルで実行すると AVD が起動します。</p>
+
+<p><img src="http://watson1978.github.io/images/blog/Android/AVD.png" alt="AVD.png (103.1 kB)" /></p>
+
+<p><code>Create</code> ボタンをクリックしてデバイスを作成します。</p>
+
+<table>
+<thead>
+<tr>
+<th> 項目 </th>
+<th> 値  </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> AVD Name </td>
+<td> RubyMotion </td>
+</tr>
+<tr>
+<td> Device </td>
+<td> Nexus 6 (5.96", 1440 x 2560: 560dpi)  </td>
+</tr>
+<tr>
+<td>  Target </td>
+<td> Android 6.0 - API Level 23 </td>
+</tr>
+<tr>
+<td> CPU/ABI </td>
+<td> Google APIs Intel Atom (x86) </td>
+</tr>
+<tr>
+<td> Skin </td>
+<td> No Skin </td>
+</tr>
+<tr>
+<td> Emulation Options: Use Host GPU </td>
+<td> ✓ </td>
+</tr>
+</tbody>
+</table>
+
+
+<p>上記のように各項目を設定します。</p>
+
+<p><img src="http://watson1978.github.io/images/blog/Android/Create_new_Android_Virtual_Device.png" alt="Create new Android Virtual Device" /></p>
+
+<p><code>OK</code> をクリックしデバイスを作成します。</p>
+
+<h3>4. エミュレータの起動</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ ~/.rubymotion-android/sdk/tools/android avd</span></code></pre></td></tr></table></div></figure>
+
+
+<p>で AVD を起動し <code>Start</code> をクリックするとエミュレータが起動します。<code>emulator</code> コマンドを使うとコマンドラインから直接起動することもできます。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ ~/.rubymotion-android/sdk/tools/emulator -avd RubyMotion</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[RubyMotion アプリのメモリ関連の不具合を簡単に探す方法(2)]]></title>
@@ -59,7 +216,7 @@
 
 <h2>1. Instrumentsを使う</h2>
 
-<p>RubyMotion 2.12でInstrumentsを簡単に使えるようになりました。まずは、Instrumentsを使用して不具合があるかどうか確認しておきましょう。今回は&#8221;Zombies&#8221;というテンプレートを用います。</p>
+<p>RubyMotion 2.12でInstrumentsを簡単に使えるようになりました。まずは、Instrumentsを使用して不具合があるかどうか確認しておきましょう。今回は"Zombies"というテンプレートを用います。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>% rake profile template="Zombies"</span></code></pre></td></tr></table></div></figure>
@@ -73,7 +230,7 @@
 
 <p>メモリが解放されてしまったオブジェクトにメッセージを送信してクラッシュしていることがわかります。残念ながら、シンボルが削除されていてなにが原因なのかまではわかりません。</p>
 
-<p>&ldquo;Zombie Messaged&#8221;と表示されない場合には、今回の手順では不具合箇所を探すことができないので、別の方法を模索してください。</p>
+<p>&ldquo;Zombie Messaged"と表示されない場合には、今回の手順では不具合箇所を探すことができないので、別の方法を模索してください。</p>
 
 <h2>2. 意図せず解放されているオブジェクトを探す</h2>
 
@@ -137,7 +294,7 @@
 <h2>3. 余談</h2>
 
 <p><code>RubyObject</code>ではなく<code>NSObject</code>に対してメソッドをオーバーライドしてみたのですが、うまくいかなかったのでこのようになっています。
-<code>String</code>クラスが<code>String</code>&ndash;><code>NSMutableString</code>&ndash;><code>NSString</code>&ndash;><code>NSObject</code>と継承しているせいなのか<code>dealloc</code>で文字列を扱うと、文字列生成->dealloc->文字列生成->dealloc->&hellip;と無限に繰り返されてしまい、クラッシュしてしまいます。</p>
+<code>String</code>クラスが<code>String</code>-><code>NSMutableString</code>-><code>NSString</code>-><code>NSObject</code>と継承しているせいなのか<code>dealloc</code>で文字列を扱うと、文字列生成->dealloc->文字列生成->dealloc->&hellip;と無限に繰り返されてしまい、クラッシュしてしまいます。</p>
 
 <p>組み込みの<code>String</code>クラスに影響を与えないために<code>RubyObject</code>を使用しています。おおよそ以下の図のような構成になっているはずです。このため、組み込みクラスやiOS SDKのクラスを継承しているものや、それらが影響して解放されてしまっているようなものは、今回の方法では検出できません。</p>
 
@@ -281,14 +438,14 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>とRubyMotionアプリのプロジェクトを作成し、`app/app_delegate.rb&#8217;のコードを上記のものに置き換えます。</p>
+<p>とRubyMotionアプリのプロジェクトを作成し、`app/app_delegate.rb'のコードを上記のものに置き換えます。</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">%</span> <span class="n">rake</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>を実行するとMacアプリが起動しますので、&#8221;Timer Start&#8221;というボタンをクリックしてください。アプリがクラッシュしますので、原因となっている箇所を探し出してみてください。</p>
+<p>を実行するとMacアプリが起動しますので、"Timer Start"というボタンをクリックしてください。アプリがクラッシュしますので、原因となっている箇所を探し出してみてください。</p>
 
 <p>問題箇所が分かった場合でも、公にしないでくださいね(。・ω・。)</p>
 
@@ -999,7 +1156,7 @@
 <p>@satococoa さんが発表の前に壇上からアンケートをとっていたので興味深く拝見しました。</p>
 
 <ul>
-<li>RubyMotion の認知度は 8 &ndash; 9 割くらい。<a href="https://twitter.com/satococoa">@satococoa</a> さんや <a href="https://twitter.com/naoya_ito">@naoya_ito</a> さんの宣伝のおかげですね。ありがとうございます。</li>
+<li>RubyMotion の認知度は 8 - 9 割くらい。<a href="https://twitter.com/satococoa">@satococoa</a> さんや <a href="https://twitter.com/naoya_ito">@naoya_ito</a> さんの宣伝のおかげですね。ありがとうございます。</li>
 <li>購入した方は、ぱっと見て居ないんじゃないかと言うくらい・・・。</li>
 </ul>
 
@@ -1668,230 +1825,6 @@
 <p>完全に一致した場合に表示しているので、インスタンス変数を調べるときには <code>@front</code> のように ワードを指定します。</p>
 
 <p>短いメソッドなどを探すのが楽になるかなと思っていますが、いかがでしたでしょうか。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[RubyMotion アプリを Jenkins でテスト実行してみよう]]></title>
-    <link href="http://watson1978.github.io/blog/2012/12/07/jenkins/"/>
-    <updated>2012-12-07T00:00:00+09:00</updated>
-    <id>http://watson1978.github.io/blog/2012/12/07/jenkins</id>
-    <content type="html"><![CDATA[<p>この記事は <a href="http://www.adventar.org/calendars/18">RubyMotion Advent Calendar 2012</a> の 7 日目の記事です。</p>
-
-<p>最近になってようやく Jenkins を使い始めてみたので、RubyMotion アプリを Jenkins でテスト実行する方法について調べてみました。</p>
-
-<!-- more -->
-
-
-<h2>Jenkins をインストール</h2>
-
-<p>Homebrew を利用してインストールしました。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew install jenkins</span></code></pre></td></tr></table></div></figure>
-
-
-<p>以下のコマンドを実行すると Jenkins が起動します。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ java -jar /usr/local/opt/jenkins/libexec/jenkins.war</span></code></pre></td></tr></table></div></figure>
-
-
-<p>ログインしたときに自動的に Jenkins を起動したい場合には以下のコマンドを実行すると良いようです。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ ln -sfv /usr/local/opt/jenkins/*.plist ~/Library/LaunchAgents
-</span><span class='line'>$ launchctl load ~/Library/LaunchAgents/homebrew.mxcl.jenkins.plist</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Jenkins をインストールしたマシンからのみアクセスする場合には問題がないのですが、別のマシンからもアクセスしたい場合には homebrew.mxcl.jenkins.plist を修正する必要があるようです。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='diff'><span class='line'><span class="gh">diff --git a/homebrew.mxcl.jenkins.plist b/homebrew.mxcl.jenkins.plist</span>
-</span><span class='line'><span class="gh">index 294b857..e4b892e 100644</span>
-</span><span class='line'><span class="gd">--- a/homebrew.mxcl.jenkins.plist</span>
-</span><span class='line'><span class="gi">+++ b/homebrew.mxcl.jenkins.plist</span>
-</span><span class='line'><span class="gu">@@ -9,7 +9,6 @@</span>
-</span><span class='line'>       &lt;string&gt;/usr/bin/java&lt;/string&gt;
-</span><span class='line'>       &lt;string&gt;-jar&lt;/string&gt;
-</span><span class='line'>       &lt;string&gt;/usr/local/opt/jenkins/libexec/jenkins.war&lt;/string&gt;
-</span><span class='line'><span class="gd">-      &lt;string&gt;--httpListenAddress=127.0.0.1&lt;/string&gt;</span>
-</span><span class='line'>     &lt;/array&gt;
-</span><span class='line'>     &lt;key&gt;RunAtLoad&lt;/key&gt;
-</span><span class='line'>     &lt;true/&gt;
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><code>--httpListenAddress</code> の行をざっくりと削除しましょう。</p>
-
-<p><a href="http://localhost:8080/">http://localhost:8080/</a> にアクセスすると、Jenkins で作業をおこなうことができます。</p>
-
-<h2>ジョブを作成</h2>
-
-<p>試しに <a href="https://github.com/HipByte/RubyMotionSamples">https://github.com/HipByte/RubyMotionSamples</a> の Timer アプリをテストするジョブを作ってみたいと思います。</p>
-
-<p>とりあえず、サンプルを clone しておきます。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='diff'><span class='line'>$ mkdir work
-</span><span class='line'>$ git clone git://github.com/HipByte/RubyMotionSamples.git
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>次に Jenkins でジョブを設定してきます。</p>
-
-<ol>
-<li><p>メニューの「新規ジョブ作成」を選択します。ここではジョブ名に「Timer」とし、「フリースタイル・プロジェクトのビルド」をチェックします。<br/>
-<img src="http://watson1978.github.io/images/blog/jenkins/create_new_job.png" alt="新規ジョブ作成" /></p></li>
-<li><p>「プロジェクトの高度なオプション」でカスタムワークスペースを設定します。先ほど <code>git clone</code> したプロジェクトのパスを設定します。私の環境では <code>/Users/watson/work/RubyMotionSamples/Timer</code> というパスになります。<br/>
-<img src="http://watson1978.github.io/images/blog/jenkins/custom_workspace.png" alt="カスタムワークスペースの設定" /></p></li>
-<li><p>「ビルド」で「シェルの実行」を選択し、<code>rake spec</code> を実行します。
-<img src="http://watson1978.github.io/images/blog/jenkins/shell_command.png" alt="シェルスクリプト" /></p></li>
-</ol>
-
-
-<h2>ビルド実行</h2>
-
-<p>先ほど作成したジョブを実行してみます。メニューから「ビルド実行」を選択します。
-ビルドした結果のコンソール出力を見てみましょう。</p>
-
-<p><img src="http://watson1978.github.io/images/blog/jenkins/consol_log.png" alt="コンソール出力" /></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='diff'><span class='line'><span class="gi">+ rake spec</span>
-</span><span class='line'>...
-</span><span class='line'>[1m  Simulate[0m ./build/iPhoneSimulator-6.0-Development/Timer_spec.app
-</span><span class='line'>*** stdout unavailable, output disabled
-</span><span class='line'>*** stderr unavailable, output disabled
-</span><span class='line'>Finished: SUCCESS
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><code>SUCCESS</code> で終了しているのに、<code>*** stdout unavailable, output disabled</code> と結果が出力されません。</p>
-
-<h2>実行するスクリプトの修正</h2>
-
-<p>RubyMotion 1.28 で環境変数 <code>SIM_STDOUT_PATH</code>、<code>SIM_STDERR_PATH</code> を設定すると標準出力と標準エラーの結果を指定したパスに保存されるようになったので、これを使ってみます。</p>
-
-<p>ジョブに設定したシェルスクリプトを以下のように変更します。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='diff'><span class='line'>rake spec SIM_STDOUT_PATH=/tmp/jenkins_output SIM_STDERR_PATH=/tmp/jenkins_error
-</span><span class='line'>cat /tmp/jenkins_output
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>ジョブを実行すると、コンソール出力が次のようになります。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='diff'><span class='line'><span class="gi">+ rake spec SIM_STDOUT_PATH=/tmp/jenkins_output SIM_STDERR_PATH=/tmp/jenkins_error</span>
-</span><span class='line'>[1m     Build[0m ./build/iPhoneSimulator-6.0-Development
-</span><span class='line'>[1m  Simulate[0m ./build/iPhoneSimulator-6.0-Development/Timer_spec.app
-</span><span class='line'><span class="gi">+ cat /tmp/jenkins_output</span>
-</span><span class='line'>The Timer view controller
-</span><span class='line'>  - has a timer label
-</span><span class='line'>  - starts a timer
-</span><span class='line'>  - increases the timer label value
-</span><span class='line'>  - resets the timer on each run
-</span><span class='line'>
-</span><span class='line'>4 specifications (6 requirements), 0 failures, 0 errors
-</span><span class='line'>Finished: SUCCESS
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>ずいぶん良くなりました。</p>
-
-<p>Jenkins はスクリプトの終了コードを見て、成功なのか失敗なのかを判断しているようです。テストがすべて成功したときだけ SUCCESS としてほしいところです。そこで次の <code>run_spec</code> というファイルを作成してパスが通っているところに配置し、Jenkins で実行するようにしました。</p>
-
-<figure class='code'><figcaption><span>run_spec </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/ruby</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;fileutils&quot;</span>
-</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;tempfile&quot;</span>
-</span><span class='line'><span class="kp">include</span> <span class="no">FileUtils</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">stdout</span>  <span class="o">=</span> <span class="no">Tempfile</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;stdout&quot;</span><span class="p">)</span> <span class="p">{}</span>
-</span><span class='line'><span class="n">stderr</span>  <span class="o">=</span> <span class="no">Tempfile</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;stderr&quot;</span><span class="p">)</span> <span class="p">{}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># run spec</span>
-</span><span class='line'><span class="nb">system</span> <span class="s2">&quot;rake clean&quot;</span>
-</span><span class='line'><span class="nb">system</span> <span class="s2">&quot;rake spec SIM_STDOUT_PATH=</span><span class="si">#{</span><span class="n">stdout</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2"> SIM_STDERR_PATH=</span><span class="si">#{</span><span class="n">stderr</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># print result</span>
-</span><span class='line'><span class="n">result</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">stdout</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
-</span><span class='line'><span class="nb">puts</span> <span class="n">result</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">match</span>  <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">to_a</span><span class="o">.</span><span class="n">last</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sr">/(\d+) failures, (\d+) errors$/</span><span class="p">)</span>
-</span><span class='line'><span class="n">failures</span> <span class="o">=</span> <span class="n">match</span><span class="o">[</span><span class="mi">1</span><span class="o">].</span><span class="n">to_i</span>
-</span><span class='line'><span class="n">errors</span>   <span class="o">=</span> <span class="n">match</span><span class="o">[</span><span class="mi">2</span><span class="o">].</span><span class="n">to_i</span>
-</span><span class='line'><span class="k">if</span> <span class="n">failures</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">errors</span> <span class="o">&gt;</span> <span class="mi">0</span>
-</span><span class='line'>  <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Jenkins の「シェルの実行」には <code>run_spec</code> とだけ記述すれば OK です。これでテストに失敗したときには Jenkins のステータスが赤く表示されるので分かりやすくなりました。</p>
-
-<p>記事を書くまでに設定したのはここまでです。あとは定期的にテストを実行したり、テスト結果をメールで送信したりなどするとより良くなるのではないでしょうか。</p>
-
-<p>Jenkins を使い始めたばかりでわからないことばかりなので、便利な使い方などありましたらお知らせください〜。</p>
-
-<h2>まとめ</h2>
-
-<p>Jenkins で RubyMotion アプリを実行するときには、環境変数 <code>SIM_STDOUT_PATH</code> と <code>SIM_STDERR_PATH</code> を使いましょう。</p>
 ]]></content>
   </entry>
   

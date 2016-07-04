@@ -107,7 +107,7 @@
   
 
 
-<time datetime="2013-12-07T00:23:00+09:00" pubdate data-updated="true">Dec 7<span>th</span>, 2013</time>
+<time datetime="2013-12-07T00:23:00+09:00" pubdate data-updated="true"></time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,7 +123,7 @@
 
 <h2>1. Instrumentsを使う</h2>
 
-<p>RubyMotion 2.12でInstrumentsを簡単に使えるようになりました。まずは、Instrumentsを使用して不具合があるかどうか確認しておきましょう。今回は&#8221;Zombies&#8221;というテンプレートを用います。</p>
+<p>RubyMotion 2.12でInstrumentsを簡単に使えるようになりました。まずは、Instrumentsを使用して不具合があるかどうか確認しておきましょう。今回は"Zombies"というテンプレートを用います。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>% rake profile template="Zombies"</span></code></pre></td></tr></table></div></figure>
@@ -137,7 +137,7 @@
 
 <p>メモリが解放されてしまったオブジェクトにメッセージを送信してクラッシュしていることがわかります。残念ながら、シンボルが削除されていてなにが原因なのかまではわかりません。</p>
 
-<p>&ldquo;Zombie Messaged&#8221;と表示されない場合には、今回の手順では不具合箇所を探すことができないので、別の方法を模索してください。</p>
+<p>&ldquo;Zombie Messaged"と表示されない場合には、今回の手順では不具合箇所を探すことができないので、別の方法を模索してください。</p>
 
 <h2>2. 意図せず解放されているオブジェクトを探す</h2>
 
@@ -201,7 +201,7 @@
 <h2>3. 余談</h2>
 
 <p><code>RubyObject</code>ではなく<code>NSObject</code>に対してメソッドをオーバーライドしてみたのですが、うまくいかなかったのでこのようになっています。
-<code>String</code>クラスが<code>String</code>&ndash;><code>NSMutableString</code>&ndash;><code>NSString</code>&ndash;><code>NSObject</code>と継承しているせいなのか<code>dealloc</code>で文字列を扱うと、文字列生成->dealloc->文字列生成->dealloc->&hellip;と無限に繰り返されてしまい、クラッシュしてしまいます。</p>
+<code>String</code>クラスが<code>String</code>-><code>NSMutableString</code>-><code>NSString</code>-><code>NSObject</code>と継承しているせいなのか<code>dealloc</code>で文字列を扱うと、文字列生成->dealloc->文字列生成->dealloc->&hellip;と無限に繰り返されてしまい、クラッシュしてしまいます。</p>
 
 <p>組み込みの<code>String</code>クラスに影響を与えないために<code>RubyObject</code>を使用しています。おおよそ以下の図のような構成になっているはずです。このため、組み込みクラスやiOS SDKのクラスを継承しているものや、それらが影響して解放されてしまっているようなものは、今回の方法では検出できません。</p>
 
@@ -228,12 +228,12 @@
   
 
 
-<time datetime="2013-12-07T00:23:00+09:00" pubdate data-updated="true">Dec 7<span>th</span>, 2013</time>
+<time datetime="2013-12-07T00:23:00+09:00" pubdate data-updated="true"></time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/rubymotion/'>RubyMotion</a>
+    <a class='category' href='/blog/categories/rubymotion/'>rubymotion</a>
   
 </span>
 
@@ -298,6 +298,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/07/04/how-to-setup-android-environment/">Android セットアップ手順</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/12/08/find-memory-problem-2/">RubyMotion アプリのメモリ関連の不具合を簡単に探す方法(2)</a>
       </li>
     
@@ -311,10 +315,6 @@
     
       <li class="post">
         <a href="/blog/2013/12/02/development-rubymotion-app-with-motion-mode-plus-rubocop/">RubyMotionアプリ開発に、motion-mode + Rubocop を導入</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/09/10/using-newest-or-previous-rubymotion/">最新の RubyMotion の試し方</a>
       </li>
     
   </ul>
@@ -348,7 +348,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Watson -
+  Copyright &copy; 2016 - Watson -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

@@ -107,7 +107,7 @@
   
 
 
-<time datetime="2012-08-23T22:19:00+09:00" pubdate data-updated="true">Aug 23<span>rd</span>, 2012</time>
+<time datetime="2012-08-23T22:19:00+09:00" pubdate data-updated="true"></time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -131,7 +131,7 @@
 
 <p>Sublime Text は Python で plugin を作成でき、さまざまな機能追加ができるようになっています。Github などを眺めていると便利な plugin がパッケージとしていろいろあります。<a href="http://wbond.net/sublime_packages/package_control">Package Control</a> は、それらパッケージのインストールや不要になった際にはアンインストールしたりと、文字通りパッケージの管理が簡単になります。</p>
 
-<p>Sublime Text を起動し、[View] &ndash;> [Show Console] とメニューを選択し (ショートカット : <kbd>control</kbd> + <kbd>`</kbd>)、コンソールに次の文をコピー&amp;ペーストし <kbd>Enter</kbd> を押下して実行します。</p>
+<p>Sublime Text を起動し、[View] -> [Show Console] とメニューを選択し (ショートカット : <kbd>control</kbd> + <kbd>`</kbd>)、コンソールに次の文をコピー&amp;ペーストし <kbd>Enter</kbd> を押下して実行します。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>import urllib2,os; pf='Package Control.sublime-package'; ipp=sublime.installed_packages_path(); os.makedirs(ipp) if not os.path.exists(ipp) else None; urllib2.install_opener(urllib2.build_opener(urllib2.ProxyHandler())); open(os.path.join(ipp,pf),'wb').write(urllib2.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read()); print 'Please restart Sublime Text to finish installation'</span></code></pre></td></tr></table></div></figure>
@@ -143,7 +143,7 @@
 
 <p>次に、<a href="https://twitter.com/haraken3">@haraken3</a> さんが開発されている <a href="https://github.com/haraken3/SublimeRubyMotionBuilder">SublimeRubyMotionBuilder</a> プラグインを導入します。コード補完や、アプリ開発に便利な機能が追加されます。</p>
 
-<p>[Tools] &ndash;> [Command Palette&hellip;] とメニューを選択し (ショートカット : <kbd>command</kbd> + <kbd>shift</kbd> + <kbd>p</kbd>)、表示されるダイアログに「install package」と入力し実行します。</p>
+<p>[Tools] -> [Command Palette&hellip;] とメニューを選択し (ショートカット : <kbd>command</kbd> + <kbd>shift</kbd> + <kbd>p</kbd>)、表示されるダイアログに「install package」と入力し実行します。</p>
 
 <p><img src="/images/blog/sublime-install-package.png" alt="install package dialog" /></p>
 
@@ -183,9 +183,9 @@
 
 <p>さっそく、SublimeLinter をインストールしてみましょう(上のサイトに書いてあるとおりですが・・・)。</p>
 
-<p>[Tools] &ndash;> [Command Palette&hellip;] とメニューを選択し (ショートカット : <kbd>command</kbd> + <kbd>shift</kbd> + <kbd>p</kbd>)、表示されるダイアログに「install package」と入力し実行します。「SublimeLinter」と入力し <kbd>Enter</kbd> を押下します。</p>
+<p>[Tools] -> [Command Palette&hellip;] とメニューを選択し (ショートカット : <kbd>command</kbd> + <kbd>shift</kbd> + <kbd>p</kbd>)、表示されるダイアログに「install package」と入力し実行します。「SublimeLinter」と入力し <kbd>Enter</kbd> を押下します。</p>
 
-<p>つぎに [Preferences] &ndash;> [Browse Packages&hellip;] を選択します。</p>
+<p>つぎに [Preferences] -> [Browse Packages&hellip;] を選択します。</p>
 
 <p><img src="/images/blog/sublime-browse-package.png" alt="Browse Packages" /></p>
 
@@ -231,12 +231,12 @@
   
 
 
-<time datetime="2012-08-23T22:19:00+09:00" pubdate data-updated="true">Aug 23<span>rd</span>, 2012</time>
+<time datetime="2012-08-23T22:19:00+09:00" pubdate data-updated="true"></time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/rubymotion/'>RubyMotion</a>
+    <a class='category' href='/blog/categories/rubymotion/'>rubymotion</a>
   
 </span>
 
@@ -301,6 +301,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/07/04/how-to-setup-android-environment/">Android セットアップ手順</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/12/08/find-memory-problem-2/">RubyMotion アプリのメモリ関連の不具合を簡単に探す方法(2)</a>
       </li>
     
@@ -314,10 +318,6 @@
     
       <li class="post">
         <a href="/blog/2013/12/02/development-rubymotion-app-with-motion-mode-plus-rubocop/">RubyMotionアプリ開発に、motion-mode + Rubocop を導入</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/09/10/using-newest-or-previous-rubymotion/">最新の RubyMotion の試し方</a>
       </li>
     
   </ul>
@@ -351,7 +351,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Watson -
+  Copyright &copy; 2016 - Watson -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

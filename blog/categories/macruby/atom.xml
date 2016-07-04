@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: MacRuby | Watson's Blog]]></title>
+  <title><![CDATA[Category: macruby | Watson's Blog]]></title>
   <link href="http://watson1978.github.io/blog/categories/macruby/atom.xml" rel="self"/>
   <link href="http://watson1978.github.io/"/>
-  <updated>2014-05-10T23:09:26+09:00</updated>
+  <updated>2016-07-04T18:10:46+09:00</updated>
   <id>http://watson1978.github.io/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -27,64 +27,51 @@
 
 <p>NSNetServiceBrowser と NSNetService というクラスを使って、iOS 側から Web サーバを探して接続するものとなっています。</p>
 
-<p>```ruby app/app_delegate.rb
-class BJController &lt; UIViewController
-  def viewDidLoad</p>
+<pre><code class="ruby app/app_delegate.rb">class BJController &lt; UIViewController
+  def viewDidLoad
+    super
 
-<pre><code>super
+    # NSNetServiceBrowser を使ってサービスを検索
+    @netServiceBrowser = NSNetServiceBrowser.alloc.init
+    @netServiceBrowser.delegate = self
+    @netServiceBrowser.searchForServicesOfType("_http._tcp", inDomain:"local")
+    self
+  end
 
-# NSNetServiceBrowser を使ってサービスを検索
-@netServiceBrowser = NSNetServiceBrowser.alloc.init
-@netServiceBrowser.delegate = self
-@netServiceBrowser.searchForServicesOfType("_http._tcp", inDomain:"local")
-self
-</code></pre>
+  def netServiceBrowser(netServiceBrowser,
+                        didFindService: service,
+                        moreComing: moreComing)
+    @netServiceBrowser.stop
 
-<p>  end</p>
+    # NSNetService を使って接続先のアドレスを解決
+    @service = NSNetService.alloc.initWithDomain(service.domain, type:service.type, name:service.name)
+    @service.delegate = self
+    @service.resolveWithTimeout(5.0)
+  end
 
-<p>  def netServiceBrowser(netServiceBrowser,</p>
+  def netServiceDidResolveAddress(service)
+    @service.stop
 
-<pre><code>                    didFindService: service,
-                    moreComing: moreComing)
-@netServiceBrowser.stop
-
-# NSNetService を使って接続先のアドレスを解決
-@service = NSNetService.alloc.initWithDomain(service.domain, type:service.type, name:service.name)
-@service.delegate = self
-@service.resolveWithTimeout(5.0)
-</code></pre>
-
-<p>  end</p>
-
-<p>  def netServiceDidResolveAddress(service)</p>
-
-<pre><code>@service.stop
-
-url = "http://#{@service.hostName}:#{@service.port}/"
-@webview = UIWebView.new.tap do |v|
-  v.frame = self.view.bounds
-  v.scalesPageToFit = true
-  v.loadRequest(NSURLRequest.requestWithURL(NSURL.URLWithString(url)))
-  v.delegate = self
-  view.addSubview(v)
-end    
-</code></pre>
-
-<p>  end
-end</p>
-
-<p>class AppDelegate
-  def application(application, didFinishLaunchingWithOptions:launchOptions)</p>
-
-<pre><code>@window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)
-@window.rootViewController = BJController.alloc.initWithNibName(nil, bundle: nil)
-@window.makeKeyAndVisible
-true
-</code></pre>
-
-<p>  end
+    url = "http://#{@service.hostName}:#{@service.port}/"
+    @webview = UIWebView.new.tap do |v|
+      v.frame = self.view.bounds
+      v.scalesPageToFit = true
+      v.loadRequest(NSURLRequest.requestWithURL(NSURL.URLWithString(url)))
+      v.delegate = self
+      view.addSubview(v)
+    end    
+  end
 end
-```</p>
+
+class AppDelegate
+  def application(application, didFinishLaunchingWithOptions:launchOptions)
+    @window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)
+    @window.rootViewController = BJController.alloc.initWithNibName(nil, bundle: nil)
+    @window.makeKeyAndVisible
+    true
+  end
+end
+</code></pre>
 
 <p>Web サーバはどうするかというと、<a href="https://github.com/MacRuby/MacRubySamples/blob/master/Scripts/webrick.rb">https://github.com/MacRuby/MacRubySamples/blob/master/Scripts/webrick.rb</a> のサンプルを利用すると、すでに Bonjour が使われているので簡単ですね〜。</p>
 

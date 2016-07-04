@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: RubyMotion, | Watson's Blog]]></title>
+  <title><![CDATA[Category: rubymotion, | Watson's Blog]]></title>
   <link href="http://watson1978.github.io/blog/categories/rubymotion/atom.xml" rel="self"/>
   <link href="http://watson1978.github.io/"/>
-  <updated>2014-05-10T23:09:26+09:00</updated>
+  <updated>2016-07-04T18:10:46+09:00</updated>
   <id>http://watson1978.github.io/</id>
   <author>
     <name><![CDATA[Watson]]></name>
@@ -75,27 +75,22 @@ Xcode に付属している Instruments が様々な情報を表示できるの�
 
 <p>現在利用可能なプローブの一覧は <code>sudo dtrace -l</code> で確認することができます。シミュレータで RubyMotion アプリを実行した状態で確認してみましょう。</p>
 
-<p><code>
-$ motion create HelloDTrace
+<pre><code>$ motion create HelloDTrace
 $ cd HelloDTrace
 $ rake
-</code></p>
+</code></pre>
 
 <p>別の Terminal ウィンドウで <code>sudo dtrace -l</code> を実行してみます。</p>
 
-<p>```
-$ sudo dtrace -l
-   ID   PROVIDER            MODULE                          FUNCTION NAME</p>
-
-<pre><code>1     dtrace                                                     BEGIN
-2     dtrace                                                     END
-3     dtrace                                                     ERROR
-4   lockstat       mach_kernel                      lck_mtx_lock adaptive-acquire
-5   lockstat       mach_kernel                      lck_mtx_lock adaptive-spin
+<pre><code>$ sudo dtrace -l
+   ID   PROVIDER            MODULE                          FUNCTION NAME
+    1     dtrace                                                     BEGIN
+    2     dtrace                                                     END
+    3     dtrace                                                     ERROR
+    4   lockstat       mach_kernel                      lck_mtx_lock adaptive-acquire
+    5   lockstat       mach_kernel                      lck_mtx_lock adaptive-spin
+...
 </code></pre>
-
-<p>&hellip;
-```</p>
 
 <p>各列の説明を簡単にします。</p>
 
@@ -109,12 +104,11 @@ $ sudo dtrace -l
 
 <p>大量に表示されるプローブの一覧から RubyMotion が提供しているものを探し出すのは不可能に近いので <code>grep</code> で検索してみましょう。</p>
 
-<p><code>
-$ sudo dtrace -l | grep HelloDTrace
+<pre><code>$ sudo dtrace -l | grep HelloDTrace
  8037 macruby2577       HelloDTrace                    rb_vm_dispatch method-entry
  8038 macruby2577       HelloDTrace                    rb_vm_dispatch method-return
  8039 macruby2577       HelloDTrace   _ZL10__vm_raisev [__vm_raise()] raise
-</code></p>
+</code></pre>
 
 <p>RubyMotion は MacRuby と同様に <code>macruby</code> というプロバイダ名でプローブを提供しています。プローブは <code>method-entry</code>、 <code>method-return</code> と <code>raise</code> の 3 種類あることが分かります。</p>
 
@@ -136,7 +130,7 @@ $ sudo dtrace -l | grep HelloDTrace
 
 <p>最初に作成した HelloDTrace アプリの <code>app/app_delegate.rb</code> を以下のように変更しておきます。</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>app/app_delegate.rb </span></figcaption>
+<p><figure class='code'><figcaption><span>app/app_delegate.rb </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -154,39 +148,27 @@ $ sudo dtrace -l | grep HelloDTrace
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
 <span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">hello_dtrace</span>
 </span><span class='line'>  <span class="n">time</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span>
-</span><span class='line'>  <span class="no">UIAlertView</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithTitle</span><span class="p">(</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>  <span class="no">UIAlertView</span><span class="o">.</span><span class="n">alloc</span><span class="o">.</span><span class="n">initWithTitle</span><span class="p">(</span>
+</span><span class='line'>    <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="no">Hello</span> <span class="no">DTrace</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;,</span>
+</span><span class='line'>    <span class="ss">message</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="no">Current</span> <span class="n">time</span> <span class="n">is</span> <span class="c1">#{time.to_s}&amp;rdquo;,</span>
+</span><span class='line'>    <span class="ss">delegate</span><span class="p">:</span> <span class="kp">nil</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">cancelButtonTitle</span><span class="p">:</span> <span class="kp">nil</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">otherButtonTitles</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="no">OK</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;,</span>
+</span><span class='line'>    <span class="kp">nil</span>
+</span><span class='line'>  <span class="p">)</span><span class="o">.</span><span class="n">show</span>
+</span><span class='line'><span class="k">end</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;&quot;Hello DTrace&quot;,</span>
-</span><span class='line'><span class="sr">message: &quot;Current time is </span><span class="si">#{</span><span class="n">time</span><span class="o">.</span><span class="n">to_s</span><span class="si">}</span><span class="sr">&quot;,</span>
-</span><span class='line'><span class="sr">delegate: nil,</span>
-</span><span class='line'><span class="sr">cancelButtonTitle: nil,</span>
-</span><span class='line'><span class="sr">otherButtonTitles: &quot;OK&quot;,</span>
-</span><span class='line'><span class="sr">nil</span>
-</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;  ).show</span>
-</span><span class='line'><span class="sr">end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">AppDelegate</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="ss">didFinishLaunchingWithOptions</span><span class="p">:</span><span class="n">launchOptions</span><span class="p">)</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;true</span>
-</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;  end</span>
+</span><span class='line'><span class="sr">&lt;p&gt;class AppDelegate</span>
+</span><span class='line'><span class="sr">  def application(application, didFinishLaunchingWithOptions:launchOptions)</span>
+</span><span class='line'><span class="sr">    true</span>
+</span><span class='line'><span class="sr">  end</span>
 </span><span class='line'><span class="sr">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>次に以下のような DTrace 用のスクリプト <code>trace.d</code> を用意します。
-<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>trace.d </span></figcaption>
+<figure class='code'><figcaption><span>trace.d </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -197,23 +179,17 @@ $ sudo dtrace -l | grep HelloDTrace
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='d'><span class='line'><span class="c1">// メソッドの開始と終了の出力をインデント (&amp;ndash;&gt;) を付けて表示させる&lt;/p&gt;</span>
+</pre></td><td class='code'><pre><code class='d'><span class='line'><span class="c1">// メソッドの開始と終了の出力をインデント (-&gt;) を付けて表示させる&lt;/p&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="p">&lt;</span><span class="n">h1</span><span class="p">&gt;</span><span class="k">pragma</span> <span class="n">D</span> <span class="n">option</span> <span class="n">flowindent</span><span class="p">&lt;/</span><span class="n">h1</span><span class="p">&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;</span><span class="n">macruby</span><span class="p">$</span><span class="n">target</span><span class="p">:::</span><span class="n">method</span><span class="p">-</span><span class="n">entry</span><span class="p">,</span>
 </span><span class='line'><span class="n">macruby</span><span class="p">$</span><span class="n">target</span><span class="p">:::</span><span class="n">method</span><span class="p">-</span><span class="k">return</span>
-</span><span class='line'><span class="p">{&lt;/</span><span class="n">p</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="n">pre</span><span class="p">&gt;&lt;</span><span class="n">code</span><span class="p">&gt;</span><span class="cm">/* arg0 にはクラス名、 arg1 にはメソッド名が格納されています */</span>
-</span><span class='line'><span class="n">printf</span><span class="p">(</span><span class="s">&quot;(%s#%s)&quot;</span><span class="p">,</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg0</span><span class="p">),</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg1</span><span class="p">))</span>
-</span><span class='line'><span class="p">&lt;/</span><span class="n">code</span><span class="p">&gt;&lt;/</span><span class="n">pre</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="p">/&lt;</span><span class="n">em</span><span class="p">&gt;</span> <span class="n">arg0</span> <span class="err">にはクラス名、</span> <span class="n">arg1</span> <span class="err">にはメソッド名が格納されています</span> <span class="p">&lt;/</span><span class="n">em</span><span class="p">&gt;/</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(&amp;</span><span class="n">ldquo</span><span class="p">;(%</span><span class="n">s</span><span class="err">#</span><span class="p">%</span><span class="n">s</span><span class="p">)&amp;</span><span class="n">rdquo</span><span class="p">;,</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg0</span><span class="p">),</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg1</span><span class="p">))</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <h3>実行してみよう</h3>
 
@@ -221,18 +197,16 @@ $ sudo dtrace -l | grep HelloDTrace
 
 <p>シミュレータが起動したところで、別の Terminal ウィンドウで起動したアプリのプロセス ID を <code>ps</code> コマンドやアクティビティモニターで調べておきます。DTrace を実行する際にこのプロセス ID を使用します。</p>
 
-<p><code>
-$ ps cux | grep HelloDTrace
+<pre><code>$ ps cux | grep HelloDTrace
 watson  5140   0.0  0.3   875476  21148   ??  S     6:04PM   0:00.31 HelloDTrace
-</code></p>
+</code></pre>
 
 <p>プロセス ID は 5140 でした。</p>
 
 <p>次に DTrace を実行します。<code>dtrace</code> の後に <code>-s</code> オプションで用意した DTrace 用のスクリプト、<code>-p</code> で情報を取得するプロセスの ID を指定します。</p>
 
-<p><code>
-$ sudo dtrace -s trace.d -p 5140
-</code></p>
+<pre><code>$ sudo dtrace -s trace.d -p 5140
+</code></pre>
 
 <p>マウスカーソルを移動するたびに DTrace の実行画面にトレース情報が表示されるかと思います。シミュレータ上でマウスオーバーを検出するためにマウスカーソルのイベントが発生するとやりとりしているようです。(キーボード操作だけで乗り切ると、余計なログが表示されず見やすくなります)</p>
 
@@ -265,7 +239,7 @@ $ sudo dtrace -s trace.d -p 5140
 
 <p>今度はメソッドの実行時間を計測してみよう。使用するスクリプトは以下のようになります。</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>time.d </span></figcaption>
+<p><figure class='code'><figcaption><span>time.d </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -289,9 +263,6 @@ $ sudo dtrace -s trace.d -p 5140
 <span class='line-number'>21</span>
 <span class='line-number'>22</span>
 <span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
 </pre></td><td class='code'><pre><code class='d'><span class='line'><span class="p">&lt;/</span><span class="n">p</span><span class="p">&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="p">&lt;</span><span class="n">h1</span><span class="p">&gt;</span><span class="k">pragma</span> <span class="n">D</span> <span class="n">option</span> <span class="n">quiet</span><span class="p">&lt;/</span><span class="n">h1</span><span class="p">&gt;</span>
@@ -305,33 +276,28 @@ $ sudo dtrace -s trace.d -p 5140
 </span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;</span><span class="n">macruby</span><span class="p">$</span><span class="n">target</span><span class="p">:::</span><span class="n">method</span><span class="p">-</span><span class="k">return</span>
 </span><span class='line'><span class="p">/</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg0</span><span class="p">)</span> <span class="p">==</span> <span class="p">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">String</span><span class="p">&amp;</span><span class="n">rdquo</span><span class="p">;</span> <span class="p">/</span>  <span class="p">/&lt;</span><span class="n">em</span><span class="p">&gt;</span> <span class="n">String</span> <span class="err">クラスだけを計測する</span> <span class="p">&lt;/</span><span class="n">em</span><span class="p">&gt;/</span>
 </span><span class='line'><span class="p">{</span>
-</span><span class='line'>  <span class="err">@</span><span class="n">invoked_time</span><span class="p">[</span><span class="n">copyinstr</span><span class="p">(</span><span class="n">arg0</span><span class="p">),</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg1</span><span class="p">)]</span> <span class="p">=</span> <span class="n">sum</span><span class="p">((</span><span class="n">walltimestamp</span> <span class="p">/</span> <span class="mi">1000</span><span class="p">)</span> <span class="p">&amp;</span><span class="n">ndash</span><span class="p">;</span> <span class="n">self</span><span class="p">-&gt;</span><span class="n">starttime</span><span class="p">);</span>
+</span><span class='line'>  <span class="nd">@invoked_time</span><span class="p">[</span><span class="n">copyinstr</span><span class="p">(</span><span class="n">arg0</span><span class="p">),</span> <span class="n">copyinstr</span><span class="p">(</span><span class="n">arg1</span><span class="p">)]</span> <span class="p">=</span> <span class="n">sum</span><span class="p">((</span><span class="n">walltimestamp</span> <span class="p">/</span> <span class="mi">1000</span><span class="p">)</span> <span class="p">-</span> <span class="n">self</span><span class="p">-&gt;</span><span class="n">starttime</span><span class="p">);</span>
 </span><span class='line'><span class="p">}&lt;/</span><span class="n">p</span><span class="p">&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;</span><span class="n">END</span>
-</span><span class='line'><span class="p">{&lt;/</span><span class="n">p</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="n">pre</span><span class="p">&gt;&lt;</span><span class="n">code</span><span class="p">&gt;</span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;\n&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="n">printf</span><span class="p">(</span><span class="s">&quot;%-10s  %-15s  %s\n&quot;</span><span class="p">,</span> <span class="s">&quot;CLASS&quot;</span><span class="p">,</span> <span class="s">&quot;METHOD&quot;</span><span class="p">,</span> <span class="s">&quot;TOTAL TIME µsec&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="n">printf</span><span class="p">(</span><span class="s">&quot;--------------------------------------------------------------------------------\n&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="n">printa</span><span class="p">(</span><span class="s">&quot;%-10s  %-15s  %@d\n&quot;</span><span class="p">,</span> <span class="err">@</span><span class="n">invoked_time</span><span class="p">);</span>
-</span><span class='line'><span class="p">&lt;/</span><span class="n">code</span><span class="p">&gt;&lt;/</span><span class="n">pre</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="n">p</span><span class="p">&gt;}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="s">\n</span><span class="p">&amp;</span><span class="n">rdquo</span><span class="p">;);</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(&amp;</span><span class="n">ldquo</span><span class="p">;%-</span><span class="mi">10</span><span class="n">s</span>  <span class="p">%-</span><span class="mi">15</span><span class="n">s</span>  <span class="p">%</span><span class="n">s</span><span class="s">\n</span><span class="p">&amp;</span><span class="n">rdquo</span><span class="p">;,</span> <span class="p">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">CLASS</span><span class="p">&amp;</span><span class="n">rdquo</span><span class="p">;,</span> <span class="p">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">METHOD</span><span class="p">&amp;</span><span class="n">rdquo</span><span class="p">;,</span> <span class="p">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">TOTAL</span> <span class="n">TIME</span> <span class="err">µ</span><span class="n">sec</span><span class="p">&amp;</span><span class="n">rdquo</span><span class="p">;);</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(&amp;</span><span class="n">ldquo</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">mdash</span><span class="p">;&amp;</span><span class="n">ndash</span><span class="p">;</span><span class="s">\n</span><span class="p">&amp;</span><span class="n">rdquo</span><span class="p">;);</span>
+</span><span class='line'>    <span class="n">printa</span><span class="p">(&amp;</span><span class="n">ldquo</span><span class="p">;%-</span><span class="mi">10</span><span class="n">s</span>  <span class="p">%-</span><span class="mi">15</span><span class="n">s</span>  <span class="p">%</span><span class="nd">@d</span><span class="s">\n</span><span class="p">&amp;</span><span class="n">rdquo</span><span class="p">;,</span> <span class="nd">@invoked_time</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p><code>/ copyinstr(arg0) == "String" /</code> という記述を追加すると、変数 arg0 が &ldquo;String&rdquo; と一致するときだけ計測されるようになります。</p>
 
 <p>DTrace で上のスクリプトを実行すると次のように、String クラスのメソッドの実行時間の合計が表示されます。</p>
 
-<p>```</p>
-
-<h2>CLASS       METHOD           TOTAL TIME µsec</h2>
-
-<p>String      +:               64
+<pre><code>CLASS       METHOD           TOTAL TIME µsec
+--------------------------------------------------------------------------------
+String      +:               64
 String      *:               71
 String      index:           68125
-```</p>
+</code></pre>
 
 <p>わざわざアプリにパフォーマンスを計測するためのコードを追加しなくても、どのメソッドの処理が重たいのかが分かります。</p>
 
@@ -378,64 +344,51 @@ String      index:           68125
 
 <p>NSNetServiceBrowser と NSNetService というクラスを使って、iOS 側から Web サーバを探して接続するものとなっています。</p>
 
-<p>```ruby app/app_delegate.rb
-class BJController &lt; UIViewController
-  def viewDidLoad</p>
+<pre><code class="ruby app/app_delegate.rb">class BJController &lt; UIViewController
+  def viewDidLoad
+    super
 
-<pre><code>super
+    # NSNetServiceBrowser を使ってサービスを検索
+    @netServiceBrowser = NSNetServiceBrowser.alloc.init
+    @netServiceBrowser.delegate = self
+    @netServiceBrowser.searchForServicesOfType("_http._tcp", inDomain:"local")
+    self
+  end
 
-# NSNetServiceBrowser を使ってサービスを検索
-@netServiceBrowser = NSNetServiceBrowser.alloc.init
-@netServiceBrowser.delegate = self
-@netServiceBrowser.searchForServicesOfType("_http._tcp", inDomain:"local")
-self
-</code></pre>
+  def netServiceBrowser(netServiceBrowser,
+                        didFindService: service,
+                        moreComing: moreComing)
+    @netServiceBrowser.stop
 
-<p>  end</p>
+    # NSNetService を使って接続先のアドレスを解決
+    @service = NSNetService.alloc.initWithDomain(service.domain, type:service.type, name:service.name)
+    @service.delegate = self
+    @service.resolveWithTimeout(5.0)
+  end
 
-<p>  def netServiceBrowser(netServiceBrowser,</p>
+  def netServiceDidResolveAddress(service)
+    @service.stop
 
-<pre><code>                    didFindService: service,
-                    moreComing: moreComing)
-@netServiceBrowser.stop
-
-# NSNetService を使って接続先のアドレスを解決
-@service = NSNetService.alloc.initWithDomain(service.domain, type:service.type, name:service.name)
-@service.delegate = self
-@service.resolveWithTimeout(5.0)
-</code></pre>
-
-<p>  end</p>
-
-<p>  def netServiceDidResolveAddress(service)</p>
-
-<pre><code>@service.stop
-
-url = "http://#{@service.hostName}:#{@service.port}/"
-@webview = UIWebView.new.tap do |v|
-  v.frame = self.view.bounds
-  v.scalesPageToFit = true
-  v.loadRequest(NSURLRequest.requestWithURL(NSURL.URLWithString(url)))
-  v.delegate = self
-  view.addSubview(v)
-end    
-</code></pre>
-
-<p>  end
-end</p>
-
-<p>class AppDelegate
-  def application(application, didFinishLaunchingWithOptions:launchOptions)</p>
-
-<pre><code>@window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)
-@window.rootViewController = BJController.alloc.initWithNibName(nil, bundle: nil)
-@window.makeKeyAndVisible
-true
-</code></pre>
-
-<p>  end
+    url = "http://#{@service.hostName}:#{@service.port}/"
+    @webview = UIWebView.new.tap do |v|
+      v.frame = self.view.bounds
+      v.scalesPageToFit = true
+      v.loadRequest(NSURLRequest.requestWithURL(NSURL.URLWithString(url)))
+      v.delegate = self
+      view.addSubview(v)
+    end    
+  end
 end
-```</p>
+
+class AppDelegate
+  def application(application, didFinishLaunchingWithOptions:launchOptions)
+    @window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)
+    @window.rootViewController = BJController.alloc.initWithNibName(nil, bundle: nil)
+    @window.makeKeyAndVisible
+    true
+  end
+end
+</code></pre>
 
 <p>Web サーバはどうするかというと、<a href="https://github.com/MacRuby/MacRubySamples/blob/master/Scripts/webrick.rb">https://github.com/MacRuby/MacRubySamples/blob/master/Scripts/webrick.rb</a> のサンプルを利用すると、すでに Bonjour が使われているので簡単ですね〜。</p>
 
@@ -473,39 +426,35 @@ end
 
 <p>Terminal で作成したプロジェクトのディレクトリに移動します。今回は &ldquo;foo&rdquo; という名前でプロジェクトを作成しています。</p>
 
-<p><code>
-$ ls
+<pre><code>$ ls
 foo/           foo.xcodeproj/
-</code></p>
+</code></pre>
 
 <p>ARM バイナリを作成します。</p>
 
-<p><code>
-$ xcodebuild -arch armv6 -arch armv7 -arch armv7s
-$ file build/Release-iphoneos/libfoo.a
+<pre><code>$ xcodebuild -arch armv6 -arch armv7 -arch armv7s
+$ file build/Release-iphoneos/libfoo.a 
 build/Release-iphoneos/libfoo.a: Mach-O universal binary with 2 architectures
 build/Release-iphoneos/libfoo.a (for architecture armv6):   current ar archive random library
 build/Release-iphoneos/libfoo.a (for architecture armv7):   current ar archive random library
-</code></p>
+</code></pre>
 
 <p>i386 バイナリは SDK に iphonesimulator を指定するとビルドされるようです。</p>
 
-<p><code>
-$ xcodebuild -sdk iphonesimulator
-$ file build/Release-iphonesimulator/libfoo.a
+<pre><code>$ xcodebuild -sdk iphonesimulator
+$ file build/Release-iphonesimulator/libfoo.a 
 build/Release-iphonesimulator/libfoo.a: current ar archive random library
-</code></p>
+</code></pre>
 
 <p>ライブラリファイルが 2 つになってしまったので、<code>lipo</code> コマンドを使って 1 つに結合します。</p>
 
-<p><code>
-$ lipo -create build/Release-iphoneos/libfoo.a build/Release-iphonesimulator/libfoo.a -output libfoo.a
-$ file libfoo.a
+<pre><code>$ lipo -create build/Release-iphoneos/libfoo.a build/Release-iphonesimulator/libfoo.a -output libfoo.a
+$ file libfoo.a 
 libfoo.a: Mach-O universal binary with 3 architectures
 libfoo.a (for architecture armv6): current ar archive random library
 libfoo.a (for architecture armv7): current ar archive random library
 libfoo.a (for architecture i386):  current ar archive random library
-</code></p>
+</code></pre>
 
 <p>これで欲しかったライブラリができあがりました。</p>
 

@@ -107,7 +107,7 @@
   
 
 
-<time datetime="2012-09-20T16:01:00+09:00" pubdate data-updated="true">Sep 20<span>th</span>, 2012</time>
+<time datetime="2012-09-20T16:01:00+09:00" pubdate data-updated="true"></time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -125,8 +125,8 @@
 
 <ol>
 <li>「キーチェーンアクセス」を起動します。</li>
-<li>メニューの &ldquo;キーチェーンアクセス&rdquo; &ndash;> &ldquo;証明書アシスタント&rdquo; &ndash;> &ldquo;認証局に証明書を要求&rdquo; を選択します。</li>
-<li>メールアドレスと名前を記入して、&#8221;ディスクに保存&#8221; を選択し &ldquo;続ける&rdquo; をクリックします。<code>CertificateSigningRequest.certSigningRequest</code> というファイルが保存されます。(&ldquo;CAのメールアドレス&rdquo; の欄は未記入で良かったみたいです・・・)<br/>
+<li>メニューの &ldquo;キーチェーンアクセス&rdquo; -> &ldquo;証明書アシスタント&rdquo; -> &ldquo;認証局に証明書を要求&rdquo; を選択します。</li>
+<li>メールアドレスと名前を記入して、"ディスクに保存" を選択し &ldquo;続ける&rdquo; をクリックします。<code>CertificateSigningRequest.certSigningRequest</code> というファイルが保存されます。(&ldquo;CAのメールアドレス&rdquo; の欄は未記入で良かったみたいです・・・)<br/>
 <img src="/images/blog/parse_push/certificate_signing_request.png" alt="Certificate Signing Request" /></li>
 </ol>
 
@@ -134,20 +134,20 @@
 <p>次に <a href="https://developer.apple.com/ios/manage/bundles/index.action">iOS Provisioning Portal</a> で App ID の設定をします。</p>
 
 <ol>
-<li>&ldquo;App IDs&rdquo; というメニューを選択し、&#8221;New App ID&#8221; ボタンをクリックします。</li>
-<li>&ldquo;Description&rdquo; にアプリの内容、&#8221;Bundle Identifier&#8221; にアプリの識別子を記入します。識別子には <code>*</code> を含めず、アプリ名までしっかり記入する必要があるようです。<br/>
+<li>&ldquo;App IDs&rdquo; というメニューを選択し、"New App ID" ボタンをクリックします。</li>
+<li>&ldquo;Description&rdquo; にアプリの内容、"Bundle Identifier" にアプリの識別子を記入します。識別子には <code>*</code> を含めず、アプリ名までしっかり記入する必要があるようです。<br/>
 <img src="/images/blog/parse_push/app_id.png" alt="App IDs" /></li>
 <li>作成したアプリ ID の &ldquo;Configure&rdquo; をクリックします。<br/>
 <img src="/images/blog/parse_push/app_id_configure.png" alt="App IDs" /></li>
-<li>&ldquo;Enable for Apple Push Notification service&rdquo; のチェックを on にし、&#8221;Development Push SSL Certificate&#8221; の &ldquo;Configure&rdquo; ボタンをクリックします。<br/>
+<li>&ldquo;Enable for Apple Push Notification service&rdquo; のチェックを on にし、"Development Push SSL Certificate" の &ldquo;Configure&rdquo; ボタンをクリックします。<br/>
 <img src="/images/blog/parse_push/enable_push_notification.png" alt="App IDs" /></li>
-<li>&ldquo;Generate a Certificate Signing Request&rdquo; というポップアップウィンドウが表示されます。&#8221;Continnue&#8221; ボタンをクリックして次の画面に進みます。</li>
-<li>&ldquo;Submit Certificate Signing Request&rdquo; 画面が表示されます。ここで、「キーチェーンアクセス」で作成した <code>CertificateSigningRequest.certSigningRequest</code> ファイルを選択し、&#8221;Generate&#8221; ボタンをクリックします。<br/>
+<li>&ldquo;Generate a Certificate Signing Request&rdquo; というポップアップウィンドウが表示されます。"Continnue" ボタンをクリックして次の画面に進みます。</li>
+<li>&ldquo;Submit Certificate Signing Request&rdquo; 画面が表示されます。ここで、「キーチェーンアクセス」で作成した <code>CertificateSigningRequest.certSigningRequest</code> ファイルを選択し、"Generate" ボタンをクリックします。<br/>
 <img src="/images/blog/parse_push/submit_certificate_signing_request.png" alt="App IDs" /></li>
-<li><p>&ldquo;Download &amp; Install 〜&rdquo; の画面まで進みます。&#8221;Download&#8221; をクリックして証明書をダウンロードしておきます。<br/>
+<li><p>&ldquo;Download &amp; Install 〜&rdquo; の画面まで進みます。"Download" をクリックして証明書をダウンロードしておきます。<br/>
 <img src="/images/blog/parse_push/download_install_certificate.png" alt="App IDs" /></p></li>
 <li><p>上の作業でダウンロードした証明書をダブルクリックして「キーチェーンアクセス」へ登録します。</p></li>
-<li>キーチェーンアクセスで &ldquo;ログイン&rdquo; 項目の、&#8221;自分の証明書&#8221; を表示すると先ほど登録した証明書があります。右クリックして「書き出す」を選択します。<br/>
+<li>キーチェーンアクセスで &ldquo;ログイン&rdquo; 項目の、"自分の証明書" を表示すると先ほど登録した証明書があります。右クリックして「書き出す」を選択します。<br/>
 <img src="/images/blog/parse_push/keychain_export.png" alt="KeyChain Export" /></li>
 <li>&ldquo;.p12&rdquo; という形式でファイルを保存します。<br/>
 <img src="/images/blog/parse_push/export_p12.png" alt="KeyChain Export" /></li>
@@ -163,7 +163,7 @@
 <p><a href="https://developer.apple.com/ios/manage/bundles/index.action">iOS Provisioning Portal</a> へ戻り、Provisioning Profile を作成しましょう。</p>
 
 <ol>
-<li>&ldquo;Provisioning&rdquo; メニューを選択し、&#8221;New Profile&#8221; ボタンをクリックします。</li>
+<li>&ldquo;Provisioning&rdquo; メニューを選択し、"New Profile" ボタンをクリックします。</li>
 <li>わかりやすい &ldquo;Profile Name&rdquo; を記入し、プッシュ通知するアプリを選択します。<br/>
 <img src="/images/blog/parse_push/provisioning.png" alt="Provisioning" /></li>
 <li>&ldquo;New Profile&rdquo; ボタンをクリックした画面に戻り、Provisioning をダウンロードしておきます。<br/>
@@ -194,7 +194,7 @@
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Motion</span><span class="o">::</span><span class="no">Project</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="ss">Motion</span><span class="p">:</span><span class="ss">:Project</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
 </span><span class='line'><span class="o">.</span><span class="n">.</span><span class="o">.</span>
 </span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="s1">&#39;com.yourcompany.HelloParsePush&#39;</span>
 </span><span class='line'>  <span class="n">app</span><span class="o">.</span><span class="n">provisioning_profile</span> <span class="o">=</span> <span class="s2">&quot;/Users/watson/Library/MobileDevice/Provisioning Profiles/CE5E34BE-FDEB-43C5-860A-9301122AB46D.mobileprovision&quot;</span>
@@ -244,9 +244,9 @@
 <span class='line-number'>33</span>
 <span class='line-number'>34</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">AppDelegate</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="ss">:launchOptions</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="ss">didFinishLaunchingWithOptions</span><span class="p">:</span><span class="n">launchOptions</span><span class="p">)</span>
 </span><span class='line'>    <span class="no">Parse</span><span class="o">.</span><span class="n">setApplicationId</span><span class="p">(</span><span class="s2">&quot;&lt;Application-Id&gt;&quot;</span><span class="p">,</span>
-</span><span class='line'>                           <span class="n">clientKey</span><span class="ss">:&quot;&lt;Client-Key&gt;&quot;</span><span class="p">)</span>
+</span><span class='line'>                           <span class="ss">clientKey</span><span class="p">:</span><span class="s2">&quot;&lt;Client-Key&gt;&quot;</span><span class="p">)</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="n">application</span><span class="o">.</span><span class="n">registerForRemoteNotificationTypes</span><span class="p">(</span><span class="no">UIRemoteNotificationTypeBadge</span><span class="o">|</span>
 </span><span class='line'>                                                <span class="no">UIRemoteNotificationTypeAlert</span><span class="o">|</span>
@@ -256,7 +256,7 @@
 </span><span class='line'>  <span class="k">end</span>
 </span><span class='line'>
 </span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span>
-</span><span class='line'>        <span class="n">didRegisterForRemoteNotificationsWithDeviceToken</span><span class="ss">:newDeviceToken</span><span class="p">)</span>
+</span><span class='line'>        <span class="ss">didRegisterForRemoteNotificationsWithDeviceToken</span><span class="p">:</span><span class="n">newDeviceToken</span><span class="p">)</span>
 </span><span class='line'>    <span class="c1"># Tell Parse about the device token.</span>
 </span><span class='line'>    <span class="no">PFPush</span><span class="o">.</span><span class="n">storeDeviceToken</span><span class="p">(</span><span class="n">newDeviceToken</span><span class="p">)</span>
 </span><span class='line'>    <span class="c1"># Subscribe to the global broadcast channel.</span>
@@ -264,12 +264,12 @@
 </span><span class='line'>  <span class="k">end</span>
 </span><span class='line'>
 </span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span>
-</span><span class='line'>        <span class="n">didReceiveRemoteNotification</span><span class="ss">:userInfo</span><span class="p">)</span>
+</span><span class='line'>        <span class="ss">didReceiveRemoteNotification</span><span class="p">:</span><span class="n">userInfo</span><span class="p">)</span>
 </span><span class='line'>    <span class="no">PFPush</span><span class="o">.</span><span class="n">handlePush</span><span class="p">(</span><span class="n">userInfo</span><span class="p">)</span>
 </span><span class='line'>  <span class="k">end</span>
 </span><span class='line'>
 </span><span class='line'>  <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span>
-</span><span class='line'>        <span class="n">didFailToRegisterForRemoteNotificationsWithError</span><span class="ss">:error</span><span class="p">)</span>
+</span><span class='line'>        <span class="ss">didFailToRegisterForRemoteNotificationsWithError</span><span class="p">:</span><span class="n">error</span><span class="p">)</span>
 </span><span class='line'>    <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="mi">3010</span>
 </span><span class='line'>      <span class="no">NSLog</span><span class="p">(</span><span class="s2">&quot;Push notifications don&#39;t work in the simulator!&quot;</span><span class="p">)</span>
 </span><span class='line'>    <span class="k">else</span>
@@ -318,12 +318,12 @@
   
 
 
-<time datetime="2012-09-20T16:01:00+09:00" pubdate data-updated="true">Sep 20<span>th</span>, 2012</time>
+<time datetime="2012-09-20T16:01:00+09:00" pubdate data-updated="true"></time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/rubymotion/'>RubyMotion</a>
+    <a class='category' href='/blog/categories/rubymotion/'>rubymotion</a>
   
 </span>
 
@@ -388,6 +388,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/07/04/how-to-setup-android-environment/">Android セットアップ手順</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/12/08/find-memory-problem-2/">RubyMotion アプリのメモリ関連の不具合を簡単に探す方法(2)</a>
       </li>
     
@@ -401,10 +405,6 @@
     
       <li class="post">
         <a href="/blog/2013/12/02/development-rubymotion-app-with-motion-mode-plus-rubocop/">RubyMotionアプリ開発に、motion-mode + Rubocop を導入</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/09/10/using-newest-or-previous-rubymotion/">最新の RubyMotion の試し方</a>
       </li>
     
   </ul>
@@ -438,7 +438,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Watson -
+  Copyright &copy; 2016 - Watson -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
